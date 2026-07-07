@@ -109,7 +109,7 @@ typed app 配置源推荐顺序是 `default -> local YAML -> registry source -> 
 LINKER_V3_EXAMPLE_CONFIG=config/app.example.yaml LINKER_V3_EXAMPLE_PG_PASSWORD=... go run .
 ```
 
-linker runtime 配置源推荐顺序是 `local seed -> registry final -> env override`。`example/server_yaml_test.go` 用 `registryMockSource` 演示 Nacos 类注册中心 source 如何读取本地 seed，再由环境变量覆盖最终配置。
+linker runtime 配置源推荐顺序是 `local seed -> registry final -> env override`。`example/server_yaml_test.go` 用 `registryMockSource` 演示注册中心 source 如何读取本地 seed，再由环境变量覆盖最终配置；`example/nacos_example_test.go` 使用 `registry/nacos/linker.NewSource` 和本地 fake getter 演示真实 Nacos source 入口，不依赖外部 Nacos 服务。
 
 ## Example
 
@@ -125,3 +125,4 @@ go test ./...
 - `internal/app/app.go`：集中装配 framework、组件、配置源和 adapter。
 - `internal/route/graph/*_api.go`：一个 API 一个文件，route/resource/middleware 和 handler 放在同一个入口重心内。
 - `example/graph_example_test.go`：验证 graph route、Plan asset 和 renderer capability。
+- `example/nacos_example_test.go`：验证 YAML seed、Nacos source、HTTP/gRPC registry adapter 和 Plan 里的依赖/capability 表达。
