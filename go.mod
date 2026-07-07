@@ -44,6 +44,7 @@ require (
 	github.com/bsm/redislock v0.9.4 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/emmansun/gmsm v0.44.0 // indirect
 	github.com/gin-gonic/gin v1.11.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
@@ -55,6 +56,7 @@ require (
 	github.com/neteast-software/go-module/audit/operate/store/gorm v0.0.0 // indirect
 	github.com/neteast-software/go-module/cache/redis v0.0.0 // indirect
 	github.com/neteast-software/go-module/config/yaml v0.0.0 // indirect
+	github.com/neteast-software/go-module/crypto/sm v0.0.0 // indirect
 	github.com/neteast-software/go-module/db/gorm/table v0.0.0 // indirect
 	github.com/neteast-software/go-module/fault v0.0.0 // indirect
 	github.com/neteast-software/go-module/fault/notice v0.0.0 // indirect
@@ -102,13 +104,13 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.3.1 // indirect
 	golang.org/x/arch v0.22.0 // indirect
-	golang.org/x/crypto v0.48.0 // indirect
-	golang.org/x/mod v0.32.0 // indirect
-	golang.org/x/net v0.51.0 // indirect
-	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.42.0 // indirect
-	golang.org/x/text v0.34.0 // indirect
-	golang.org/x/tools v0.41.0 // indirect
+	golang.org/x/crypto v0.53.0 // indirect
+	golang.org/x/mod v0.36.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/sync v0.21.0 // indirect
+	golang.org/x/sys v0.46.0 // indirect
+	golang.org/x/text v0.38.0 // indirect
+	golang.org/x/tools v0.45.0 // indirect
 )
 
 replace github.com/neteast-software/linker/v3 => ../linker-v3
@@ -164,6 +166,8 @@ replace github.com/neteast-software/go-module/mq/consumer => ../modules/mq/consu
 replace github.com/neteast-software/go-module/mq/consumer/linker => ../modules/mq/consumer/linker
 
 replace github.com/neteast-software/go-module/config/yaml/linker => ../modules/config/yaml/linker
+
+replace github.com/neteast-software/go-module/crypto/sm => ../modules/crypto/sm
 
 replace github.com/neteast-software/go-module/notify/feishu => ../modules/notify/feishu
 

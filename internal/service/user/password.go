@@ -4,7 +4,7 @@ import useraccount "github.com/neteast-software/go-module/user/account"
 
 const passwordSalt = "linker-v3-example"
 
-var passwordHasher = useraccount.SHA256("linker-v3-example")
+var passwordHasher = useraccount.SM3("linker-v3-example")
 
 func passwordHash(password string) (string, error) {
 	return passwordHasher.Hash(password, passwordSalt)
