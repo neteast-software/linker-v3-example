@@ -9,12 +9,14 @@ import (
 	routemiddleware "linker-v3-example/internal/route/middleware"
 )
 
+const refreshResource = "http.app2.graph.refresh"
+
 func init() {
 	http.RegisterIn("api/v1/app2",
 		http.Group("graph",
 			http.Use(routemiddleware.Application("app2")),
 			http.GET("refresh", refreshAPI).Resource(
-				"http.app2.graph.refresh",
+				refreshResource,
 				acl.Scope("app2", 1, "应用二 graph 行为"),
 			),
 		),

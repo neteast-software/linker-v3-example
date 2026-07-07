@@ -14,12 +14,14 @@ import (
 	routemiddleware "linker-v3-example/internal/route/middleware"
 )
 
+const ordersResource = "http.app2.graph.orders"
+
 func init() {
 	http.RegisterIn("api/v1/app2",
 		http.Group("graph",
 			http.Use(routemiddleware.Application("app2")),
 			http.GET("orders", ordersAPI).Resource(
-				"http.app2.graph.orders",
+				ordersResource,
 				acl.Scope("app2", 1, "应用二订单 graph 列表"),
 			),
 		),
@@ -29,6 +31,7 @@ func init() {
 func ordersAPI(c *http.Context) {
 	rows := sampleOrders()
 	graph := viewer.New[order]("订单").
+		WithResource(ordersResource).
 		AddColumn(
 			viewer.NewColumn("id", "ID").SortableColumn().WithWidth(80),
 			viewer.NewColumn("number", "订单号").SortableColumn(),
@@ -46,8 +49,8 @@ func ordersAPI(c *http.Context) {
 				types.NewItem("已关闭", "closed"),
 			), filter.Where("status", filter.Eq)),
 		).
-		AddButton(button.Refresh("刷新", button.WithBehavior(behavior.Refresh(behavior.WithMessage("已刷新"))))).
-		AddRowButton(button.Redirect("编辑", "/api/v1/app2/graph/orders/form", button.WithKeys("id"))).
+		AddButton(button.Refresh("刷新", button.WithResource(refreshResource), button.WithBehavior(behavior.Refresh(behavior.WithMessage("已刷新"))))).
+		AddRowButton(button.Redirect("编辑", "/api/v1/app2/graph/orders/form", button.WithResource(orderFormResource), button.WithKeys("id"))).
 		WithPage(1, len(rows), int64(len(rows))).
 		WithData(rows...)
 

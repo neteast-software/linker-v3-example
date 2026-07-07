@@ -2,6 +2,9 @@ package example
 
 import (
 	"context"
+	"io"
+	stdhttp "net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -10,9 +13,11 @@ import (
 	graphlinker "github.com/neteast-software/go-module/graph/naive/linker"
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	server "github.com/neteast-software/go-module/linker/server"
+	"github.com/neteast-software/go-module/observe/tracing"
 	linker "github.com/neteast-software/linker/v3"
 
 	graphcomponent "linker-v3-example/internal/component/graph"
+	observabilitycomponent "linker-v3-example/internal/component/observability"
 )
 
 func TestGraphNaiveExample(t *testing.T) {
@@ -23,6 +28,7 @@ func TestGraphNaiveExample(t *testing.T) {
 			linker.Namespace(http.ID): []byte(`{"addr":"127.0.0.1:0"}`),
 		}),
 		server.WithComponents(
+			observabilitycomponent.NewComponent(),
 			applicationcomponent.New(
 				applicationcomponent.WithDBTarget(""),
 				applicationcomponent.WithApplications(applicationcore.Application{
@@ -63,13 +69,21 @@ func TestGraphNaiveExample(t *testing.T) {
 	}
 	baseURL := "http://" + httpServer.Addr()
 
-	viewerPayload := getJSON(t, baseURL+"/api/v1/app2/graph/orders", "")
+	viewerReq, err := stdhttp.NewRequest(stdhttp.MethodGet, baseURL+"/api/v1/app2/graph/orders", nil)
+	if err != nil {
+		t.Fatalf("new graph request: %v", err)
+	}
+	viewerReq.Header.Set(tracing.HeaderTraceID, "trace-graph")
+	viewerPayload, viewerHeaders := doJSONHeaders(t, viewerReq)
+	if viewerHeaders.Get(tracing.HeaderTraceID) != "trace-graph" || viewerHeaders.Get(tracing.HeaderRequestID) == "" {
+		t.Fatalf("trace headers missing from graph response: %#v", viewerHeaders)
+	}
 	viewerData := responseData(t, viewerPayload)
 	if viewerData["type"] != "viewer" {
 		t.Fatalf("unexpected viewer payload: %#v", viewerData)
 	}
 	viewerGraph := responseMap(t, viewerData["graph"])
-	if viewerGraph["name"] != "订单" {
+	if viewerGraph["name"] != "订单" || viewerGraph["resource"] != "http.app2.graph.orders" {
 		t.Fatalf("unexpected viewer graph: %#v", viewerGraph)
 	}
 
@@ -85,4 +99,24 @@ func TestGraphNaiveExample(t *testing.T) {
 	if behavior["type"] != "refresh" {
 		t.Fatalf("unexpected behavior payload: %#v", behaviorData)
 	}
+
+	metricsPayload := getRaw(t, baseURL+"/metrics")
+	if !strings.Contains(metricsPayload, `route="/api/v1/app2/graph/orders"`) ||
+		!strings.Contains(metricsPayload, `status="200"`) {
+		t.Fatalf("graph metrics missing:\n%s", metricsPayload)
+	}
+}
+
+func getRaw(t *testing.T, url string) string {
+	t.Helper()
+	resp, err := stdhttp.Get(url)
+	if err != nil {
+		t.Fatalf("get raw: %v", err)
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatalf("read raw: %v", err)
+	}
+	return string(body)
 }
