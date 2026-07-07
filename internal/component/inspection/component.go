@@ -34,6 +34,7 @@ func (p *Component) Dependencies() []linker.Dependency {
 func (p *Component) Assets(context.Context, linker.Runtime) ([]linker.Asset, error) {
 	return []linker.Asset{
 		postgresql.Table(&inspectionmodel.Task{}, postgresql.Comment("演示巡检任务")),
+		postgresql.Table(&inspectionmodel.Archive{}, postgresql.Comment("外部巡检归档"), postgresql.External()),
 	}, nil
 }
 
