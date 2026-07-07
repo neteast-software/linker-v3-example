@@ -95,7 +95,7 @@ record-level 权限建议放在具体业务 store 的查询入口处完成。`in
 go run . --plan
 ```
 
-输出会包含 mode、components、dependencies、capabilities 和 route/table/RPC/job 等 assets。缺少 `LINKER_V3_EXAMPLE_PG_PASSWORD` 时，`--plan` 只使用本地占位值构建计划，不会启动 PostgreSQL component。
+输出会包含 mode、components、dependencies、capabilities 和 application、route、gRPC、MQ consumer、cron job 等 assets。缺少 `LINKER_V3_EXAMPLE_PG_PASSWORD` 时，`--plan` 只使用本地占位值构建计划，不会启动 PostgreSQL component。
 
 ```bash
 go run .
@@ -130,3 +130,4 @@ go test ./...
 - `internal/route/graph/*_api.go`：一个 API 一个文件，route/resource/middleware 和 handler 放在同一个入口重心内。
 - `example/graph_example_test.go`：验证 graph route、Plan asset 和 renderer capability。
 - `example/nacos_example_test.go`：验证 YAML seed、Nacos source、HTTP/gRPC registry adapter 和 Plan 里的依赖/capability 表达。
+- `example/reliability_example_test.go`：验证 DB capability 缺失会在组件初始化期失败，以及 Stop timeout 会返回可判断的 `context.DeadlineExceeded`。

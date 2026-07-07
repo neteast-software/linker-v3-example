@@ -29,6 +29,12 @@ func TestPlanCommand(t *testing.T) {
 	if !ok || len(assets) == 0 {
 		t.Fatalf("plan missing assets: %#v", body)
 	}
+	if !jsonPlanHasAsset(assets, "rpc/grpc/server", "127.0.0.1:9900") {
+		t.Fatalf("plan missing grpc server asset: %#v", assets)
+	}
+	if !jsonPlanHasAsset(assets, "rpc/grpc/client", "rpc/client/tts") {
+		t.Fatalf("plan missing grpc client asset: %#v", assets)
+	}
 }
 
 func TestPlanCommandArg(t *testing.T) {
@@ -38,4 +44,17 @@ func TestPlanCommandArg(t *testing.T) {
 	if isPlanCommand([]string{"linker-v3-example"}) {
 		t.Fatal("unexpected plan command")
 	}
+}
+
+func jsonPlanHasAsset(assets []any, kind string, name string) bool {
+	for _, item := range assets {
+		asset, ok := item.(map[string]any)
+		if !ok {
+			continue
+		}
+		if asset["kind"] == kind && asset["name"] == name {
+			return true
+		}
+	}
+	return false
 }

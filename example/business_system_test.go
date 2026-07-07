@@ -74,6 +74,12 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	if !planHasAsset(plan, "scheduler/cron/job", "notification.health") {
 		t.Fatalf("plan missing notification cron asset: %#v", plan.Assets)
 	}
+	if !planHasAsset(plan, "rpc/grpc/server", config.GRPC.Addr) {
+		t.Fatalf("plan missing grpc server asset: %#v", plan.Assets)
+	}
+	if !planHasAsset(plan, "rpc/grpc/client", ttsclient.ID.String()) {
+		t.Fatalf("plan missing tts grpc client asset: %#v", plan.Assets)
+	}
 	if !planHasRouteAsset(plan, "GET", "/api/v1/app2/notification/events", "http.app2.notification.events") {
 		t.Fatalf("plan missing notification SSE route asset: %#v", plan.Assets)
 	}
