@@ -66,6 +66,7 @@ record-level 权限建议放在具体业务 store 的查询入口处完成。`in
 - `internal/route/inspection`、`internal/model/inspection`、`internal/service/inspection`、`internal/component/inspection`：接近真实业务的列表接口结构，route 负责 HTTP 参数和输出，service/store 负责批量查询和数据范围。
 - `internal/component/notification`、`internal/service/notification`、`internal/route/notification`：MQ consumer、cron job、SSE route 和 provider mock 的长生命周期组合。
 - `internal/component/observability`、`internal/service/observability`、`internal/route/observability`：Prometheus recorder capability、`/metrics` route 和 HTTP 请求指标 middleware。
+- `license/http/gin`：示例只在需要保护的入口显式挂 `licensehttp.Gate(gate)`；license 不进入 core，也不默认挂到 server framework。
 - `internal/rpc/tts`、`internal/client/tts`、`internal/component/tts`：gRPC server/client 的声明、注册和 capability provider。
 
 组件 identity 必须由组件 package 自己声明，例如 `component/user.ID`。需要依赖该组件时引用这个符号，不把组件 ID 放到 `constant` 或其他公共包里代管。

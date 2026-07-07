@@ -141,6 +141,8 @@ require (
 	github.com/neteast-software/go-module/http/gin/linker v0.0.0
 	github.com/neteast-software/go-module/http/gin/registry/nacos v0.0.0 // indirect
 	github.com/neteast-software/go-module/http/gin/registry/nacos/linker v0.0.0
+	github.com/neteast-software/go-module/license v0.0.0
+	github.com/neteast-software/go-module/license/http/gin v0.0.0
 	github.com/neteast-software/go-module/registry/nacos v0.0.0 // indirect
 	github.com/neteast-software/go-module/registry/nacos/linker v0.0.0
 	github.com/neteast-software/go-module/rpc/grpc/registry/nacos v0.0.0 // indirect
@@ -270,3 +272,7 @@ replace github.com/neteast-software/go-module/registry/nacos => ../modules/regis
 replace github.com/neteast-software/go-module/http/gin/registry/nacos => ../modules/http/gin/registry/nacos
 
 replace github.com/neteast-software/go-module/rpc/grpc/registry/nacos => ../modules/rpc/grpc/registry/nacos
+
+replace github.com/neteast-software/go-module/license => ../modules/license
+
+replace github.com/neteast-software/go-module/license/http/gin => ../modules/license/http/gin

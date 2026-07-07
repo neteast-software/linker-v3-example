@@ -14,6 +14,8 @@ import (
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	"github.com/neteast-software/go-module/http/gin/param"
 	"github.com/neteast-software/go-module/http/gin/response"
+	"github.com/neteast-software/go-module/license"
+	licensehttp "github.com/neteast-software/go-module/license/http/gin"
 	server "github.com/neteast-software/go-module/linker/server"
 	"github.com/neteast-software/go-module/observe/tracing"
 	linker "github.com/neteast-software/linker/v3"
@@ -23,6 +25,11 @@ import (
 
 func TestLinkerV3HTTPGinExample(t *testing.T) {
 	recorder := eventcore.NewMemoryRecorder()
+	now := time.Date(2026, 7, 8, 0, 0, 0, 0, time.Local)
+	gate := license.NewGate(license.New(
+		license.WithExpireAt(now.Add(-time.Second)),
+		license.WithClock(func() time.Time { return now }),
+	))
 	app := server.New(
 		server.WithMode(linker.Server),
 		server.WithShutdownTimeout(3*time.Second),
@@ -47,6 +54,9 @@ func TestLinkerV3HTTPGinExample(t *testing.T) {
 				}
 				response.Data(c, map[string]any{"id": id, "url": url})
 			}),
+			http.GET("licensed", func(c *http.Context) {
+				response.Success(c)
+			}).With(licensehttp.Gate(gate)),
 		),
 	)
 
@@ -92,6 +102,23 @@ func TestLinkerV3HTTPGinExample(t *testing.T) {
 	}
 	if resp.StatusCode != stdhttp.StatusOK || string(body) != "pong" {
 		t.Fatalf("unexpected response: status=%d body=%q", resp.StatusCode, body)
+	}
+
+	resp, err = stdhttp.Get("http://" + httpServer.Addr() + "/licensed")
+	if err != nil {
+		t.Fatalf("get licensed: %v", err)
+	}
+	defer resp.Body.Close()
+	body, err = io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatalf("read licensed body: %v", err)
+	}
+	var licensed map[string]any
+	if err := json.Unmarshal(body, &licensed); err != nil {
+		t.Fatalf("decode licensed body: %v body=%q", err, body)
+	}
+	if licensed["code"].(float64) != response.CodeFailure || licensed["msg"] != "授权已到期" {
+		t.Fatalf("unexpected licensed payload: %#v", licensed)
 	}
 
 	req, err := stdhttp.NewRequest(stdhttp.MethodGet, "http://"+httpServer.Addr()+"/items/7", nil)
