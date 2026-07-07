@@ -185,7 +185,10 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 	)
 
 	plan := app.Plan()
-	if !planHasComponent(plan, observabilitycomponent.ID) || !planHasRouteAsset(plan, "GET", "/metrics", "http.observe.metrics") {
+	if !planHasComponent(plan, observabilitycomponent.ID) ||
+		!planHasRouteAsset(plan, "GET", "/metrics", "http.observe.metrics") ||
+		!planHasAsset(plan, "observe/metrics", "prometheus") ||
+		!planHasAsset(plan, "observe/tracing", "http+grpc") {
 		t.Fatalf("plan missing observability assets: components=%#v assets=%#v", plan.Components, plan.Assets)
 	}
 

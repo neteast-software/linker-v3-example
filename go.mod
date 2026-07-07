@@ -15,11 +15,13 @@ require (
 	github.com/neteast-software/go-module/config/yaml v0.0.0
 	github.com/neteast-software/go-module/config/yaml/linker v0.0.0
 	github.com/neteast-software/go-module/db/gorm/query v0.0.0
+	github.com/neteast-software/go-module/db/gorm/table v0.0.0
 	github.com/neteast-software/go-module/db/postgresql v0.0.0
 	github.com/neteast-software/go-module/db/postgresql/linker v0.0.0
 	github.com/neteast-software/go-module/fault/event v0.0.0
 	github.com/neteast-software/go-module/fault/event/linker v0.0.0
 	github.com/neteast-software/go-module/http/gin v0.0.0
+	github.com/neteast-software/go-module/linker/plan v0.0.0
 	github.com/neteast-software/go-module/linker/server v0.0.0
 	github.com/neteast-software/go-module/mq/consumer/linker v0.0.0
 	github.com/neteast-software/go-module/notify/feishu v0.0.0
@@ -27,6 +29,7 @@ require (
 	github.com/neteast-software/go-module/observe/metrics v0.0.0
 	github.com/neteast-software/go-module/observe/metrics/prometheus v0.0.0
 	github.com/neteast-software/go-module/observe/tracing v0.0.0
+	github.com/neteast-software/go-module/observe/tracing/rpc/grpc v0.0.0
 	github.com/neteast-software/go-module/outbox v0.0.0
 	github.com/neteast-software/go-module/rpc/grpc v0.0.0
 	github.com/neteast-software/go-module/rpc/grpc/linker v0.0.0
@@ -86,11 +89,9 @@ require (
 	github.com/neteast-software/go-module/audit/operate/store/gorm v0.0.0 // indirect
 	github.com/neteast-software/go-module/cache/redis v0.0.0 // indirect
 	github.com/neteast-software/go-module/crypto/sm v0.0.0 // indirect
-	github.com/neteast-software/go-module/db/gorm/table v0.0.0 // indirect
 	github.com/neteast-software/go-module/fault v0.0.0 // indirect
 	github.com/neteast-software/go-module/fault/notice v0.0.0 // indirect
 	github.com/neteast-software/go-module/fault/notice/linker v0.0.0 // indirect
-	github.com/neteast-software/go-module/linker/plan v0.0.0 // indirect
 	github.com/neteast-software/go-module/mq/consumer v0.0.0 // indirect
 	github.com/neteast-software/go-module/scheduler/cron v0.0.0 // indirect
 	github.com/neteast-software/go-module/scheduler/cron/store/gorm v0.0.0 // indirect
@@ -228,6 +229,8 @@ replace github.com/neteast-software/go-module/observe/metrics => ../modules/obse
 replace github.com/neteast-software/go-module/observe/metrics/prometheus => ../modules/observe/metrics/prometheus
 
 replace github.com/neteast-software/go-module/observe/tracing => ../modules/observe/tracing
+
+replace github.com/neteast-software/go-module/observe/tracing/rpc/grpc => ../modules/observe/tracing/rpc/grpc
 
 replace github.com/neteast-software/go-module/outbox => ../modules/outbox
 

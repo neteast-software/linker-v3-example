@@ -8,6 +8,7 @@ import (
 	postgresql "github.com/neteast-software/go-module/db/postgresql/linker"
 	server "github.com/neteast-software/go-module/linker/server"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
+	tracegrpc "github.com/neteast-software/go-module/observe/tracing/rpc/grpc"
 	rpccore "github.com/neteast-software/go-module/rpc/grpc"
 	rpc "github.com/neteast-software/go-module/rpc/grpc/linker"
 	cron "github.com/neteast-software/go-module/scheduler/cron/linker"
@@ -63,7 +64,7 @@ func New(config config.Config) (*server.App, error) {
 			rpc.New(
 				rpc.WithConfig(config.GRPC),
 				rpc.WithAfter(ttscomponent.ID),
-				rpc.WithServerOptions(stdgrpc.ChainUnaryInterceptor(rpccore.UnaryServerMeta())),
+				rpc.WithServerOptions(stdgrpc.ChainUnaryInterceptor(tracegrpc.UnaryServer(), rpccore.UnaryServerMeta())),
 			),
 			ttsclient.Provider(config.TTSClient),
 		),

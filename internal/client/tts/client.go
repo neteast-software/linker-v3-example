@@ -1,6 +1,7 @@
 package tts
 
 import (
+	tracegrpc "github.com/neteast-software/go-module/observe/tracing/rpc/grpc"
 	grpclinker "github.com/neteast-software/go-module/rpc/grpc/linker"
 	linker "github.com/neteast-software/linker/v3"
 	"google.golang.org/grpc"
@@ -26,5 +27,6 @@ func Provider(config grpclinker.ClientConfig) linker.Component {
 		New,
 		grpclinker.WithClientConfig[Client](config),
 		grpclinker.WithClientAfter[Client]("rpc/grpc"),
+		grpclinker.WithDialOptions[Client](grpc.WithChainUnaryInterceptor(tracegrpc.UnaryClient())),
 	)
 }

@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/neteast-software/go-module/observe/tracing"
+	tracegrpc "github.com/neteast-software/go-module/observe/tracing/rpc/grpc"
 	rpcgrpc "github.com/neteast-software/go-module/rpc/grpc"
 	rpcmeta "github.com/neteast-software/go-module/rpc/meta"
 	stdgrpc "google.golang.org/grpc"
@@ -18,11 +20,13 @@ type exampleMetaServer interface {
 type exampleMetaService struct {
 	scope string
 	user  rpcmeta.User
+	trace tracing.Trace
 }
 
 func (p *exampleMetaService) Ping(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
 	p.scope, _ = rpcmeta.Scope(ctx)
 	p.user, _ = rpcmeta.UserFrom(ctx)
+	p.trace, _ = tracing.FromContext(ctx)
 	return &emptypb.Empty{}, nil
 }
 
@@ -30,7 +34,7 @@ func TestGRPCMetadataExample(t *testing.T) {
 	service := &exampleMetaService{}
 	server := rpcgrpc.NewServerWithOptions(
 		rpcgrpc.ServerConfig{Addr: "127.0.0.1:0"},
-		[]stdgrpc.ServerOption{stdgrpc.UnaryInterceptor(rpcgrpc.UnaryServerMeta())},
+		[]stdgrpc.ServerOption{stdgrpc.ChainUnaryInterceptor(tracegrpc.UnaryServer(), rpcgrpc.UnaryServerMeta())},
 		func(server *stdgrpc.Server) {
 			registerExampleMeta(server, service)
 		},
@@ -46,7 +50,7 @@ func TestGRPCMetadataExample(t *testing.T) {
 		context.Background(),
 		rpcgrpc.ClientConfig{Target: server.Addr()},
 		stdgrpc.WithTransportCredentials(insecure.NewCredentials()),
-		stdgrpc.WithChainUnaryInterceptor(rpcgrpc.UnaryClientMeta(rpcmeta.System("front"))),
+		stdgrpc.WithChainUnaryInterceptor(tracegrpc.UnaryClient(), rpcgrpc.UnaryClientMeta(rpcmeta.System("front"))),
 	)
 	if err != nil {
 		t.Fatalf("new client: %v", err)
@@ -55,11 +59,15 @@ func TestGRPCMetadataExample(t *testing.T) {
 		_ = conn.Close()
 	})
 
-	if err = conn.Invoke(context.Background(), "/example.Meta/Ping", &emptypb.Empty{}, &emptypb.Empty{}); err != nil {
+	ctx, _ := tracing.Ensure(context.Background(), tracing.WithTraceID("trace-grpc-example"), tracing.WithRequestID("request-grpc-example"))
+	if err = conn.Invoke(ctx, "/example.Meta/Ping", &emptypb.Empty{}, &emptypb.Empty{}); err != nil {
 		t.Fatalf("invoke: %v", err)
 	}
 	if service.scope != "front" || service.user.ID != "0" || service.user.Name != "system" {
 		t.Fatalf("metadata not propagated: scope=%s user=%+v", service.scope, service.user)
+	}
+	if service.trace.TraceID != "trace-grpc-example" || service.trace.RequestID != "request-grpc-example" {
+		t.Fatalf("trace not propagated: %#v", service.trace)
 	}
 }
 

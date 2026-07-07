@@ -33,6 +33,7 @@ import (
 	ttsclient "linker-v3-example/internal/client/tts"
 	inspectioncomponent "linker-v3-example/internal/component/inspection"
 	notificationcomponent "linker-v3-example/internal/component/notification"
+	observabilitycomponent "linker-v3-example/internal/component/observability"
 	ttscomponent "linker-v3-example/internal/component/tts"
 	usercomponent "linker-v3-example/internal/component/user"
 	exampleconfig "linker-v3-example/internal/config"
@@ -56,6 +57,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		!planHasComponent(plan, audit.ID) ||
 		!planHasComponent(plan, inspectioncomponent.ID) ||
 		!planHasComponent(plan, notificationcomponent.ID) ||
+		!planHasComponent(plan, observabilitycomponent.ID) ||
 		!planHasComponent(plan, usercomponent.ID) ||
 		!planHasComponent(plan, ttscomponent.ID) ||
 		!planHasComponent(plan, mq.ID) ||
@@ -79,6 +81,9 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	}
 	if !planHasAsset(plan, "rpc/grpc/client", ttsclient.ID.String()) {
 		t.Fatalf("plan missing tts grpc client asset: %#v", plan.Assets)
+	}
+	if !planHasAsset(plan, "observe/metrics", "prometheus") || !planHasAsset(plan, "observe/tracing", "http+grpc") {
+		t.Fatalf("plan missing observability asset: %#v", plan.Assets)
 	}
 	if !planHasRouteAsset(plan, "GET", "/api/v1/app2/notification/events", "http.app2.notification.events") {
 		t.Fatalf("plan missing notification SSE route asset: %#v", plan.Assets)
