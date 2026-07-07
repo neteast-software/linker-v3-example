@@ -15,6 +15,7 @@ import (
 	stdgrpc "google.golang.org/grpc"
 
 	ttsclient "linker-v3-example/internal/client/tts"
+	graphcomponent "linker-v3-example/internal/component/graph"
 	inspectioncomponent "linker-v3-example/internal/component/inspection"
 	notificationcomponent "linker-v3-example/internal/component/notification"
 	observabilitycomponent "linker-v3-example/internal/component/observability"
@@ -45,6 +46,7 @@ func New(config config.Config) (*server.App, error) {
 					applicationcore.Application{ID: "app2", Scope: "app2", Name: "应用二", Host: "app2.local", Status: applicationcore.StatusEnabled},
 				),
 			),
+			graphcomponent.NewComponent(),
 			observabilitycomponent.NewComponent(),
 			inspectioncomponent.NewComponent(),
 			usercomponent.NewComponent(),

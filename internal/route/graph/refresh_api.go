@@ -1,0 +1,26 @@
+package graph
+
+import (
+	"github.com/neteast-software/go-module/acl"
+	"github.com/neteast-software/go-module/graph/naive/behavior"
+	graphhttp "github.com/neteast-software/go-module/graph/naive/http/gin"
+	http "github.com/neteast-software/go-module/http/gin/linker"
+
+	routemiddleware "linker-v3-example/internal/route/middleware"
+)
+
+func init() {
+	http.RegisterIn("api/v1/app2",
+		http.Group("graph",
+			http.Use(routemiddleware.Application("app2")),
+			http.GET("refresh", refreshAPI).Resource(
+				"http.app2.graph.refresh",
+				acl.Scope("app2", 1, "应用二 graph 行为"),
+			),
+		),
+	)
+}
+
+func refreshAPI(c *http.Context) {
+	graphhttp.Behavior(c, behavior.Refresh(behavior.WithMessage("已刷新"), behavior.WithWait(0.2)))
+}
