@@ -34,7 +34,7 @@ func (p *Service) Transcribe(ctx context.Context, req *wrapperspb.StringValue) (
 	if scope != "" {
 		result += ":" + scope
 	}
-	record := ttsmodel.Request{
+	record := ttsmodel.Transcription{
 		Text:   text,
 		Result: result,
 		Scope:  scope,

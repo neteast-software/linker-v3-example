@@ -17,6 +17,7 @@ import (
 	ttsclient "linker-v3-example/internal/client/tts"
 	inspectioncomponent "linker-v3-example/internal/component/inspection"
 	notificationcomponent "linker-v3-example/internal/component/notification"
+	observabilitycomponent "linker-v3-example/internal/component/observability"
 	ttscomponent "linker-v3-example/internal/component/tts"
 	usercomponent "linker-v3-example/internal/component/user"
 	"linker-v3-example/internal/config"
@@ -44,6 +45,7 @@ func New(config config.Config) (*server.App, error) {
 					applicationcore.Application{ID: "app2", Scope: "app2", Name: "应用二", Host: "app2.local", Status: applicationcore.StatusEnabled},
 				),
 			),
+			observabilitycomponent.NewComponent(),
 			inspectioncomponent.NewComponent(),
 			usercomponent.NewComponent(),
 			ttscomponent.NewComponent(),

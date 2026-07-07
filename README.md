@@ -11,6 +11,7 @@
 - `GET /api/v1/app2/user/:id/profile`：多层 route 示例，实际访问形如 `/api/v1/app2/user/3/profile`。
 - `GET /api/v1/app2/inspection/tasks`：巡检任务列表，演示 application data scope、分页查询和响应白名单。
 - `GET /api/v1/app2/notification/events`：SSE 事件入口，演示长连接 route 的局部声明。
+- `GET /metrics`：Prometheus scrape 入口，演示 observability 组件、HTTP 指标 middleware 和低基数 label。
 - `example.tts.TTS/Transcribe`：gRPC service，演示 RPC register、typed client provider 和表资产。
 
 登录链路使用 modules 的边界：
@@ -59,6 +60,7 @@ func init() {
 - `internal/component/user`：组件 identity、linker 组件生命周期、表资产和 service capability 挂载。
 - `internal/route/inspection`、`internal/model/inspection`、`internal/service/inspection`、`internal/component/inspection`：接近真实业务的列表接口结构，route 负责 HTTP 参数和输出，service/store 负责批量查询和数据范围。
 - `internal/component/notification`、`internal/service/notification`、`internal/route/notification`：MQ consumer、cron job、SSE route 和 provider mock 的长生命周期组合。
+- `internal/component/observability`、`internal/service/observability`、`internal/route/observability`：Prometheus recorder capability、`/metrics` route 和 HTTP 请求指标 middleware。
 - `internal/rpc/tts`、`internal/client/tts`、`internal/component/tts`：gRPC server/client 的声明、注册和 capability provider。
 
 组件 identity 必须由组件 package 自己声明，例如 `component/user.ID`。需要依赖该组件时引用这个符号，不把组件 ID 放到 `constant` 或其他公共包里代管。

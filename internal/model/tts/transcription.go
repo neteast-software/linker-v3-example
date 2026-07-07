@@ -2,7 +2,7 @@ package tts
 
 import "time"
 
-type Request struct {
+type Transcription struct {
 	ID        uint64    `gorm:"primaryKey;autoIncrement;comment:主键ID" json:"id"`
 	CreatedAt time.Time `gorm:"comment:创建时间" json:"created_at"`
 	UpdatedAt time.Time `gorm:"comment:更新时间" json:"updated_at"`
@@ -11,6 +11,6 @@ type Request struct {
 	Scope     string    `gorm:"comment:RPC scope;type:varchar(64);index" json:"scope"`
 }
 
-func (Request) TableName() string {
+func (Transcription) TableName() string {
 	return "tts_request"
 }

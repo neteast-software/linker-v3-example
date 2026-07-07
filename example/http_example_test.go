@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	stdhttp "net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -15,6 +16,8 @@ import (
 	"github.com/neteast-software/go-module/http/gin/response"
 	server "github.com/neteast-software/go-module/linker/server"
 	linker "github.com/neteast-software/linker/v3"
+
+	observabilitycomponent "linker-v3-example/internal/component/observability"
 )
 
 func TestLinkerV3HTTPGinExample(t *testing.T) {
@@ -101,5 +104,60 @@ func TestLinkerV3HTTPGinExample(t *testing.T) {
 	data, ok := payload["data"].(map[string]any)
 	if !ok || data["url"] != "https://gateway.example/api/items/7" || data["id"].(float64) != 7 {
 		t.Fatalf("unexpected item payload: %#v", payload)
+	}
+}
+
+func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
+	app := server.New(
+		server.WithMode(linker.Server),
+		server.WithShutdownTimeout(3*time.Second),
+		server.WithMapSetting(map[linker.Namespace][]byte{
+			linker.Namespace(http.ID): []byte(`{"addr":"127.0.0.1:0"}`),
+		}),
+		server.WithComponents(
+			observabilitycomponent.NewComponent(),
+		),
+		server.WithHTTPRoutes(
+			http.GET("pong", func(c *http.Context) {
+				c.String(stdhttp.StatusOK, "pong")
+			}),
+		),
+	)
+
+	plan := app.Plan()
+	if !planHasComponent(plan, observabilitycomponent.ID) || !planHasRouteAsset(plan, "GET", "/metrics", "http.observe.metrics") {
+		t.Fatalf("plan missing observability assets: components=%#v assets=%#v", plan.Components, plan.Assets)
+	}
+
+	if err := app.Start(context.Background()); err != nil {
+		t.Fatalf("start: %v", err)
+	}
+	t.Cleanup(func() {
+		if err := app.Stop(context.Background()); err != nil {
+			t.Fatalf("stop: %v", err)
+		}
+	})
+
+	httpServer, err := linker.RequireCapability(app.App(), linker.NewCapabilityKey[*http.Server](http.ID))
+	if err != nil {
+		t.Fatalf("server capability: %v", err)
+	}
+	if _, err = stdhttp.Get("http://" + httpServer.Addr() + "/pong"); err != nil {
+		t.Fatalf("get pong: %v", err)
+	}
+	resp, err := stdhttp.Get("http://" + httpServer.Addr() + "/metrics")
+	if err != nil {
+		t.Fatalf("get metrics: %v", err)
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatalf("read metrics: %v", err)
+	}
+	text := string(body)
+	if !strings.Contains(text, "linker_v3_example_http_requests_total") ||
+		!strings.Contains(text, `route="/pong"`) ||
+		!strings.Contains(text, `status="200"`) {
+		t.Fatalf("unexpected metrics body:\n%s", text)
 	}
 }
