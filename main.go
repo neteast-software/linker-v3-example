@@ -29,7 +29,11 @@ func isPlanCommand(args []string) bool {
 }
 
 func run(ctx context.Context) error {
-	serverApp, err := app.New(config.FromEnv())
+	cfg, err := config.Load(ctx)
+	if err != nil {
+		return fmt.Errorf("配置加载失败: %w", err)
+	}
+	serverApp, err := app.New(cfg)
 	if err != nil {
 		return fmt.Errorf("配置错误: %w", err)
 	}

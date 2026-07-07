@@ -14,11 +14,11 @@ const ExampleLoginPassword = "linfunlinfun"
 const ExampleUserPhone = "18558755877"
 
 type Config struct {
-	HTTP            http.Config
-	GRPC            rpcgrpc.ServerConfig
-	TTSClient       rpcgrpc.ClientConfig
-	PostgreSQL      postgresql.Config
-	ShutdownTimeout time.Duration
+	HTTP            http.Config          `json:"http" yaml:"http"`
+	GRPC            rpcgrpc.ServerConfig `json:"grpc" yaml:"grpc"`
+	TTSClient       rpcgrpc.ClientConfig `json:"ttsClient" yaml:"ttsClient"`
+	PostgreSQL      postgresql.Config    `json:"postgresql" yaml:"postgresql"`
+	ShutdownTimeout time.Duration        `json:"shutdownTimeout" yaml:"shutdownTimeout"`
 }
 
 func Default() Config {
@@ -58,6 +58,14 @@ func Default() Config {
 
 func FromEnv() Config {
 	config := Default()
+	ApplyEnv(&config)
+	return config
+}
+
+func ApplyEnv(config *Config) {
+	if config == nil {
+		return
+	}
 	config.HTTP.Addr = env("LINKER_V3_EXAMPLE_HTTP_ADDR", config.HTTP.Addr)
 	config.GRPC.Addr = env("LINKER_V3_EXAMPLE_GRPC_ADDR", config.GRPC.Addr)
 	config.PostgreSQL.Host = env("LINKER_V3_EXAMPLE_PG_HOST", config.PostgreSQL.Host)
@@ -65,7 +73,6 @@ func FromEnv() Config {
 	config.PostgreSQL.User = env("LINKER_V3_EXAMPLE_PG_USER", config.PostgreSQL.User)
 	config.PostgreSQL.Password = env("LINKER_V3_EXAMPLE_PG_PASSWORD", config.PostgreSQL.Password)
 	config.PostgreSQL.DBName = env("LINKER_V3_EXAMPLE_PG_DB", config.PostgreSQL.DBName)
-	return config
 }
 
 func env(key string, fallback string) string {

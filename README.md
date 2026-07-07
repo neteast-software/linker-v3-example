@@ -103,7 +103,13 @@ go run .
 LINKER_V3_EXAMPLE_PG_HOST=127.0.0.1 LINKER_V3_EXAMPLE_PG_PASSWORD=... go run .
 ```
 
-配置源推荐顺序是 `local seed -> registry final -> env override`。`example/server_yaml_test.go` 用 `registryMockSource` 演示 Nacos 类注册中心 source 如何读取本地 seed，再由环境变量覆盖最终配置。
+typed app 配置源推荐顺序是 `default -> local YAML -> registry source -> env override`。示例 YAML 不包含数据库密码：
+
+```bash
+LINKER_V3_EXAMPLE_CONFIG=config/app.example.yaml LINKER_V3_EXAMPLE_PG_PASSWORD=... go run .
+```
+
+linker runtime 配置源推荐顺序是 `local seed -> registry final -> env override`。`example/server_yaml_test.go` 用 `registryMockSource` 演示 Nacos 类注册中心 source 如何读取本地 seed，再由环境变量覆盖最终配置。
 
 ## Example
 

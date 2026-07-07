@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 
@@ -11,7 +12,10 @@ import (
 const planOnlyPostgreSQLPassword = "linker-v3-example-plan-only"
 
 func printPlan(output io.Writer) error {
-	cfg := config.FromEnv()
+	cfg, err := config.Load(context.Background())
+	if err != nil {
+		return err
+	}
 	if cfg.PostgreSQL.Password == "" {
 		cfg.PostgreSQL.Password = planOnlyPostgreSQLPassword
 	}
