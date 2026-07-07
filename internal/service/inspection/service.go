@@ -25,7 +25,7 @@ func (p Service) List(ctx context.Context, app application.Application, req List
 
 func Seed(ctx context.Context, store Store) error {
 	return store.SaveDefaults(ctx,
-		inspectionmodel.Task{Head: head(1), ApplicationScope: "app2", Title: "应用二巡检任务", Status: "open", OwnerID: 1},
+		inspectionmodel.Task{Head: head(1), ApplicationScope: "app2", Title: "应用二巡检任务", Status: "open", OwnerID: 2},
 		inspectionmodel.Task{Head: head(2), ApplicationScope: "console", Title: "后台巡检任务", Status: "open", OwnerID: 1},
 		inspectionmodel.Task{Head: head(3), ApplicationScope: "app2", Title: "应用二已完成任务", Status: "done", OwnerID: 1},
 	)

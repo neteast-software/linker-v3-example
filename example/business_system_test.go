@@ -170,14 +170,14 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		t.Fatalf("unexpected app2 profile: %#v", app2ProfileData)
 	}
 
-	tasks := getJSON(t, baseURL+"/api/v1/app2/inspection/tasks?page=1&pageSize=10&status=open", "")
+	tasks := getJSON(t, baseURL+"/api/v1/app2/inspection/tasks?page=1&pageSize=10&status=open", token)
 	taskData := responseData(t, tasks)
 	items, ok := taskData["items"].([]any)
 	if !ok || len(items) != 1 {
 		t.Fatalf("unexpected task items: %#v", taskData)
 	}
 	task, ok := items[0].(map[string]any)
-	if !ok || task["application_scope"] != "app2" || task["status"] != "open" {
+	if !ok || task["application_scope"] != "app2" || task["status"] != "open" || task["owner_id"] != userID {
 		t.Fatalf("unexpected scoped task: %#v", task)
 	}
 

@@ -3,12 +3,14 @@ package inspection
 import (
 	"context"
 
+	"github.com/neteast-software/go-module/acl"
 	"github.com/neteast-software/go-module/application"
 	appstore "github.com/neteast-software/go-module/application/store/gorm"
 	"github.com/neteast-software/go-module/db/gorm/query"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
+	inspectionconstant "linker-v3-example/internal/constant/inspection"
 	inspectionmodel "linker-v3-example/internal/model/inspection"
 )
 
@@ -19,6 +21,7 @@ type Store struct {
 type ListRequest struct {
 	Page   query.Page
 	Status string
+	Access TaskAccess
 }
 
 func NewStore(db *gorm.DB) Store {
@@ -37,6 +40,9 @@ func (p Store) SaveDefaults(ctx context.Context, tasks ...inspectionmodel.Task) 
 }
 
 func (p Store) List(ctx context.Context, app application.Application, req ListRequest) ([]inspectionmodel.Task, query.Page, error) {
+	if !req.Access.Can(acl.Read) {
+		return nil, query.Page{}, inspectionconstant.ErrForbidden
+	}
 	spec := query.Spec{
 		Page:   req.Page,
 		Orders: []query.Order{query.Desc("id")},
@@ -44,6 +50,7 @@ func (p Store) List(ctx context.Context, app application.Application, req ListRe
 	if req.Status != "" {
 		spec.Filters = append(spec.Filters, query.Where("status", req.Status))
 	}
+	spec.Filters = append(spec.Filters, req.Access.Range.Filters()...)
 	db, spec, err := query.Apply(
 		p.db.WithContext(ctx).
 			Model(&inspectionmodel.Task{}).

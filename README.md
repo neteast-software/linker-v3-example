@@ -61,6 +61,8 @@ func init() {
 - `internal/service/user`：登录、资料读取、token/session 和存储流程；service capability key 由 service 自己声明。
 - `internal/constant/user`：业务错误。
 - `internal/component/user`：组件 identity、linker 组件生命周期、表资产和 service capability 挂载。
+
+record-level 权限建议放在具体业务 store 的查询入口处完成。`internal/service/inspection` 用 `TaskAccess` 把 `acl.Access`、`acl.Resource` 和 `RecordRange` 组合在一起：route 只提供当前 application 和 actor，store 在一次查询里同时应用 application scope、业务 filter 和 owner range，避免为了权限判断额外做 N+1 查询或维护 RBAC 关系表。
 - `internal/route/inspection`、`internal/model/inspection`、`internal/service/inspection`、`internal/component/inspection`：接近真实业务的列表接口结构，route 负责 HTTP 参数和输出，service/store 负责批量查询和数据范围。
 - `internal/component/notification`、`internal/service/notification`、`internal/route/notification`：MQ consumer、cron job、SSE route 和 provider mock 的长生命周期组合。
 - `internal/component/observability`、`internal/service/observability`、`internal/route/observability`：Prometheus recorder capability、`/metrics` route 和 HTTP 请求指标 middleware。
