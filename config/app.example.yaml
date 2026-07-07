@@ -1,0 +1,32 @@
+http/gin:
+  addr: 127.0.0.1:8800
+  recovery: true
+  health:
+    enabled: true
+    path: ping
+
+rpc/grpc:
+  addr: 127.0.0.1:9900
+
+rpc/client/tts:
+  discovery:
+    scheme: example
+    service: tts
+    group: DEFAULT_GROUP
+    metadata:
+      version: v1
+  metadata:
+    scope: front
+
+registry/nacos:
+  server: 127.0.0.1:8848
+  namespace: example
+  group: DEFAULT_GROUP
+
+db/postgresql:
+  host: 192.168.3.13
+  port: 5432
+  user: neteast
+  password: "${LINKER_V3_EXAMPLE_PG_PASSWORD}"
+  db_name: linker_v3_example
+  ssl_mode: disable
