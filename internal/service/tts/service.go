@@ -34,12 +34,12 @@ func (p *Service) Transcribe(ctx context.Context, req *wrapperspb.StringValue) (
 	if scope != "" {
 		result += ":" + scope
 	}
-	record := ttsmodel.Record{
+	conversion := ttsmodel.Conversion{
 		Text:   text,
 		Result: result,
 		Scope:  scope,
 	}
-	if err := p.db.WithContext(ctx).Create(&record).Error; err != nil {
+	if err := p.db.WithContext(ctx).Create(&conversion).Error; err != nil {
 		return nil, err
 	}
 	return wrapperspb.String(result), nil

@@ -36,7 +36,7 @@ func (p *Component) Dependencies() []linker.Dependency {
 
 func (p *Component) Assets(context.Context, linker.Runtime) ([]linker.Asset, error) {
 	return []linker.Asset{
-		postgresql.Table(&ttsmodel.Record{}, postgresql.Comment("演示 TTS 转写记录")),
+		postgresql.Table(&ttsmodel.Conversion{}, postgresql.Comment("演示 TTS 转写资产")),
 		grpclinker.Register(func(server *grpc.Server) {
 			ttsrpc.Register(server, p)
 		}),

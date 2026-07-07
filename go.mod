@@ -27,6 +27,7 @@ require (
 	github.com/neteast-software/go-module/notify/feishu v0.0.0
 	github.com/neteast-software/go-module/notify/feishu/linker v0.0.0
 	github.com/neteast-software/go-module/observe/metrics v0.0.0
+	github.com/neteast-software/go-module/observe/metrics/linker/server v0.0.0
 	github.com/neteast-software/go-module/observe/metrics/mq/consumer v0.0.0
 	github.com/neteast-software/go-module/observe/metrics/prometheus v0.0.0
 	github.com/neteast-software/go-module/observe/metrics/rpc/grpc v0.0.0
@@ -230,6 +231,8 @@ replace github.com/neteast-software/go-module/notify/feishu => ../modules/notify
 replace github.com/neteast-software/go-module/notify/feishu/linker => ../modules/notify/feishu/linker
 
 replace github.com/neteast-software/go-module/observe/metrics => ../modules/observe/metrics
+
+replace github.com/neteast-software/go-module/observe/metrics/linker/server => ../modules/observe/metrics/linker/server
 
 replace github.com/neteast-software/go-module/observe/metrics/mq/consumer => ../modules/observe/metrics/mq/consumer
 

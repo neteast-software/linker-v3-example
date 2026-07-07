@@ -17,6 +17,8 @@ import (
 	"github.com/neteast-software/go-module/license"
 	licensehttp "github.com/neteast-software/go-module/license/http/gin"
 	server "github.com/neteast-software/go-module/linker/server"
+	"github.com/neteast-software/go-module/observe/metrics"
+	metricserver "github.com/neteast-software/go-module/observe/metrics/linker/server"
 	"github.com/neteast-software/go-module/observe/tracing"
 	linker "github.com/neteast-software/linker/v3"
 
@@ -168,6 +170,7 @@ func corePlanHasCapability(plan linker.Plan, id linker.ID) bool {
 }
 
 func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
+	observability := observabilitycomponent.NewComponent()
 	app := server.New(
 		server.WithMode(linker.Server),
 		server.WithShutdownTimeout(3*time.Second),
@@ -175,7 +178,7 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 			linker.Namespace(http.ID): []byte(`{"addr":"127.0.0.1:0"}`),
 		}),
 		server.WithComponents(
-			observabilitycomponent.NewComponent(),
+			observability,
 		),
 		server.WithHTTPRoutes(
 			http.GET("pong", func(c *http.Context) {
@@ -219,6 +222,15 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 	}
 	_ = resp.Body.Close()
 
+	if err := metricserver.RecordPlan(
+		context.Background(),
+		observability.Recorder(),
+		app.Plan(),
+		metricserver.WithConstLabels(metrics.Label("service", "linker-v3-example")),
+	); err != nil {
+		t.Fatalf("record linker plan metrics: %v", err)
+	}
+
 	resp, err = stdhttp.Get("http://" + httpServer.Addr() + "/metrics")
 	if err != nil {
 		t.Fatalf("get metrics: %v", err)
@@ -230,6 +242,8 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 	}
 	text := string(body)
 	if !strings.Contains(text, "linker_v3_example_http_requests_total") ||
+		!strings.Contains(text, "linker_v3_example_linker_component_state") ||
+		!strings.Contains(text, `component="example/observability"`) ||
 		!strings.Contains(text, `route="/pong"`) ||
 		!strings.Contains(text, `status="200"`) {
 		t.Fatalf("unexpected metrics body:\n%s", text)

@@ -2,8 +2,8 @@ package tts
 
 import "time"
 
-// Record is the persisted TTS request record.
-type Record struct {
+// Conversion is the persisted TTS conversion asset.
+type Conversion struct {
 	ID        uint64    `gorm:"primaryKey;autoIncrement;comment:主键ID" json:"id"`
 	CreatedAt time.Time `gorm:"comment:创建时间" json:"created_at"`
 	UpdatedAt time.Time `gorm:"comment:更新时间" json:"updated_at"`
@@ -12,6 +12,6 @@ type Record struct {
 	Scope     string    `gorm:"comment:RPC scope;type:varchar(64);index" json:"scope"`
 }
 
-func (Record) TableName() string {
-	return "tts_request"
+func (Conversion) TableName() string {
+	return "tts_conversion"
 }

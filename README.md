@@ -123,7 +123,7 @@ linker runtime 配置源推荐顺序是 `local seed -> registry final -> env ove
 go test ./...
 ```
 
-Prometheus 可抓取 `GET /metrics`，Grafana 示例面板在 `docs/grafana-dashboard.json`。当前 dashboard 对齐 HTTP、gRPC、MQ consumer 和 cron 指标，例如 `linker_v3_example_http_requests_total`、`linker_v3_example_grpc_server_requests_total`、`linker_v3_example_mq_consumer_messages_total` 和 `linker_v3_example_scheduler_cron_runs_total`；后续 component runtime 指标补齐后再扩展对应面板。
+Prometheus 可抓取 `GET /metrics`，Grafana 示例面板在 `docs/grafana-dashboard.json`。当前 dashboard 对齐 HTTP、gRPC、MQ consumer、cron 和 linker runtime Plan 指标，例如 `linker_v3_example_http_requests_total`、`linker_v3_example_grpc_server_requests_total`、`linker_v3_example_mq_consumer_messages_total`、`linker_v3_example_scheduler_cron_runs_total` 和 `linker_v3_example_linker_component_state`。
 
 推荐先看：
 

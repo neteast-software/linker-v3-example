@@ -285,6 +285,64 @@
       ],
       "title": "cron job 执行",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 32
+      },
+      "id": 11,
+      "targets": [
+        {
+          "expr": "max(linker_v3_example_linker_app_ready)",
+          "legendFormat": "ready"
+        },
+        {
+          "expr": "max(linker_v3_example_linker_app_started)",
+          "legendFormat": "started"
+        }
+      ],
+      "title": "linker app 状态",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 16,
+        "x": 8,
+        "y": 32
+      },
+      "id": 12,
+      "targets": [
+        {
+          "expr": "max by (component, state) (linker_v3_example_linker_component_state)",
+          "legendFormat": "{{component}} {{state}}"
+        }
+      ],
+      "title": "linker component 状态",
+      "type": "timeseries"
     }
   ],
   "schemaVersion": 39,
