@@ -231,6 +231,60 @@
       ],
       "title": "gRPC 延迟 p95",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "msgps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 9,
+      "targets": [
+        {
+          "expr": "sum by (consumer, status) (rate(linker_v3_example_mq_consumer_messages_total[5m]))",
+          "legendFormat": "{{consumer}} {{status}}"
+        }
+      ],
+      "title": "MQ consumer 消息",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 10,
+      "targets": [
+        {
+          "expr": "sum by (job, status) (rate(linker_v3_example_scheduler_cron_runs_total[5m]))",
+          "legendFormat": "{{job}} {{status}}"
+        }
+      ],
+      "title": "cron job 执行",
+      "type": "timeseries"
     }
   ],
   "schemaVersion": 39,

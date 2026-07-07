@@ -35,9 +35,12 @@ func New(config config.Config) (*server.App, error) {
 	if err != nil {
 		return nil, err
 	}
-	notification := notificationcomponent.NewComponent()
 	observability := observabilitycomponent.NewComponent()
 	metricLabels := []metrics.LabelValue{metrics.Label("service", "linker-v3-example")}
+	notification := notificationcomponent.NewComponent(
+		notificationcomponent.WithMetricRecorder(observability.Recorder()),
+		notificationcomponent.WithMetricLabels(metricLabels...),
+	)
 	return server.New(
 		server.WithMode(linker.Server),
 		server.WithShutdownTimeout(config.ShutdownTimeout),

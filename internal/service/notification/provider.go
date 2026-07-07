@@ -4,12 +4,16 @@ import (
 	"context"
 	"sync"
 	"time"
+
+	"github.com/neteast-software/go-module/observe/tracing"
 )
 
 type Message struct {
-	Time   time.Time
-	Source string
-	Body   string
+	Time      time.Time
+	Source    string
+	Body      string
+	TraceID   string
+	RequestID string
 }
 
 type Provider struct {
@@ -21,16 +25,19 @@ func NewProvider() *Provider {
 	return &Provider{}
 }
 
-func (p *Provider) Send(_ context.Context, source string, body string) error {
+func (p *Provider) Send(ctx context.Context, source string, body string) error {
 	if p == nil {
 		return nil
 	}
+	trace, _ := tracing.FromContext(ctx)
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.messages = append(p.messages, Message{
-		Time:   time.Now(),
-		Source: source,
-		Body:   body,
+		Time:      time.Now(),
+		Source:    source,
+		Body:      body,
+		TraceID:   trace.TraceID,
+		RequestID: trace.RequestID,
 	})
 	return nil
 }

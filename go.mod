@@ -27,10 +27,14 @@ require (
 	github.com/neteast-software/go-module/notify/feishu v0.0.0
 	github.com/neteast-software/go-module/notify/feishu/linker v0.0.0
 	github.com/neteast-software/go-module/observe/metrics v0.0.0
+	github.com/neteast-software/go-module/observe/metrics/mq/consumer v0.0.0
 	github.com/neteast-software/go-module/observe/metrics/prometheus v0.0.0
 	github.com/neteast-software/go-module/observe/metrics/rpc/grpc v0.0.0
+	github.com/neteast-software/go-module/observe/metrics/scheduler/cron v0.0.0
 	github.com/neteast-software/go-module/observe/tracing v0.0.0
+	github.com/neteast-software/go-module/observe/tracing/mq/consumer v0.0.0
 	github.com/neteast-software/go-module/observe/tracing/rpc/grpc v0.0.0
+	github.com/neteast-software/go-module/observe/tracing/scheduler/cron v0.0.0
 	github.com/neteast-software/go-module/outbox v0.0.0
 	github.com/neteast-software/go-module/rpc/grpc v0.0.0
 	github.com/neteast-software/go-module/rpc/grpc/linker v0.0.0
@@ -227,13 +231,21 @@ replace github.com/neteast-software/go-module/notify/feishu/linker => ../modules
 
 replace github.com/neteast-software/go-module/observe/metrics => ../modules/observe/metrics
 
+replace github.com/neteast-software/go-module/observe/metrics/mq/consumer => ../modules/observe/metrics/mq/consumer
+
 replace github.com/neteast-software/go-module/observe/metrics/prometheus => ../modules/observe/metrics/prometheus
 
 replace github.com/neteast-software/go-module/observe/metrics/rpc/grpc => ../modules/observe/metrics/rpc/grpc
 
+replace github.com/neteast-software/go-module/observe/metrics/scheduler/cron => ../modules/observe/metrics/scheduler/cron
+
 replace github.com/neteast-software/go-module/observe/tracing => ../modules/observe/tracing
 
+replace github.com/neteast-software/go-module/observe/tracing/mq/consumer => ../modules/observe/tracing/mq/consumer
+
 replace github.com/neteast-software/go-module/observe/tracing/rpc/grpc => ../modules/observe/tracing/rpc/grpc
+
+replace github.com/neteast-software/go-module/observe/tracing/scheduler/cron => ../modules/observe/tracing/scheduler/cron
 
 replace github.com/neteast-software/go-module/outbox => ../modules/outbox
 

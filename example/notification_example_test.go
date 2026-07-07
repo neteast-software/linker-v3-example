@@ -13,6 +13,9 @@ import (
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	server "github.com/neteast-software/go-module/linker/server"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
+	"github.com/neteast-software/go-module/observe/metrics"
+	"github.com/neteast-software/go-module/observe/tracing"
+	traceconsumer "github.com/neteast-software/go-module/observe/tracing/mq/consumer"
 	cron "github.com/neteast-software/go-module/scheduler/cron/linker"
 	linker "github.com/neteast-software/linker/v3"
 
@@ -23,7 +26,12 @@ import (
 func TestNotificationLifecycleExample(t *testing.T) {
 	eventRecorder := eventcore.NewMemoryRecorder()
 	auditRecorder := auditcore.NewMemoryRecorder()
-	notification := notificationcomponent.NewComponent(notificationcomponent.WithCronSpec("@every 1s"))
+	metricRecorder := metrics.Memory()
+	notification := notificationcomponent.NewComponent(
+		notificationcomponent.WithCronSpec("@every 1s"),
+		notificationcomponent.WithMetricRecorder(metricRecorder),
+		notificationcomponent.WithMetricLabels(metrics.Label("service", "example")),
+	)
 	app := server.New(
 		server.WithMode(linker.Server),
 		server.WithShutdownTimeout(2*time.Second),
@@ -69,18 +77,23 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	if err != nil {
 		t.Fatalf("consumer capability: %v", err)
 	}
-	if err = consumer.Submit(context.Background(), mq.Message{
+	mqCtx, _ := tracing.Ensure(context.Background(), tracing.WithTraceID("trace-notification-message"))
+	message := traceconsumer.InjectMessage(mqCtx, mq.Message{
 		Topic: "notification.message",
 		Key:   "n1",
 		Body:  []byte("hello notification"),
-	}); err != nil {
+	})
+	if err = consumer.Submit(context.Background(), message); err != nil {
 		t.Fatalf("submit: %v", err)
 	}
 	waitFor(t, 2*time.Second, func() bool {
 		return hasProviderMessage(notification.Provider().Messages(), "mq") &&
+			hasProviderTrace(notification.Provider().Messages(), "mq", "trace-notification-message") &&
 			len(auditRecorder.Records()) > 0 &&
 			len(eventRecorder.Events()) > 0
 	})
+	assertMetricLabel(t, metricRecorder, "mq_consumer_messages_total", "status", "handled")
+	assertMetricLabel(t, metricRecorder, "mq_consumer_messages_total", "service", "example")
 
 	httpServer, err := linker.RequireCapability(app.App(), linker.NewCapabilityKey[*http.Server](http.ID))
 	if err != nil {
@@ -102,8 +115,10 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	}
 
 	waitFor(t, 2500*time.Millisecond, func() bool {
-		return hasProviderMessage(notification.Provider().Messages(), "cron")
+		return hasProviderMessage(notification.Provider().Messages(), "cron") &&
+			hasProviderNonEmptyTrace(notification.Provider().Messages(), "cron")
 	})
+	assertMetricLabel(t, metricRecorder, "scheduler_cron_runs_total", "status", "success")
 }
 
 func planHasAsset(plan server.Plan, kind string, name string) bool {
@@ -130,6 +145,24 @@ func planHasRouteAsset(plan server.Plan, method string, path string, resource st
 func hasProviderMessage(messages []notificationservice.Message, source string) bool {
 	for _, message := range messages {
 		if message.Source == source {
+			return true
+		}
+	}
+	return false
+}
+
+func hasProviderTrace(messages []notificationservice.Message, source string, traceID string) bool {
+	for _, message := range messages {
+		if message.Source == source && message.TraceID == traceID {
+			return true
+		}
+	}
+	return false
+}
+
+func hasProviderNonEmptyTrace(messages []notificationservice.Message, source string) bool {
+	for _, message := range messages {
+		if message.Source == source && message.TraceID != "" {
 			return true
 		}
 	}

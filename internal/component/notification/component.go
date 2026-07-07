@@ -8,6 +8,11 @@ import (
 	eventcore "github.com/neteast-software/go-module/fault/event"
 	event "github.com/neteast-software/go-module/fault/event/linker"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
+	"github.com/neteast-software/go-module/observe/metrics"
+	metricconsumer "github.com/neteast-software/go-module/observe/metrics/mq/consumer"
+	metriccron "github.com/neteast-software/go-module/observe/metrics/scheduler/cron"
+	traceconsumer "github.com/neteast-software/go-module/observe/tracing/mq/consumer"
+	tracecron "github.com/neteast-software/go-module/observe/tracing/scheduler/cron"
 	cron "github.com/neteast-software/go-module/scheduler/cron/linker"
 	linker "github.com/neteast-software/linker/v3"
 
@@ -24,6 +29,9 @@ type Component struct {
 	audit    auditcore.Recorder
 	event    eventcore.Recorder
 	cronSpec string
+
+	metricRecorder metrics.Recorder
+	metricLabels   []metrics.LabelValue
 }
 
 type Option func(*Component)
@@ -40,13 +48,32 @@ func NewComponent(opts ...Option) *Component {
 			opt(p)
 		}
 	}
-	p.consumer = mq.NewConsumer("notification", mq.HandlerFuncOf(p.handleMessage),
+	consumerHandler := mq.Handler(traceconsumer.Handler(mq.HandlerFuncOf(p.handleMessage)))
+	if p.metricRecorder != nil {
+		consumerHandler = metricconsumer.Handler(
+			"notification",
+			consumerHandler,
+			p.metricRecorder,
+			metricconsumer.WithTopic("notification.message"),
+			metricconsumer.WithConstLabels(p.metricLabels...),
+		)
+	}
+	p.consumer = mq.NewConsumer("notification", consumerHandler,
 		mq.WithDesc("通知消息消费"),
 		mq.WithTopic("notification.message"),
 		mq.WithBuffer(16),
 		mq.WithBackpressure(mq.BackpressureReject),
 	)
-	p.job = cron.NewJob("notification.health", p.cronSpec, cron.HandlerFuncOf(p.runJob),
+	jobHandler := cron.Handler(tracecron.Handler(cron.HandlerFuncOf(p.runJob)))
+	if p.metricRecorder != nil {
+		jobHandler = metriccron.Handler(
+			"notification.health",
+			jobHandler,
+			p.metricRecorder,
+			metriccron.WithConstLabels(p.metricLabels...),
+		)
+	}
+	p.job = cron.NewJob("notification.health", p.cronSpec, jobHandler,
 		cron.JobDesc("通知服务健康采样"),
 	)
 	return p
@@ -65,6 +92,18 @@ func WithCronSpec(spec string) Option {
 		if spec != "" {
 			p.cronSpec = spec
 		}
+	}
+}
+
+func WithMetricRecorder(recorder metrics.Recorder) Option {
+	return func(p *Component) {
+		p.metricRecorder = recorder
+	}
+}
+
+func WithMetricLabels(labels ...metrics.LabelValue) Option {
+	return func(p *Component) {
+		p.metricLabels = append(p.metricLabels, labels...)
 	}
 }
 

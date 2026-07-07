@@ -11,7 +11,7 @@
 - `GET /api/v1/app2/user/:id/profile`：多层 route 示例，实际访问形如 `/api/v1/app2/user/3/profile`。
 - `GET /api/v1/app2/inspection/tasks`：巡检任务列表，演示 application data scope、分页查询和响应白名单。
 - `GET /api/v1/app2/notification/events`：SSE 事件入口，演示长连接 route 的局部声明。
-- `GET /metrics`：Prometheus scrape 入口，演示 observability 组件、HTTP/gRPC 指标、低基数 label 和 Grafana dashboard。
+- `GET /metrics`：Prometheus scrape 入口，演示 observability 组件、HTTP/gRPC/MQ/cron 指标、低基数 label 和 Grafana dashboard。
 - `GET /api/v1/app2/graph/orders`：graph/naive viewer 示例。
 - `GET /api/v1/app2/graph/orders/form`：graph/naive form 示例。
 - `GET /api/v1/app2/graph/refresh`：graph/naive behavior 示例。
@@ -65,7 +65,7 @@ func init() {
 record-level 权限建议放在具体业务 store 的查询入口处完成。`internal/service/inspection` 用 `TaskAccess` 把 `acl.Access`、`acl.Resource` 和 `RecordRange` 组合在一起：route 只提供当前 application 和 actor，store 在一次查询里同时应用 application scope、业务 filter 和 owner range，避免为了权限判断额外做 N+1 查询或维护 RBAC 关系表。
 - `internal/route/inspection`、`internal/model/inspection`、`internal/service/inspection`、`internal/component/inspection`：接近真实业务的列表接口结构，route 负责 HTTP 参数和输出，service/store 负责批量查询和数据范围。
 - `internal/model/inspection/archive.go`：外部维护表资产示例，只改业务 model 和 component asset，使用 `postgresql.External()` 避免启动期迁移。
-- `internal/component/notification`、`internal/service/notification`、`internal/route/notification`：MQ consumer、cron job、SSE route 和 provider mock 的长生命周期组合。
+- `internal/component/notification`、`internal/service/notification`、`internal/route/notification`：MQ consumer、cron job、SSE route、trace/metrics wrapper 和 provider mock 的长生命周期组合。
 - `internal/component/observability`、`internal/service/observability`、`internal/route/observability`：Prometheus recorder capability、`/metrics` route、HTTP 请求指标 middleware 和 Plan 里的 metrics/tracing asset。
 - `license/http/gin`：示例只在需要保护的入口显式挂 `licensehttp.Gate(gate)`；license 不进入 core，也不默认挂到 server framework。
 - `internal/rpc/tts`、`internal/client/tts`、`internal/component/tts`：gRPC server/client 的声明、注册、trace/metrics interceptor 和 capability provider。
@@ -123,7 +123,7 @@ linker runtime 配置源推荐顺序是 `local seed -> registry final -> env ove
 go test ./...
 ```
 
-Prometheus 可抓取 `GET /metrics`，Grafana 示例面板在 `docs/grafana-dashboard.json`。当前 dashboard 对齐 `linker_v3_example_http_requests_total`、`linker_v3_example_http_request_seconds_bucket`、`linker_v3_example_grpc_server_requests_total` 和 `linker_v3_example_grpc_server_request_seconds_bucket`，后续 component/MQ/cron 指标补齐后再扩展对应面板。
+Prometheus 可抓取 `GET /metrics`，Grafana 示例面板在 `docs/grafana-dashboard.json`。当前 dashboard 对齐 HTTP、gRPC、MQ consumer 和 cron 指标，例如 `linker_v3_example_http_requests_total`、`linker_v3_example_grpc_server_requests_total`、`linker_v3_example_mq_consumer_messages_total` 和 `linker_v3_example_scheduler_cron_runs_total`；后续 component runtime 指标补齐后再扩展对应面板。
 
 推荐先看：
 
