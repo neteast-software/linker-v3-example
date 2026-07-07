@@ -63,6 +63,18 @@ func TestLinkerV3HTTPGinExample(t *testing.T) {
 		}
 	})
 
+	runtimePlan := app.App().Plan()
+	if !runtimePlan.Started || !runtimePlan.Ready {
+		t.Fatalf("runtime plan = %#v", runtimePlan)
+	}
+	httpRuntimePlan := requireCoreComponentPlan(t, runtimePlan, http.ID)
+	if !httpRuntimePlan.Active || !httpRuntimePlan.Initialized || !httpRuntimePlan.Started {
+		t.Fatalf("http runtime plan = %#v", httpRuntimePlan)
+	}
+	if !corePlanHasCapability(runtimePlan, http.ID) {
+		t.Fatalf("runtime plan missing http capability: %#v", runtimePlan.Capabilities)
+	}
+
 	httpServer, err := linker.RequireCapability(app.App(), linker.NewCapabilityKey[*http.Server](http.ID))
 	if err != nil {
 		t.Fatalf("server capability: %v", err)
@@ -106,6 +118,26 @@ func TestLinkerV3HTTPGinExample(t *testing.T) {
 	if !ok || data["url"] != "https://gateway.example/api/items/7" || data["id"].(float64) != 7 {
 		t.Fatalf("unexpected item payload: %#v", payload)
 	}
+}
+
+func requireCoreComponentPlan(t *testing.T, plan linker.Plan, id linker.ID) linker.ComponentPlan {
+	t.Helper()
+	for _, component := range plan.Components {
+		if component.ID == id {
+			return component
+		}
+	}
+	t.Fatalf("core component %s not found in %#v", id, plan.Components)
+	return linker.ComponentPlan{}
+}
+
+func corePlanHasCapability(plan linker.Plan, id linker.ID) bool {
+	for _, capability := range plan.Capabilities {
+		if capability == id {
+			return true
+		}
+	}
+	return false
 }
 
 func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
