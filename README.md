@@ -130,6 +130,7 @@ Prometheus 可抓取 `GET /metrics`，Grafana 示例面板在 `docs/grafana-dash
 推荐先看：
 
 - `docs/scaffold.md`：推荐项目骨架，说明 main、app、component、route、model、service、config、observability 和 example test 的边界。
+- `docs/example-policy.md`：说明 example 的定位、外部依赖、测试拆分和未来 submodule 边界。
 - `main.go`：保持极薄，只分发 server 启动和 `--plan`。
 - `internal/app/app.go`：集中装配 framework、组件、配置源和 adapter。
 - `internal/route/graph/*_api.go`：一个 API 一个文件，route/resource/middleware 和 handler 放在同一个入口重心内。
