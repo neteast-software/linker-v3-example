@@ -6,6 +6,7 @@ import (
 
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	"github.com/neteast-software/go-module/observe/metrics"
+	"github.com/neteast-software/go-module/observe/tracing"
 )
 
 var httpRequests = metrics.Counter(
@@ -29,13 +30,15 @@ func init() {
 func HTTPMetrics() http.HandlerFunc {
 	return func(c *http.Context) {
 		started := time.Now()
+		ctx, trace := tracing.Ensure(c.Request.Context(), tracing.WithTrace(tracing.FromHeaders(c.GetHeader)))
+		c.Request = c.Request.WithContext(ctx)
+		tracing.InjectHeaders(trace, c.Header)
 		c.Next()
 		recorder, ok := metricRecorder(c)
 		if !ok {
 			return
 		}
 		labels := requestLabels(c)
-		ctx := c.Request.Context()
 		_ = httpRequests.Add(ctx, recorder, 1, labels...)
 		_ = httpRequestSeconds.Observe(ctx, recorder, time.Since(started).Seconds(), labels...)
 	}

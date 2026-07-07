@@ -15,6 +15,7 @@ import (
 	"github.com/neteast-software/go-module/http/gin/param"
 	"github.com/neteast-software/go-module/http/gin/response"
 	server "github.com/neteast-software/go-module/linker/server"
+	"github.com/neteast-software/go-module/observe/tracing"
 	linker "github.com/neteast-software/linker/v3"
 
 	observabilitycomponent "linker-v3-example/internal/component/observability"
@@ -142,10 +143,21 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 	if err != nil {
 		t.Fatalf("server capability: %v", err)
 	}
-	if _, err = stdhttp.Get("http://" + httpServer.Addr() + "/pong"); err != nil {
+	req, err := stdhttp.NewRequest(stdhttp.MethodGet, "http://"+httpServer.Addr()+"/pong", nil)
+	if err != nil {
+		t.Fatalf("new pong request: %v", err)
+	}
+	req.Header.Set(tracing.HeaderTraceID, "trace-example")
+	resp, err := stdhttp.DefaultClient.Do(req)
+	if err != nil {
 		t.Fatalf("get pong: %v", err)
 	}
-	resp, err := stdhttp.Get("http://" + httpServer.Addr() + "/metrics")
+	if resp.Header.Get(tracing.HeaderTraceID) != "trace-example" || resp.Header.Get(tracing.HeaderRequestID) == "" {
+		t.Fatalf("trace headers missing: %#v", resp.Header)
+	}
+	_ = resp.Body.Close()
+
+	resp, err = stdhttp.Get("http://" + httpServer.Addr() + "/metrics")
 	if err != nil {
 		t.Fatalf("get metrics: %v", err)
 	}
