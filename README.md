@@ -78,7 +78,7 @@ func init() {
 
 ## 运行
 
-默认连接 pi2 PostgreSQL 的局域网地址 `192.168.3.13:5432`，账号为 `neteast`，密码通过 `LINKER_V3_EXAMPLE_PG_PASSWORD` 或默认配置提供，数据库名为 `linker_v3_example`。
+默认连接 pi2 PostgreSQL 的局域网地址 `192.168.3.13:5432`，账号为 `neteast`，数据库名为 `linker_v3_example`。数据库密码不写入默认配置，必须通过 `LINKER_V3_EXAMPLE_PG_PASSWORD` 显式提供。
 
 ```bash
 go run .
@@ -87,7 +87,7 @@ go run .
 本地需要覆盖数据库地址时：
 
 ```bash
-LINKER_V3_EXAMPLE_PG_HOST=127.0.0.1 go run .
+LINKER_V3_EXAMPLE_PG_HOST=127.0.0.1 LINKER_V3_EXAMPLE_PG_PASSWORD=... go run .
 ```
 
 配置源推荐顺序是 `local seed -> registry final -> env override`。`example/server_yaml_test.go` 用 `registryMockSource` 演示 Nacos 类注册中心 source 如何读取本地 seed，再由环境变量覆盖最终配置。

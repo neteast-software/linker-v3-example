@@ -122,7 +122,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 
 	admin := postJSON(t, baseURL+"/system/login", map[string]string{
 		"username": "admin",
-		"password": exampleconfig.DefaultPassword,
+		"password": exampleconfig.ExampleLoginPassword,
 	}, "")
 	adminData := responseData(t, admin)
 	adminToken, _ := adminData["token"].(string)
@@ -140,8 +140,8 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	}
 
 	front := postJSON(t, baseURL+"/user/login", map[string]string{
-		"phone":    exampleconfig.DefaultUserPhone,
-		"password": exampleconfig.DefaultPassword,
+		"phone":    exampleconfig.ExampleUserPhone,
+		"password": exampleconfig.ExampleLoginPassword,
 	}, "")
 	frontData := responseData(t, front)
 	token, _ := frontData["token"].(string)
@@ -152,7 +152,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	profile := getJSON(t, baseURL+"/api/profile", token)
 	profileData := responseData(t, profile)
 	if profileData["username"] != "example_user" ||
-		profileData["phone"] != exampleconfig.DefaultUserPhone ||
+		profileData["phone"] != exampleconfig.ExampleUserPhone ||
 		profileData["email"] != "example.user@neteast.cn" ||
 		profileData["avatar"] == "" {
 		t.Fatalf("unexpected profile: %#v", profileData)
@@ -165,7 +165,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	app2Profile := getJSON(t, fmt.Sprintf("%s/api/v1/app2/user/%d/profile", baseURL, int(userID)), "")
 	app2ProfileData := responseData(t, app2Profile)
 	if app2ProfileData["username"] != "example_user" ||
-		app2ProfileData["phone"] != exampleconfig.DefaultUserPhone ||
+		app2ProfileData["phone"] != exampleconfig.ExampleUserPhone ||
 		app2ProfileData["application"] != "app2" {
 		t.Fatalf("unexpected app2 profile: %#v", app2ProfileData)
 	}
@@ -230,9 +230,12 @@ func prepareExampleDatabase(t *testing.T) postgresqlcore.Config {
 		Host:     getenv("LINKER_V3_EXAMPLE_PG_HOST", defaultConfig.Host),
 		Port:     getenvInt("LINKER_V3_EXAMPLE_PG_PORT", 5432),
 		User:     getenv("LINKER_V3_EXAMPLE_PG_USER", "neteast"),
-		Password: getenv("LINKER_V3_EXAMPLE_PG_PASSWORD", exampleconfig.DefaultPassword),
+		Password: os.Getenv("LINKER_V3_EXAMPLE_PG_PASSWORD"),
 		DBName:   "postgres",
 		SSLMode:  "disable",
+	}
+	if config.Password == "" {
+		t.Skip("未设置 LINKER_V3_EXAMPLE_PG_PASSWORD，跳过真实数据库 example")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

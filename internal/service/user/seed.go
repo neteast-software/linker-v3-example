@@ -8,11 +8,11 @@ import (
 )
 
 func Seed(ctx context.Context, store Store) error {
-	adminHash, err := passwordHash(config.DefaultPassword)
+	adminHash, err := passwordHash(config.ExampleLoginPassword)
 	if err != nil {
 		return err
 	}
-	userHash, err := passwordHash(config.DefaultPassword)
+	userHash, err := passwordHash(config.ExampleLoginPassword)
 	if err != nil {
 		return err
 	}
@@ -34,11 +34,11 @@ func Seed(ctx context.Context, store Store) error {
 				Username: "example_user",
 				Avatar:   "https://static.neteast.cn/avatar/user.png",
 				Email:    "example.user@neteast.cn",
-				Phone:    config.DefaultUserPhone,
+				Phone:    config.ExampleUserPhone,
 				Role:     "user",
 			},
 			Accounts: []usermodel.Account{
-				{Provider: "phone", Identifier: config.DefaultUserPhone, SecretHash: userHash, Salt: passwordSalt},
+				{Provider: "phone", Identifier: config.ExampleUserPhone, SecretHash: userHash, Salt: passwordSalt},
 			},
 		},
 	)

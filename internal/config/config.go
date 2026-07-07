@@ -10,8 +10,8 @@ import (
 	rpcgrpc "github.com/neteast-software/go-module/rpc/grpc"
 )
 
-const DefaultPassword = "linfunlinfun"
-const DefaultUserPhone = "18558755877"
+const ExampleLoginPassword = "linfunlinfun"
+const ExampleUserPhone = "18558755877"
 
 type Config struct {
 	HTTP            http.Config
@@ -46,12 +46,11 @@ func Default() Config {
 			},
 		},
 		PostgreSQL: postgresql.Config{
-			Host:     "192.168.3.13",
-			Port:     5432,
-			User:     "neteast",
-			Password: DefaultPassword,
-			DBName:   "linker_v3_example",
-			SSLMode:  "disable",
+			Host:    "192.168.3.13",
+			Port:    5432,
+			User:    "neteast",
+			DBName:  "linker_v3_example",
+			SSLMode: "disable",
 		},
 		ShutdownTimeout: 3 * time.Second,
 	}
