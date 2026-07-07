@@ -26,6 +26,7 @@ require (
 	github.com/neteast-software/go-module/observe/metrics v0.0.0
 	github.com/neteast-software/go-module/observe/metrics/prometheus v0.0.0
 	github.com/neteast-software/go-module/observe/tracing v0.0.0
+	github.com/neteast-software/go-module/outbox v0.0.0
 	github.com/neteast-software/go-module/rpc/grpc v0.0.0
 	github.com/neteast-software/go-module/rpc/grpc/linker v0.0.0
 	github.com/neteast-software/go-module/rpc/meta v0.0.0
@@ -178,6 +179,8 @@ replace github.com/neteast-software/go-module/observe/metrics => ../modules/obse
 replace github.com/neteast-software/go-module/observe/metrics/prometheus => ../modules/observe/metrics/prometheus
 
 replace github.com/neteast-software/go-module/observe/tracing => ../modules/observe/tracing
+
+replace github.com/neteast-software/go-module/outbox => ../modules/outbox
 
 replace github.com/neteast-software/go-module/config/yaml => ../modules/config/yaml
 
