@@ -8,6 +8,8 @@ import (
 	postgresql "github.com/neteast-software/go-module/db/postgresql/linker"
 	server "github.com/neteast-software/go-module/linker/server"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
+	"github.com/neteast-software/go-module/observe/metrics"
+	metricgrpc "github.com/neteast-software/go-module/observe/metrics/rpc/grpc"
 	tracegrpc "github.com/neteast-software/go-module/observe/tracing/rpc/grpc"
 	rpccore "github.com/neteast-software/go-module/rpc/grpc"
 	rpc "github.com/neteast-software/go-module/rpc/grpc/linker"
@@ -34,6 +36,8 @@ func New(config config.Config) (*server.App, error) {
 		return nil, err
 	}
 	notification := notificationcomponent.NewComponent()
+	observability := observabilitycomponent.NewComponent()
+	metricLabels := []metrics.LabelValue{metrics.Label("service", "linker-v3-example")}
 	return server.New(
 		server.WithMode(linker.Server),
 		server.WithShutdownTimeout(config.ShutdownTimeout),
@@ -48,7 +52,7 @@ func New(config config.Config) (*server.App, error) {
 				),
 			),
 			graphcomponent.NewComponent(),
-			observabilitycomponent.NewComponent(),
+			observability,
 			inspectioncomponent.NewComponent(),
 			usercomponent.NewComponent(),
 			ttscomponent.NewComponent(),
@@ -64,9 +68,17 @@ func New(config config.Config) (*server.App, error) {
 			rpc.New(
 				rpc.WithConfig(config.GRPC),
 				rpc.WithAfter(ttscomponent.ID),
-				rpc.WithServerOptions(stdgrpc.ChainUnaryInterceptor(tracegrpc.UnaryServer(), rpccore.UnaryServerMeta())),
+				rpc.WithServerOptions(stdgrpc.ChainUnaryInterceptor(
+					tracegrpc.UnaryServer(),
+					metricgrpc.UnaryServer(observability.Recorder(), metricgrpc.WithConstLabels(metricLabels...)),
+					rpccore.UnaryServerMeta(),
+				)),
 			),
-			ttsclient.Provider(config.TTSClient),
+			ttsclient.Provider(
+				config.TTSClient,
+				ttsclient.WithMetricRecorder(observability.Recorder()),
+				ttsclient.WithMetricLabels(metricLabels...),
+			),
 		),
 		server.WithMapSetting(map[linker.Namespace][]byte{
 			linker.Namespace(postgresql.ID): postgresqlConfig,

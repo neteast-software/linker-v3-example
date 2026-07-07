@@ -11,7 +11,7 @@
 - `GET /api/v1/app2/user/:id/profile`：多层 route 示例，实际访问形如 `/api/v1/app2/user/3/profile`。
 - `GET /api/v1/app2/inspection/tasks`：巡检任务列表，演示 application data scope、分页查询和响应白名单。
 - `GET /api/v1/app2/notification/events`：SSE 事件入口，演示长连接 route 的局部声明。
-- `GET /metrics`：Prometheus scrape 入口，演示 observability 组件、HTTP 指标 middleware、低基数 label 和 Grafana dashboard。
+- `GET /metrics`：Prometheus scrape 入口，演示 observability 组件、HTTP/gRPC 指标、低基数 label 和 Grafana dashboard。
 - `GET /api/v1/app2/graph/orders`：graph/naive viewer 示例。
 - `GET /api/v1/app2/graph/orders/form`：graph/naive form 示例。
 - `GET /api/v1/app2/graph/refresh`：graph/naive behavior 示例。
@@ -68,7 +68,7 @@ record-level 权限建议放在具体业务 store 的查询入口处完成。`in
 - `internal/component/notification`、`internal/service/notification`、`internal/route/notification`：MQ consumer、cron job、SSE route 和 provider mock 的长生命周期组合。
 - `internal/component/observability`、`internal/service/observability`、`internal/route/observability`：Prometheus recorder capability、`/metrics` route、HTTP 请求指标 middleware 和 Plan 里的 metrics/tracing asset。
 - `license/http/gin`：示例只在需要保护的入口显式挂 `licensehttp.Gate(gate)`；license 不进入 core，也不默认挂到 server framework。
-- `internal/rpc/tts`、`internal/client/tts`、`internal/component/tts`：gRPC server/client 的声明、注册和 capability provider。
+- `internal/rpc/tts`、`internal/client/tts`、`internal/component/tts`：gRPC server/client 的声明、注册、trace/metrics interceptor 和 capability provider。
 
 组件 identity 必须由组件 package 自己声明，例如 `component/user.ID`。需要依赖该组件时引用这个符号，不把组件 ID 放到 `constant` 或其他公共包里代管。
 
@@ -123,7 +123,7 @@ linker runtime 配置源推荐顺序是 `local seed -> registry final -> env ove
 go test ./...
 ```
 
-Prometheus 可抓取 `GET /metrics`，Grafana 示例面板在 `docs/grafana-dashboard.json`。当前 dashboard 对齐 `linker_v3_example_http_requests_total` 和 `linker_v3_example_http_request_seconds_bucket`，后续 component/MQ/cron 指标补齐后再扩展对应面板。
+Prometheus 可抓取 `GET /metrics`，Grafana 示例面板在 `docs/grafana-dashboard.json`。当前 dashboard 对齐 `linker_v3_example_http_requests_total`、`linker_v3_example_http_request_seconds_bucket`、`linker_v3_example_grpc_server_requests_total` 和 `linker_v3_example_grpc_server_request_seconds_bucket`，后续 component/MQ/cron 指标补齐后再扩展对应面板。
 
 推荐先看：
 

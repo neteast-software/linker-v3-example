@@ -51,6 +51,13 @@ func (p *Component) Capabilities() []linker.ID {
 	}
 }
 
+func (p *Component) Recorder() metrics.Recorder {
+	if p == nil || p.recorder == nil {
+		return metrics.Noop()
+	}
+	return p.recorder
+}
+
 func (p *Component) LinkerAssetPlans() []planmodule.Asset {
 	return []planmodule.Asset{
 		{
