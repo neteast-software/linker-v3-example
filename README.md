@@ -12,6 +12,9 @@
 - `GET /api/v1/app2/inspection/tasks`：巡检任务列表，演示 application data scope、分页查询和响应白名单。
 - `GET /api/v1/app2/notification/events`：SSE 事件入口，演示长连接 route 的局部声明。
 - `GET /metrics`：Prometheus scrape 入口，演示 observability 组件、HTTP 指标 middleware 和低基数 label。
+- `GET /api/v1/app2/graph/orders`：graph/naive viewer 示例。
+- `GET /api/v1/app2/graph/orders/form`：graph/naive form 示例。
+- `GET /api/v1/app2/graph/refresh`：graph/naive behavior 示例。
 - `example.tts.TTS/Transcribe`：gRPC service，演示 RPC register、typed client provider 和表资产。
 
 登录链路使用 modules 的边界：
@@ -82,6 +85,14 @@ func init() {
 
 默认连接 pi2 PostgreSQL 的局域网地址 `192.168.3.13:5432`，账号为 `neteast`，数据库名为 `linker_v3_example`。数据库密码不写入默认配置，必须通过 `LINKER_V3_EXAMPLE_PG_PASSWORD` 显式提供。
 
+查看 linker 装配计划不需要连接数据库：
+
+```bash
+go run . --plan
+```
+
+输出会包含 mode、components、dependencies、capabilities 和 route/table/RPC/job 等 assets。缺少 `LINKER_V3_EXAMPLE_PG_PASSWORD` 时，`--plan` 只使用本地占位值构建计划，不会启动 PostgreSQL component。
+
 ```bash
 go run .
 ```
@@ -101,3 +112,10 @@ LINKER_V3_EXAMPLE_PG_HOST=127.0.0.1 LINKER_V3_EXAMPLE_PG_PASSWORD=... go run .
 ```bash
 go test ./...
 ```
+
+推荐先看：
+
+- `main.go`：保持极薄，只分发 server 启动和 `--plan`。
+- `internal/app/app.go`：集中装配 framework、组件、配置源和 adapter。
+- `internal/route/graph/*_api.go`：一个 API 一个文件，route/resource/middleware 和 handler 放在同一个入口重心内。
+- `example/graph_example_test.go`：验证 graph route、Plan asset 和 renderer capability。

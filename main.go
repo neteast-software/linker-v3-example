@@ -10,10 +10,22 @@ import (
 )
 
 func main() {
-	if err := run(context.Background()); err != nil {
+	ctx := context.Background()
+	if isPlanCommand(os.Args) {
+		if err := printPlan(os.Stdout); err != nil {
+			_, _ = fmt.Fprintf(os.Stderr, "linker-v3-example 计划输出失败：%v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
+	if err := run(ctx); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "linker-v3-example 启动失败：%v\n", err)
 		os.Exit(1)
 	}
+}
+
+func isPlanCommand(args []string) bool {
+	return len(args) > 1 && args[1] == "--plan"
 }
 
 func run(ctx context.Context) error {
