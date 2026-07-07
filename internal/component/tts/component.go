@@ -12,6 +12,7 @@ import (
 	"gorm.io/gorm"
 
 	ttsmodel "linker-v3-example/internal/model/tts"
+	_ "linker-v3-example/internal/route/tts" // route 声明随组件进入编译
 	ttsrpc "linker-v3-example/internal/rpc/tts"
 	ttsservice "linker-v3-example/internal/service/tts"
 )

@@ -1,7 +1,9 @@
 package example
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"io"
 	stdhttp "net/http"
 	"strings"
@@ -20,6 +22,7 @@ import (
 	linker "github.com/neteast-software/linker/v3"
 
 	notificationcomponent "linker-v3-example/internal/component/notification"
+	observabilitycomponent "linker-v3-example/internal/component/observability"
 	notificationservice "linker-v3-example/internal/service/notification"
 )
 
@@ -40,6 +43,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		server.WithAuditRecorder(auditRecorder),
 		server.WithoutNotice(),
 		server.WithComponents(
+			observabilitycomponent.NewComponent(),
 			notification,
 			mq.New(
 				mq.WithAfter(notificationcomponent.ID),
@@ -62,6 +66,9 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	}
 	if !planHasRouteAsset(plan, "GET", "/api/v1/app2/notification/events", "http.app2.notification.events") {
 		t.Fatalf("missing SSE route asset plan: %#v", plan.Assets)
+	}
+	if !planHasRouteAsset(plan, "POST", "/api/v1/app2/notification/send", "http.app2.notification.send") {
+		t.Fatalf("missing notification send route asset plan: %#v", plan.Assets)
 	}
 
 	if err := app.Start(context.Background()); err != nil {
@@ -99,7 +106,44 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	if err != nil {
 		t.Fatalf("http capability: %v", err)
 	}
-	resp, err := stdhttp.Get("http://" + httpServer.Addr() + "/api/v1/app2/notification/events")
+	sendBody, err := json.Marshal(map[string]string{"key": "http", "body": "hello from http"})
+	if err != nil {
+		t.Fatalf("marshal send body: %v", err)
+	}
+	sendReq, err := stdhttp.NewRequest(
+		stdhttp.MethodPost,
+		"http://"+httpServer.Addr()+"/api/v1/app2/notification/send",
+		bytes.NewReader(sendBody),
+	)
+	if err != nil {
+		t.Fatalf("new send request: %v", err)
+	}
+	sendReq.Header.Set("Content-Type", "application/json")
+	sendReq.Header.Set(tracing.HeaderTraceID, "trace-http-mq")
+	sendResp, err := stdhttp.DefaultClient.Do(sendReq)
+	if err != nil {
+		t.Fatalf("post notification send: %v", err)
+	}
+	sendPayload, err := io.ReadAll(sendResp.Body)
+	_ = sendResp.Body.Close()
+	if err != nil {
+		t.Fatalf("read send response: %v", err)
+	}
+	if sendResp.StatusCode != stdhttp.StatusOK ||
+		sendResp.Header.Get(tracing.HeaderTraceID) != "trace-http-mq" ||
+		!strings.Contains(string(sendPayload), "queued") {
+		t.Fatalf("unexpected send response: status=%d header=%#v body=%q", sendResp.StatusCode, sendResp.Header, sendPayload)
+	}
+	waitFor(t, 2*time.Second, func() bool {
+		return hasProviderTrace(notification.Provider().Messages(), "mq", "trace-http-mq")
+	})
+
+	sseReq, err := stdhttp.NewRequest(stdhttp.MethodGet, "http://"+httpServer.Addr()+"/api/v1/app2/notification/events", nil)
+	if err != nil {
+		t.Fatalf("new sse request: %v", err)
+	}
+	sseReq.Header.Set(tracing.HeaderTraceID, "trace-sse")
+	resp, err := stdhttp.DefaultClient.Do(sseReq)
 	if err != nil {
 		t.Fatalf("get sse: %v", err)
 	}
@@ -110,6 +154,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	}
 	if resp.StatusCode != stdhttp.StatusOK ||
 		!strings.Contains(resp.Header.Get("Content-Type"), "text/event-stream") ||
+		resp.Header.Get(tracing.HeaderTraceID) != "trace-sse" ||
 		!strings.Contains(string(body), "ready") {
 		t.Fatalf("unexpected sse response: status=%d content-type=%q body=%q", resp.StatusCode, resp.Header.Get("Content-Type"), body)
 	}

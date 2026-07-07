@@ -11,6 +11,8 @@
 - `GET /api/v1/app2/user/:id/profile`：多层 route 示例，实际访问形如 `/api/v1/app2/user/3/profile`。
 - `GET /api/v1/app2/inspection/tasks`：巡检任务列表，演示 application data scope、分页查询和响应白名单。
 - `GET /api/v1/app2/notification/events`：SSE 事件入口，演示长连接 route 的局部声明。
+- `POST /api/v1/app2/notification/send`：HTTP 到 MQ mock 的 trace 贯穿示例。
+- `POST /api/v1/app2/tts/transcribe`：HTTP 到 typed gRPC client 的 trace 贯穿示例。
 - `GET /metrics`：Prometheus scrape 入口，演示 observability 组件、HTTP/gRPC/MQ/cron 指标、低基数 label 和 Grafana dashboard。
 - `GET /api/v1/app2/graph/orders`：graph/naive viewer 示例。
 - `GET /api/v1/app2/graph/orders/form`：graph/naive form 示例。
@@ -134,3 +136,5 @@ Prometheus 可抓取 `GET /metrics`，Grafana 示例面板在 `docs/grafana-dash
 - `example/nacos_example_test.go`：验证 YAML seed、Nacos source、HTTP/gRPC registry adapter 和 Plan 里的依赖/capability 表达。
 - `example/reliability_example_test.go`：验证 DB capability 缺失会在组件初始化期失败，以及 Stop timeout 会返回可判断的 `context.DeadlineExceeded`。
 - `example/grpc_example_test.go`：验证 gRPC metadata 和 trace id 通过 interceptor 传播。
+- `example/notification_example_test.go`：验证 MQ/cron/SSE lifecycle，并覆盖 HTTP -> MQ mock 的 trace id 贯穿。
+- `example/business_system_test.go`：验证完整业务系统，并覆盖 HTTP -> gRPC typed client 的 trace id 贯穿。

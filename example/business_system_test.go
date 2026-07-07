@@ -22,6 +22,7 @@ import (
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	server "github.com/neteast-software/go-module/linker/server"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
+	"github.com/neteast-software/go-module/observe/tracing"
 	rpccore "github.com/neteast-software/go-module/rpc/grpc"
 	rpc "github.com/neteast-software/go-module/rpc/grpc/linker"
 	cron "github.com/neteast-software/go-module/scheduler/cron/linker"
@@ -87,6 +88,12 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	}
 	if !planHasRouteAsset(plan, "GET", "/api/v1/app2/notification/events", "http.app2.notification.events") {
 		t.Fatalf("plan missing notification SSE route asset: %#v", plan.Assets)
+	}
+	if !planHasRouteAsset(plan, "POST", "/api/v1/app2/notification/send", "http.app2.notification.send") {
+		t.Fatalf("plan missing notification send route asset: %#v", plan.Assets)
+	}
+	if !planHasRouteAsset(plan, "POST", "/api/v1/app2/tts/transcribe", "http.app2.tts.transcribe") {
+		t.Fatalf("plan missing tts transcribe route asset: %#v", plan.Assets)
 	}
 	postgresqlOrder := planOrder(plan, postgresql.ID)
 	applicationOrder := planOrder(plan, applicationcomponent.ID)
@@ -203,6 +210,19 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	if ttsResult != "tts:hello:front" {
 		t.Fatalf("unexpected tts result: %q", ttsResult)
 	}
+	httpTTS, traceHeaders := postJSONHeaders(t, baseURL+"/api/v1/app2/tts/transcribe", map[string]string{
+		"text": "hello-http",
+	}, "", map[string]string{
+		tracing.HeaderTraceID: "trace-http-grpc",
+	})
+	if traceHeaders.Get(tracing.HeaderTraceID) != "trace-http-grpc" ||
+		traceHeaders.Get(tracing.HeaderRequestID) == "" {
+		t.Fatalf("trace headers missing from http tts response: %#v", traceHeaders)
+	}
+	httpTTSData := responseData(t, httpTTS)
+	if httpTTSData["result"] != "tts:hello-http:front" {
+		t.Fatalf("unexpected http tts result: %#v", httpTTSData)
+	}
 	discovery.assertLookup(t, "tts", map[string]string{"version": "v1"})
 	cancelCtx, cancel := context.WithCancel(context.Background())
 	cancel()
@@ -215,7 +235,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		t.Fatalf("db capability: %v", err)
 	}
 	var ttsCount int64
-	if err = db.Table("tts_request").
+	if err = db.Table("tts_conversion").
 		Where("text = ? AND result = ? AND scope = ?", "hello", "tts:hello:front", "front").
 		Count(&ttsCount).Error; err != nil {
 		t.Fatalf("count tts request: %v", err)
@@ -341,6 +361,12 @@ func freeLocalAddr(t *testing.T) string {
 
 func postJSON(t *testing.T, url string, payload any, token string) map[string]any {
 	t.Helper()
+	result, _ := postJSONHeaders(t, url, payload, token, nil)
+	return result
+}
+
+func postJSONHeaders(t *testing.T, url string, payload any, token string, headers map[string]string) (map[string]any, stdhttp.Header) {
+	t.Helper()
 	body, err := json.Marshal(payload)
 	if err != nil {
 		t.Fatalf("marshal request: %v", err)
@@ -353,7 +379,10 @@ func postJSON(t *testing.T, url string, payload any, token string) map[string]an
 	if token != "" {
 		req.Header.Set("Authorization", "Bearer "+token)
 	}
-	return doJSON(t, req)
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+	return doJSONHeaders(t, req)
 }
 
 func getJSON(t *testing.T, url string, token string) map[string]any {
@@ -370,11 +399,18 @@ func getJSON(t *testing.T, url string, token string) map[string]any {
 
 func doJSON(t *testing.T, req *stdhttp.Request) map[string]any {
 	t.Helper()
+	payload, _ := doJSONHeaders(t, req)
+	return payload
+}
+
+func doJSONHeaders(t *testing.T, req *stdhttp.Request) (map[string]any, stdhttp.Header) {
+	t.Helper()
 	resp, err := stdhttp.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatalf("http request: %v", err)
 	}
 	defer resp.Body.Close()
+	headers := resp.Header.Clone()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatalf("read response: %v", err)
@@ -389,7 +425,7 @@ func doJSON(t *testing.T, req *stdhttp.Request) map[string]any {
 	if code, _ := payload["code"].(float64); code != 0 {
 		t.Fatalf("business response failed: %#v", payload)
 	}
-	return payload
+	return payload, headers
 }
 
 func responseData(t *testing.T, payload map[string]any) map[string]any {
