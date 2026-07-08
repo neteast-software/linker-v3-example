@@ -53,6 +53,7 @@ func TestOutboxDeadLetterExample(t *testing.T) {
 		"notification.send",
 		[]byte("will fail"),
 		outbox.WithID("notification-failed"),
+		outbox.WithAvailableAt(now),
 		outbox.WithMaxAttempts(1),
 	)); err != nil {
 		t.Fatalf("enqueue: %v", err)

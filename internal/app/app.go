@@ -61,16 +61,16 @@ func New(config config.Config) (*server.App, error) {
 			ttscomponent.NewComponent(),
 			notification,
 			mq.New(
-				mq.WithAfter(notificationcomponent.ID),
+				mq.WithStartAfter(notificationcomponent.ID),
 				mq.WithConsumers(notification.Consumer()),
 			),
 			cron.New(
-				cron.WithAfter(notificationcomponent.ID),
+				cron.WithStartAfter(notificationcomponent.ID),
 				cron.WithJobs(notification.Job()),
 			),
 			rpc.New(
 				rpc.WithConfig(config.GRPC),
-				rpc.WithAfter(ttscomponent.ID),
+				rpc.WithStartAfter(ttscomponent.ID),
 				rpc.WithServerOptions(stdgrpc.ChainUnaryInterceptor(
 					tracegrpc.UnaryServer(),
 					metricgrpc.UnaryServer(observability.Recorder(), metricgrpc.WithConstLabels(metricLabels...)),

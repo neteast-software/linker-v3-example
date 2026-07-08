@@ -46,11 +46,11 @@ func TestNotificationLifecycleExample(t *testing.T) {
 			observabilitycomponent.NewComponent(),
 			notification,
 			mq.New(
-				mq.WithAfter(notificationcomponent.ID),
+				mq.WithStartAfter(notificationcomponent.ID),
 				mq.WithConsumers(notification.Consumer()),
 			),
 			cron.New(
-				cron.WithAfter(notificationcomponent.ID),
+				cron.WithStartAfter(notificationcomponent.ID),
 				cron.WithStore(cron.NewMemoryStore()),
 				cron.WithJobs(notification.Job()),
 			),

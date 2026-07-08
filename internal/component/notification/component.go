@@ -113,8 +113,8 @@ func (p *Component) Identity() linker.ID {
 
 func (p *Component) Dependencies() []linker.Dependency {
 	return []linker.Dependency{
-		linker.AfterID(audit.ID),
-		linker.AfterID(event.ID),
+		linker.StartAfter(audit.ID),
+		linker.StartAfter(event.ID),
 	}
 }
 

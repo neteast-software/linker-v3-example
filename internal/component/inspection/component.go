@@ -28,7 +28,7 @@ func (p *Component) Identity() linker.ID {
 }
 
 func (p *Component) Dependencies() []linker.Dependency {
-	return []linker.Dependency{linker.RequireID(postgresql.ID)}
+	return []linker.Dependency{linker.RequireComponent(postgresql.ID)}
 }
 
 func (p *Component) Assets(context.Context, linker.Runtime) ([]linker.Asset, error) {

@@ -40,6 +40,8 @@ internal/component/<domain>/component.go
 - `*Component` 方法接收者统一使用 `p`，`c` 留给 context 或框架上下文。
 - component 不集中塞所有 route handler。
 - 如果组件带 HTTP route，用 blank import 让 route 随组件进入编译：`_ "project/internal/route/<domain>"`。
+- 组件硬依赖写 `linker.RequireComponent(postgresql.ID)`；启动顺序依赖写 adapter 的 `WithStartAfter(...)` 或 core 的 `linker.StartAfter(...)`。
+- `server.WithComponents(...)` 的默认心智模型是声明顺序启动；遇到依赖未就绪的组件会先让位，framework 会回扫并生成最终启动顺序。
 
 反例：
 

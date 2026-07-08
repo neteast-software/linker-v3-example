@@ -60,7 +60,7 @@ func Provider(config grpclinker.ClientConfig, opts ...Option) linker.Component {
 		ID,
 		New,
 		grpclinker.WithClientConfig[Client](config),
-		grpclinker.WithClientAfter[Client]("rpc/grpc"),
+		grpclinker.WithClientStartAfter[Client]("rpc/grpc"),
 		grpclinker.WithDialOptions[Client](grpc.WithChainUnaryInterceptor(interceptors...)),
 	)
 }
