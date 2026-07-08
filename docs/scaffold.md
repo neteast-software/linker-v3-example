@@ -126,6 +126,23 @@ internal/service/<domain>/service_key.go
 - store/query 把 application scope、actor、resource、record range 和业务 filter 尽量合并到一次查询里。
 - route 已经能自然承载的入口过程，不必过早拆进 service。
 
+## Client
+
+出站调用优先通过 typed client 表达业务语义：
+
+```text
+internal/client/<domain>/client.go
+internal/client/<domain>/<object>.go
+```
+
+推荐：
+
+- `go-module/http/client` 承载通用 HTTP 执行能力：timeout、retry、credential、错误映射、trace/log hook 和可测试 transport。
+- 业务 typed client 承载第三方 API 的业务对象和方法，例如 `directory.New(api).Badge(ctx, userID)`。
+- 需要 linker 生命周期识别时，用 `http/client/linker` 暴露 capability 和 Plan asset。
+- route/service 不直接散落 `http.NewRequestWithContext`、`Do`、凭据拼接和原始响应解析。
+- 真实外部 provider 测试默认使用 mock server；访问真实服务必须通过显式环境变量开启。
+
 ## Config
 
 推荐配置加载顺序：

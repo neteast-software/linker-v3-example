@@ -20,6 +20,8 @@ require (
 	github.com/neteast-software/go-module/db/postgresql/linker v0.0.0
 	github.com/neteast-software/go-module/fault/event v0.0.0
 	github.com/neteast-software/go-module/fault/event/linker v0.0.0
+	github.com/neteast-software/go-module/http/client v0.0.0
+	github.com/neteast-software/go-module/http/client/linker v0.0.0
 	github.com/neteast-software/go-module/http/gin v0.0.0
 	github.com/neteast-software/go-module/linker/plan v0.0.0
 	github.com/neteast-software/go-module/linker/server v0.0.0
@@ -175,6 +177,10 @@ replace github.com/neteast-software/linker/v3 => ../linker-v3
 replace github.com/neteast-software/go-module/http/gin => ../modules/http/gin
 
 replace github.com/neteast-software/go-module/http/gin/linker => ../modules/http/gin/linker
+
+replace github.com/neteast-software/go-module/http/client => ../modules/http/client
+
+replace github.com/neteast-software/go-module/http/client/linker => ../modules/http/client/linker
 
 replace github.com/neteast-software/go-module/acl => ../modules/acl
 
