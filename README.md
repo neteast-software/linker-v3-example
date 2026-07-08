@@ -76,6 +76,7 @@ record-level 权限建议放在具体业务 store 的查询入口处完成。`in
 
 推荐边界：
 
+- `component/user` 不作为 HTTP controller，不出现成片的 `http.Context` handler、`response.*` 和 route tree 聚合。
 - `component/user` 不聚合所有 HTTP handler，也不替 route 维护完整 API 树。
 - `component/user` 通过 blank import 纳入 `route/user`，表示启用该组件时才编译这些 route。
 - service capability key 由 `service/user` 声明，route 通过 `http.Require(c, user.ServiceKey())` 获取能力，避免 route 反向依赖 component。

@@ -41,6 +41,14 @@ internal/component/<domain>/component.go
 - component 不集中塞所有 route handler。
 - 如果组件带 HTTP route，用 blank import 让 route 随组件进入编译：`_ "project/internal/route/<domain>"`。
 
+反例：
+
+```text
+internal/component/msgx/component.go
+```
+
+如果一个 component 文件同时出现 `http.Context` handler、`response.*`、route tree 聚合、鉴权 helper 和请求解析，它已经退化成 controller 大文件。正确方向是把 HTTP 入口拆回 `internal/route/<domain>/*_api.go`，把跨 route middleware 放到 `internal/route/middleware` 或 domain middleware 文件，把复用流程留给 `internal/service/<domain>`。
+
 ## Route
 
 一个 API 一个 route 文件：
@@ -77,6 +85,7 @@ route 不做的事：
 - 不维护中心 route tree。
 - 不读全局 DB。
 - 不把所有 API handler 放到同一个文件。
+- 不让 component 替 route 声明 method、path、resource 和 middleware 影响面。
 - 不因为 Java 习惯强制拆 DTO/VO；payload、param、response 默认贴近 route，跨入口复用时再沉淀为 service 或稳定对象。
 
 ## Model
@@ -160,6 +169,8 @@ example/<domain>_example_test.go
 
 - `go run . --plan` 能解释组件、依赖、capability 和 asset。
 - 新增 API 不需要维护中心 route tree。
+- app 层不 import route 包，component 通过 blank import 控制 route 是否进入编译。
+- component 文件不承载 HTTP controller 职责。
 - 组件缺少依赖时在 Init 阶段失败。
 - graceful stop、context cancel、provider failure、DB store failure 有反馈。
 - 真实外部依赖不可用时跳过集成测试，不阻断普通 `go test ./...`。
