@@ -118,6 +118,13 @@ func (p *Component) Dependencies() []linker.Dependency {
 	}
 }
 
+func (p *Component) Assets(context.Context, linker.Runtime) ([]linker.Asset, error) {
+	return append(
+		mq.Consumers(p.consumer),
+		cron.JobAsset(p.job),
+	), nil
+}
+
 func (p *Component) Init(_ context.Context, runtime linker.Runtime) error {
 	if recorder, ok := linker.Resolve(runtime, audit.RecorderKey()); ok && recorder != nil {
 		p.audit = recorder
@@ -130,14 +137,6 @@ func (p *Component) Init(_ context.Context, runtime linker.Runtime) error {
 
 func (p *Component) OnMounted(_ context.Context, runtime linker.Runtime) error {
 	return linker.Provide(runtime, service.ProviderKey(), p.provider)
-}
-
-func (p *Component) Consumer() *mq.Consumer {
-	return p.consumer
-}
-
-func (p *Component) Job() cron.Job {
-	return p.job
 }
 
 func (p *Component) Provider() *service.Provider {
