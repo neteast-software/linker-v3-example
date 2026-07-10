@@ -66,7 +66,7 @@ func TestHTTPClientExample(t *testing.T) {
 		t.Fatalf("start: %v", err)
 	}
 	t.Cleanup(func() {
-		if err := app.Close(context.Background()); err != nil {
+		if err := app.Stop(context.Background()); err != nil {
 			t.Fatalf("close: %v", err)
 		}
 	})

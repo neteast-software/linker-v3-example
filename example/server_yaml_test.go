@@ -160,7 +160,7 @@ cache/redis:
 		t.Fatalf("start: %v", err)
 	}
 	t.Cleanup(func() {
-		_ = app.Close(context.Background())
+		_ = app.Stop(context.Background())
 	})
 
 	cache, ok := app.Setting("cache/redis")
