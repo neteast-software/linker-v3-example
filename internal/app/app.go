@@ -7,6 +7,7 @@ import (
 	server "github.com/neteast-software/go-module/linker/server"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
 	"github.com/neteast-software/go-module/observe/metrics"
+	metricserver "github.com/neteast-software/go-module/observe/metrics/linker/server"
 	metricgrpc "github.com/neteast-software/go-module/observe/metrics/rpc/grpc"
 	tracegrpc "github.com/neteast-software/go-module/observe/tracing/rpc/grpc"
 	rpccore "github.com/neteast-software/go-module/rpc/grpc"
@@ -38,6 +39,10 @@ func New(config config.Config) (*linker.App, error) {
 	return server.New(
 		server.WithShutdownTimeout(config.ShutdownTimeout),
 		server.WithHTTP(config.HTTP),
+		server.WithLifecycleObserver(metricserver.Observer(
+			observability.Recorder(),
+			metricserver.WithConstLabels(metricLabels...),
+		)),
 		server.WithComponents(
 			postgresql.New(postgresql.WithConfig(config.PostgreSQL)),
 			applicationcomponent.New(

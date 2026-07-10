@@ -177,6 +177,10 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 	app := server.New(
 		server.WithShutdownTimeout(3*time.Second),
 		server.WithHTTP(httpConfig),
+		server.WithLifecycleObserver(metricserver.Observer(
+			observability.Recorder(),
+			metricserver.WithConstLabels(metrics.Label("service", "linker-v3-example")),
+		)),
 		server.WithComponents(
 			observability,
 		),
@@ -229,15 +233,6 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 		t.Fatalf("trace headers missing: %#v", resp.Header)
 	}
 	_ = resp.Body.Close()
-
-	if err := metricserver.RecordPlan(
-		context.Background(),
-		observability.Recorder(),
-		app.Plan(),
-		metricserver.WithConstLabels(metrics.Label("service", "linker-v3-example")),
-	); err != nil {
-		t.Fatalf("record linker plan metrics: %v", err)
-	}
 
 	resp, err = stdhttp.Get("http://" + httpServer.Addr() + "/metrics")
 	if err != nil {
