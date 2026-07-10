@@ -120,6 +120,8 @@ LINKER_V3_EXAMPLE_CONFIG=config/app.example.yaml LINKER_V3_EXAMPLE_PG_PASSWORD=.
 
 linker runtime 配置源推荐顺序是 `local seed -> registry final -> env override`。`example/server_yaml_test.go` 用 `registryMockSource` 演示注册中心 source 如何读取本地 seed，再由环境变量覆盖最终配置；`example/nacos_example_test.go` 使用 `registry/nacos/linker.NewSource` 和本地 fake getter 演示真实 Nacos source 入口，不依赖外部 Nacos 服务。
 
+server 组合入口优先传递 module 的类型化配置，例如先修改 `http.DefaultConfig()`，再调用 `server.WithHTTP(config)`。HTTP 配置只使用 snake_case 对象结构；业务 app 不拼原始 JSON。
+
 ## Example
 
 测试文件集中在 `example/` 目录。真实 PostgreSQL example 会尝试连接 `192.168.3.13`，如果当前环境无法连接，会跳过该集成用例。
