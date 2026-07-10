@@ -1,8 +1,6 @@
 package app
 
 import (
-	"encoding/json"
-
 	applicationcore "github.com/neteast-software/go-module/application"
 	applicationcomponent "github.com/neteast-software/go-module/application/linker"
 	postgresql "github.com/neteast-software/go-module/db/postgresql/linker"
@@ -31,10 +29,6 @@ func New(config config.Config) (*linker.App, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
-	postgresqlConfig, err := json.Marshal(config.PostgreSQL)
-	if err != nil {
-		return nil, err
-	}
 	observability := observabilitycomponent.NewComponent()
 	metricLabels := []metrics.LabelValue{metrics.Label("service", "linker-v3-example")}
 	notification := notificationcomponent.NewComponent(
@@ -45,7 +39,7 @@ func New(config config.Config) (*linker.App, error) {
 		server.WithShutdownTimeout(config.ShutdownTimeout),
 		server.WithHTTP(config.HTTP),
 		server.WithComponents(
-			postgresql.New(),
+			postgresql.New(postgresql.WithConfig(config.PostgreSQL)),
 			applicationcomponent.New(
 				applicationcomponent.WithApplications(
 					applicationcore.Application{ID: "front", Scope: "front", Name: "前台应用", Status: applicationcore.StatusEnabled},
@@ -75,8 +69,5 @@ func New(config config.Config) (*linker.App, error) {
 				ttsclient.WithMetricLabels(metricLabels...),
 			),
 		),
-		server.WithMapSetting(map[linker.Namespace][]byte{
-			linker.Namespace(postgresql.ID): postgresqlConfig,
-		}),
 	), nil
 }

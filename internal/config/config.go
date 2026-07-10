@@ -25,12 +25,10 @@ type Config struct {
 }
 
 func Default() Config {
+	httpConfig := http.DefaultConfig()
+	httpConfig.Addr = "127.0.0.1:8800"
 	return Config{
-		HTTP: http.Config{
-			Addr:     "127.0.0.1:8800",
-			Recovery: true,
-			Health:   http.HealthConfig{Enabled: true, Path: "ping"},
-		},
+		HTTP: httpConfig,
 		GRPC: rpcgrpc.ServerConfig{
 			Addr: "127.0.0.1:9900",
 		},
