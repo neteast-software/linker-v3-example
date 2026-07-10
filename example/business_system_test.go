@@ -52,7 +52,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new app: %v", err)
 	}
-	plan := app.Plan()
+	plan := preparedPlan(t, app)
 	if !planHasComponent(plan, postgresql.ID) ||
 		!planHasComponent(plan, applicationcomponent.ID) ||
 		!planHasComponent(plan, audit.ID) ||

@@ -7,7 +7,6 @@ import (
 	audit "github.com/neteast-software/go-module/audit/operate/linker"
 	eventcore "github.com/neteast-software/go-module/fault/event"
 	event "github.com/neteast-software/go-module/fault/event/linker"
-	plan "github.com/neteast-software/go-module/linker/plan"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
 	"github.com/neteast-software/go-module/observe/metrics"
 	metricconsumer "github.com/neteast-software/go-module/observe/metrics/mq/consumer"
@@ -124,28 +123,6 @@ func (p *Component) Assets(context.Context, linker.Runtime) ([]linker.Asset, err
 		mq.Consumers(p.consumer),
 		cron.JobAsset(p.job),
 	), nil
-}
-
-func (p *Component) LinkerAssetPlans() []plan.Asset {
-	consumer := p.consumer.Plan()
-	return []plan.Asset{
-		{
-			Kind:      "mq/consumer",
-			Name:      consumer.Name,
-			Component: ID.String(),
-			Detail: map[string]string{
-				"topic": consumer.Topic,
-			},
-		},
-		{
-			Kind:      "scheduler/cron/job",
-			Name:      p.job.Name,
-			Component: ID.String(),
-			Detail: map[string]string{
-				"spec": p.job.Spec,
-			},
-		},
-	}
 }
 
 func (p *Component) Init(_ context.Context, runtime linker.Runtime) error {

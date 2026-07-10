@@ -23,6 +23,9 @@ func printPlan(output io.Writer) error {
 	if err != nil {
 		return err
 	}
+	if err = serverApp.Prepare(context.Background()); err != nil {
+		return err
+	}
 	encoder := json.NewEncoder(output)
 	encoder.SetIndent("", "  ")
 	return encoder.Encode(serverApp.Plan())

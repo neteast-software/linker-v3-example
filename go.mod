@@ -23,7 +23,6 @@ require (
 	github.com/neteast-software/go-module/http/client v0.0.0
 	github.com/neteast-software/go-module/http/client/linker v0.0.0
 	github.com/neteast-software/go-module/http/gin v0.0.0
-	github.com/neteast-software/go-module/linker/plan v0.0.0
 	github.com/neteast-software/go-module/linker/server v0.0.0
 	github.com/neteast-software/go-module/mq/consumer/linker v0.0.0
 	github.com/neteast-software/go-module/notify/feishu v0.0.0
@@ -221,8 +220,6 @@ replace github.com/neteast-software/go-module/fault/notice => ../modules/fault/n
 replace github.com/neteast-software/go-module/fault/notice/linker => ../modules/fault/notice/linker
 
 replace github.com/neteast-software/go-module/linker/server => ../modules/linker/server
-
-replace github.com/neteast-software/go-module/linker/plan => ../modules/linker/plan
 
 replace github.com/neteast-software/go-module/mq/consumer => ../modules/mq/consumer
 

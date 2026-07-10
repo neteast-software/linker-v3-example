@@ -52,7 +52,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		),
 	)
 
-	plan := app.Plan()
+	plan := preparedPlan(t, app)
 	if !planHasAsset(plan, "mq/consumer", "notification") {
 		t.Fatalf("missing consumer asset plan: %#v", plan.Assets)
 	}
@@ -163,7 +163,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 
 func planHasAsset(plan server.Plan, kind string, name string) bool {
 	for _, asset := range plan.Assets {
-		if asset.Kind == kind && asset.Name == name {
+		if string(asset.Kind) == kind && asset.Name == name {
 			return true
 		}
 	}
@@ -172,10 +172,10 @@ func planHasAsset(plan server.Plan, kind string, name string) bool {
 
 func planHasRouteAsset(plan server.Plan, method string, path string, resource string) bool {
 	for _, asset := range plan.Assets {
-		if asset.Kind == "http/route" &&
-			asset.Method == method &&
-			asset.Path == path &&
-			asset.Resource == resource {
+		if asset.Kind == linker.AssetRoute &&
+			asset.Detail["method"] == method &&
+			asset.Detail["path"] == path &&
+			asset.Detail["resource"] == resource {
 			return true
 		}
 	}

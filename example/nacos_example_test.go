@@ -152,7 +152,7 @@ func TestServerFrameworkPlansNacosHTTPAndGRPCRegistries(t *testing.T) {
 func assertPlanCapability(t *testing.T, plan server.Plan, id linker.ID) {
 	t.Helper()
 	for _, capability := range plan.Capabilities {
-		if capability == id {
+		if capability.ID == id {
 			return
 		}
 	}

@@ -3,7 +3,6 @@ package observability
 import (
 	"context"
 
-	planmodule "github.com/neteast-software/go-module/linker/plan"
 	"github.com/neteast-software/go-module/observe/metrics"
 	metricsprom "github.com/neteast-software/go-module/observe/metrics/prometheus"
 	linker "github.com/neteast-software/linker/v3"
@@ -44,13 +43,6 @@ func (p *Component) Identity() linker.ID {
 	return ID
 }
 
-func (p *Component) Capabilities() []linker.ID {
-	return []linker.ID{
-		observabilityservice.MetricRecorderID,
-		observabilityservice.PrometheusRecorderID,
-	}
-}
-
 func (p *Component) Recorder() metrics.Recorder {
 	if p == nil || p.recorder == nil {
 		return metrics.Noop()
@@ -58,29 +50,25 @@ func (p *Component) Recorder() metrics.Recorder {
 	return p.recorder
 }
 
-func (p *Component) LinkerAssetPlans() []planmodule.Asset {
-	return []planmodule.Asset{
-		{
-			Kind:      "observe/metrics",
-			Name:      "prometheus",
-			Component: ID.String(),
-			Detail: map[string]string{
+func (p *Component) Assets(context.Context, linker.Runtime) ([]linker.Asset, error) {
+	return []linker.Asset{
+		linker.NewAsset("observe/metrics", ID, p.recorder).Describe(
+			"prometheus",
+			map[string]string{
 				"endpoint":  "/metrics",
 				"namespace": "linker_v3_example",
 				"recorder":  "prometheus",
 			},
-		},
-		{
-			Kind:      "observe/tracing",
-			Name:      "http+grpc",
-			Component: ID.String(),
-			Detail: map[string]string{
+		),
+		linker.NewAsset("observe/tracing", ID, "http+grpc").Describe(
+			"http+grpc",
+			map[string]string{
 				"headers":   "X-Trace-ID,X-Span-ID,X-Request-ID",
 				"sampling":  "always",
 				"transport": "http,grpc",
 			},
-		},
-	}
+		),
+	}, nil
 }
 
 func (p *Component) OnMounted(_ context.Context, runtime linker.Runtime) error {

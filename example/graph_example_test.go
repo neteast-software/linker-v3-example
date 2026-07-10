@@ -42,7 +42,7 @@ func TestGraphNaiveExample(t *testing.T) {
 		),
 	)
 
-	plan := app.Plan()
+	plan := preparedPlan(t, app)
 	if !planHasComponent(plan, graphcomponent.ID) ||
 		!planHasRouteAsset(plan, "GET", "/api/v1/app2/graph/orders", "http.app2.graph.orders") ||
 		!planHasRouteAsset(plan, "GET", "/api/v1/app2/graph/orders/form", "http.app2.graph.order.form") ||

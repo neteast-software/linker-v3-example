@@ -60,7 +60,7 @@ func TestHTTPClientExample(t *testing.T) {
 		server.WithoutStartupLog(),
 		server.WithComponents(component),
 	)
-	plan := app.Plan()
+	plan := preparedPlan(t, app)
 	if !planHasComponent(plan, clientcomponent.ID) {
 		t.Fatalf("plan missing http client component: %#v", plan.Components)
 	}
