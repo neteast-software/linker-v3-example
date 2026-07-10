@@ -20,7 +20,6 @@ import (
 	postgresqlcore "github.com/neteast-software/go-module/db/postgresql"
 	postgresql "github.com/neteast-software/go-module/db/postgresql/linker"
 	http "github.com/neteast-software/go-module/http/gin/linker"
-	server "github.com/neteast-software/go-module/linker/server"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
 	"github.com/neteast-software/go-module/observe/tracing"
 	rpccore "github.com/neteast-software/go-module/rpc/grpc"
@@ -132,7 +131,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		}
 	})
 
-	httpServer, err := linker.RequireCapability(app.App(), linker.NewCapabilityKey[*http.Server](http.ID))
+	httpServer, err := linker.RequireCapability(app, linker.NewCapabilityKey[*http.Server](http.ID))
 	if err != nil {
 		t.Fatalf("http capability: %v", err)
 	}
@@ -199,7 +198,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		t.Fatalf("unexpected scoped task: %#v", task)
 	}
 
-	tts, err := linker.RequireCapability(app.App(), ttsclient.ClientKey())
+	tts, err := linker.RequireCapability(app, ttsclient.ClientKey())
 	if err != nil {
 		t.Fatalf("tts client capability: %v", err)
 	}
@@ -230,7 +229,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		t.Fatalf("expected canceled transcribe error")
 	}
 
-	db, err := linker.RequireCapability(app.App(), linker.NewCapabilityKey[*gorm.DB](postgresql.ID))
+	db, err := linker.RequireCapability(app, linker.NewCapabilityKey[*gorm.DB](postgresql.ID))
 	if err != nil {
 		t.Fatalf("db capability: %v", err)
 	}
@@ -442,11 +441,11 @@ func responseMap(t *testing.T, value any) map[string]any {
 	return data
 }
 
-func planHasComponent(plan server.Plan, id linker.ID) bool {
+func planHasComponent(plan linker.Plan, id linker.ID) bool {
 	return planOrder(plan, id) > 0
 }
 
-func planOrder(plan server.Plan, id linker.ID) int {
+func planOrder(plan linker.Plan, id linker.ID) int {
 	for _, component := range plan.Components {
 		if component.ID == id {
 			return component.Order

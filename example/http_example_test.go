@@ -33,7 +33,6 @@ func TestLinkerV3HTTPGinExample(t *testing.T) {
 		license.WithClock(func() time.Time { return now }),
 	))
 	app := server.New(
-		server.WithMode(linker.Server),
 		server.WithShutdownTimeout(3*time.Second),
 		server.WithEventRecorder(recorder),
 		server.WithMapSetting(map[linker.Namespace][]byte{
@@ -75,7 +74,7 @@ func TestLinkerV3HTTPGinExample(t *testing.T) {
 		}
 	})
 
-	runtimePlan := app.App().Plan()
+	runtimePlan := app.Plan()
 	if !runtimePlan.Started || !runtimePlan.Ready {
 		t.Fatalf("runtime plan = %#v", runtimePlan)
 	}
@@ -87,7 +86,7 @@ func TestLinkerV3HTTPGinExample(t *testing.T) {
 		t.Fatalf("runtime plan missing http capability: %#v", runtimePlan.Capabilities)
 	}
 
-	httpServer, err := linker.RequireCapability(app.App(), linker.NewCapabilityKey[*http.Server](http.ID))
+	httpServer, err := linker.RequireCapability(app, linker.NewCapabilityKey[*http.Server](http.ID))
 	if err != nil {
 		t.Fatalf("server capability: %v", err)
 	}
@@ -172,7 +171,6 @@ func corePlanHasCapability(plan linker.Plan, id linker.ID) bool {
 func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 	observability := observabilitycomponent.NewComponent()
 	app := server.New(
-		server.WithMode(linker.Server),
 		server.WithShutdownTimeout(3*time.Second),
 		server.WithMapSetting(map[linker.Namespace][]byte{
 			linker.Namespace(http.ID): []byte(`{"addr":"127.0.0.1:0"}`),
@@ -204,7 +202,7 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 		}
 	})
 
-	httpServer, err := linker.RequireCapability(app.App(), linker.NewCapabilityKey[*http.Server](http.ID))
+	httpServer, err := linker.RequireCapability(app, linker.NewCapabilityKey[*http.Server](http.ID))
 	if err != nil {
 		t.Fatalf("server capability: %v", err)
 	}

@@ -48,7 +48,6 @@ http:
 	}
 
 	app := server.New(
-		server.WithMode(linker.Server),
 		server.WithSource(yaml.NewSource(file)),
 		server.WithHTTPRoutes(http.GET("hello", func(c *http.Context) {
 			response.Data(c, map[string]string{"name": "yaml"})
@@ -61,7 +60,7 @@ http:
 		_ = app.Stop(context.Background())
 	})
 
-	httpServer, err := linker.RequireCapability(app.App(), linker.NewCapabilityKey[*http.Server](http.ID))
+	httpServer, err := linker.RequireCapability(app, linker.NewCapabilityKey[*http.Server](http.ID))
 	if err != nil {
 		t.Fatalf("http capability: %v", err)
 	}
@@ -114,7 +113,6 @@ http:
 	t.Setenv("LINKER_HTTP", `{"addr":"127.0.0.1:0","basePath":"env-api","recovery":true,"health":{"enabled":true,"path":"ready"}}`)
 
 	app := server.New(
-		server.WithMode(linker.Server),
 		server.WithSource(yaml.NewSource(file), linker.EnvSource{Prefix: "LINKER_"}),
 		server.WithHTTPRoutes(http.GET("hello", func(c *http.Context) {
 			response.Data(c, map[string]string{"name": "env"})
@@ -127,7 +125,7 @@ http:
 		_ = app.Stop(context.Background())
 	})
 
-	httpServer, err := linker.RequireCapability(app.App(), linker.NewCapabilityKey[*http.Server](http.ID))
+	httpServer, err := linker.RequireCapability(app, linker.NewCapabilityKey[*http.Server](http.ID))
 	if err != nil {
 		t.Fatalf("http capability: %v", err)
 	}
@@ -141,7 +139,7 @@ http:
 	}
 }
 
-func TestServerFrameworkLoadsRegistryMockAfterLocalSeed(t *testing.T) {
+func TestCoreBinLoadsRegistryMockAfterLocalSeed(t *testing.T) {
 	dir := t.TempDir()
 	file := filepath.Join(dir, "app.yaml")
 	if err := os.WriteFile(file, []byte(`
@@ -154,10 +152,9 @@ cache/redis:
 	}
 	t.Setenv("LINKER_CACHE__REDIS", `{"addr":"env"}`)
 
-	app := server.New(
-		server.WithMode(linker.Bin),
-		server.WithoutHTTP(),
-		server.WithSource(yaml.NewSource(file), registryMockSource{}, linker.EnvSource{Prefix: "LINKER_"}),
+	app := linker.New(
+		linker.WithMode(linker.Bin),
+		linker.WithSource(yaml.NewSource(file), registryMockSource{}, linker.EnvSource{Prefix: "LINKER_"}),
 	)
 	if err := app.Start(context.Background()); err != nil {
 		t.Fatalf("start: %v", err)
@@ -166,11 +163,11 @@ cache/redis:
 		_ = app.Close(context.Background())
 	})
 
-	cache, ok := app.App().Setting("cache/redis")
+	cache, ok := app.Setting("cache/redis")
 	if !ok || string(cache) != `{"addr":"env"}` {
 		t.Fatalf("env override setting = %q, %v", cache, ok)
 	}
-	notice, ok := app.App().Setting("notice/mock")
+	notice, ok := app.Setting("notice/mock")
 	if !ok || string(notice) != `{"enabled":true}` {
 		t.Fatalf("registry mock setting = %q, %v", notice, ok)
 	}

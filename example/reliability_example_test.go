@@ -39,7 +39,6 @@ func TestDBBackedComponentReportsMissingStoreDependency(t *testing.T) {
 
 func TestServerStopTimeoutExample(t *testing.T) {
 	app := server.New(
-		server.WithMode(linker.Server),
 		server.WithShutdownTimeout(time.Nanosecond),
 		server.WithoutHTTP(),
 		server.WithoutEvent(),

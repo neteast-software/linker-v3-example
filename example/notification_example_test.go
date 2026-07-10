@@ -36,7 +36,6 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		notificationcomponent.WithMetricLabels(metrics.Label("service", "example")),
 	)
 	app := server.New(
-		server.WithMode(linker.Server),
 		server.WithShutdownTimeout(2*time.Second),
 		server.WithHTTP(http.Config{Addr: "127.0.0.1:0"}),
 		server.WithEventRecorder(eventRecorder),
@@ -75,7 +74,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		}
 	})
 
-	consumer, err := linker.RequireCapability(app.App(), mq.ConsumerKey("notification"))
+	consumer, err := linker.RequireCapability(app, mq.ConsumerKey("notification"))
 	if err != nil {
 		t.Fatalf("consumer capability: %v", err)
 	}
@@ -97,7 +96,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	assertMetricLabel(t, metricRecorder, "mq_consumer_messages_total", "status", "handled")
 	assertMetricLabel(t, metricRecorder, "mq_consumer_messages_total", "service", "example")
 
-	httpServer, err := linker.RequireCapability(app.App(), linker.NewCapabilityKey[*http.Server](http.ID))
+	httpServer, err := linker.RequireCapability(app, linker.NewCapabilityKey[*http.Server](http.ID))
 	if err != nil {
 		t.Fatalf("http capability: %v", err)
 	}
@@ -161,7 +160,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	assertMetricLabel(t, metricRecorder, "scheduler_cron_runs_total", "status", "success")
 }
 
-func planHasAsset(plan server.Plan, kind string, name string) bool {
+func planHasAsset(plan linker.Plan, kind string, name string) bool {
 	for _, asset := range plan.Assets {
 		if string(asset.Kind) == kind && asset.Name == name {
 			return true
@@ -170,7 +169,7 @@ func planHasAsset(plan server.Plan, kind string, name string) bool {
 	return false
 }
 
-func planHasRouteAsset(plan server.Plan, method string, path string, resource string) bool {
+func planHasRouteAsset(plan linker.Plan, method string, path string, resource string) bool {
 	for _, asset := range plan.Assets {
 		if asset.Kind == linker.AssetRoute &&
 			asset.Detail["method"] == method &&

@@ -10,7 +10,6 @@ import (
 
 	httpclient "github.com/neteast-software/go-module/http/client"
 	clientcomponent "github.com/neteast-software/go-module/http/client/linker"
-	server "github.com/neteast-software/go-module/linker/server"
 	linker "github.com/neteast-software/linker/v3"
 
 	"linker-v3-example/internal/client/directory"
@@ -51,14 +50,9 @@ func TestHTTPClientExample(t *testing.T) {
 			attempts = append(attempts, attempt)
 		})),
 	)
-	app := server.New(
-		server.WithMode(linker.Bin),
-		server.WithoutHTTP(),
-		server.WithoutEvent(),
-		server.WithoutNotice(),
-		server.WithoutAudit(),
-		server.WithoutStartupLog(),
-		server.WithComponents(component),
+	app := linker.New(
+		linker.WithMode(linker.Bin),
+		linker.WithComponents(component),
 	)
 	plan := preparedPlan(t, app)
 	if !planHasComponent(plan, clientcomponent.ID) {
@@ -77,7 +71,7 @@ func TestHTTPClientExample(t *testing.T) {
 		}
 	})
 
-	api, err := linker.RequireCapability(app.App(), clientcomponent.ClientKey())
+	api, err := linker.RequireCapability(app, clientcomponent.ClientKey())
 	if err != nil {
 		t.Fatalf("http client capability: %v", err)
 	}

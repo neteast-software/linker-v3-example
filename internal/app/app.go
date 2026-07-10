@@ -27,7 +27,7 @@ import (
 	"linker-v3-example/internal/config"
 )
 
-func New(config config.Config) (*server.App, error) {
+func New(config config.Config) (*linker.App, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
@@ -42,7 +42,6 @@ func New(config config.Config) (*server.App, error) {
 		notificationcomponent.WithMetricLabels(metricLabels...),
 	)
 	return server.New(
-		server.WithMode(linker.Server),
 		server.WithShutdownTimeout(config.ShutdownTimeout),
 		server.WithHTTP(config.HTTP),
 		server.WithComponents(

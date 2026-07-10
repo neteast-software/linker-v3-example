@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	http "github.com/neteast-software/go-module/http/gin/linker"
-	server "github.com/neteast-software/go-module/linker/server"
 	linker "github.com/neteast-software/linker/v3"
 )
 
@@ -30,15 +29,14 @@ func (p *configReader) Init(_ context.Context, runtime linker.Runtime) error {
 	return nil
 }
 
-func TestServerFrameworkBinWithoutHTTP(t *testing.T) {
+func TestCoreBinDoesNotLoadServerDefaults(t *testing.T) {
 	reader := newConfigReader()
-	app := server.New(
-		server.WithMode(linker.Bin),
-		server.WithoutHTTP(),
-		server.WithMapSetting(map[linker.Namespace][]byte{
+	app := linker.New(
+		linker.WithMode(linker.Bin),
+		linker.WithSource(linker.MapSource{Setting: linker.NewSetting(map[linker.Namespace][]byte{
 			"example/config": []byte(`{"name":"bin"}`),
-		}),
-		server.WithComponents(reader),
+		})}),
+		linker.WithComponents(reader),
 	)
 
 	plan := app.Plan()
@@ -54,7 +52,7 @@ func TestServerFrameworkBinWithoutHTTP(t *testing.T) {
 	if reader.value != `{"name":"bin"}` {
 		t.Fatalf("reader value = %q", reader.value)
 	}
-	if _, ok := linker.Resolve(app.App(), linker.NewCapabilityKey[*http.Server](http.ID)); ok {
+	if _, ok := linker.Resolve(app, linker.NewCapabilityKey[*http.Server](http.ID)); ok {
 		t.Fatalf("http capability should be absent")
 	}
 	if err := app.Stop(context.Background()); err != nil {

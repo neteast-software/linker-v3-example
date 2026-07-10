@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	server "github.com/neteast-software/go-module/linker/server"
 	feishu "github.com/neteast-software/go-module/notify/feishu"
 	feishucomponent "github.com/neteast-software/go-module/notify/feishu/linker"
 	linker "github.com/neteast-software/linker/v3"
@@ -13,10 +12,10 @@ import (
 
 func TestFeishuNotifyCapabilityExample(t *testing.T) {
 	sender := &recordingFeishuSender{}
-	app := server.New(
-		server.WithMode(linker.Bin),
-		server.WithShutdownTimeout(time.Second),
-		server.WithComponents(
+	app := linker.New(
+		linker.WithMode(linker.Bin),
+		linker.WithShutdownTimeout(time.Second),
+		linker.WithComponents(
 			feishucomponent.New(feishucomponent.WithSender(sender)),
 		),
 	)
@@ -33,7 +32,7 @@ func TestFeishuNotifyCapabilityExample(t *testing.T) {
 		}
 	})
 
-	got, err := linker.RequireCapability(app.App(), feishucomponent.SenderKey())
+	got, err := linker.RequireCapability(app, feishucomponent.SenderKey())
 	if err != nil {
 		t.Fatalf("sender capability: %v", err)
 	}

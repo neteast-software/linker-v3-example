@@ -22,7 +22,6 @@ import (
 
 func TestGraphNaiveExample(t *testing.T) {
 	app := server.New(
-		server.WithMode(linker.Server),
 		server.WithShutdownTimeout(3*time.Second),
 		server.WithMapSetting(map[linker.Namespace][]byte{
 			linker.Namespace(http.ID): []byte(`{"addr":"127.0.0.1:0"}`),
@@ -59,11 +58,11 @@ func TestGraphNaiveExample(t *testing.T) {
 		}
 	})
 
-	if _, err := linker.RequireCapability(app.App(), graphlinker.RendererKey()); err != nil {
+	if _, err := linker.RequireCapability(app, graphlinker.RendererKey()); err != nil {
 		t.Fatalf("graph renderer capability: %v", err)
 	}
 
-	httpServer, err := linker.RequireCapability(app.App(), linker.NewCapabilityKey[*http.Server](http.ID))
+	httpServer, err := linker.RequireCapability(app, linker.NewCapabilityKey[*http.Server](http.ID))
 	if err != nil {
 		t.Fatalf("http capability: %v", err)
 	}

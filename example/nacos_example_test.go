@@ -86,7 +86,6 @@ http:
 	)
 
 	app := server.New(
-		server.WithMode(linker.Server),
 		server.WithSource(yaml.NewSource(file), source),
 		server.WithHTTPRoutes(http.GET("hello", func(c *http.Context) {
 			c.String(stdhttp.StatusOK, "nacos")
@@ -99,7 +98,7 @@ http:
 		_ = app.Stop(context.Background())
 	})
 
-	httpServer, err := linker.RequireCapability(app.App(), http.ServerKey())
+	httpServer, err := linker.RequireCapability(app, http.ServerKey())
 	if err != nil {
 		t.Fatalf("http capability: %v", err)
 	}
@@ -117,14 +116,10 @@ http:
 	}
 }
 
-func TestServerFrameworkPlansNacosHTTPAndGRPCRegistries(t *testing.T) {
-	app := server.New(
-		server.WithMode(linker.Bin),
-		server.WithoutHTTP(),
-		server.WithoutEvent(),
-		server.WithoutNotice(),
-		server.WithoutAudit(),
-		server.WithRegistry(
+func TestCoreBinPlansNacosHTTPAndGRPCRegistries(t *testing.T) {
+	app := linker.New(
+		linker.WithMode(linker.Bin),
+		linker.WithComponents(
 			fakeNacosComponent{naming: fakeNacosNaming{}},
 			httpregistry.New(),
 			grpcregistry.New(),
@@ -149,7 +144,7 @@ func TestServerFrameworkPlansNacosHTTPAndGRPCRegistries(t *testing.T) {
 	assertPlanCapability(t, plan, "rpc/grpc/registry")
 }
 
-func assertPlanCapability(t *testing.T, plan server.Plan, id linker.ID) {
+func assertPlanCapability(t *testing.T, plan linker.Plan, id linker.ID) {
 	t.Helper()
 	for _, capability := range plan.Capabilities {
 		if capability.ID == id {
