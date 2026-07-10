@@ -21,11 +21,11 @@ import (
 )
 
 func TestGraphNaiveExample(t *testing.T) {
+	httpConfig := http.DefaultConfig()
+	httpConfig.Addr = "127.0.0.1:0"
 	app := server.New(
 		server.WithShutdownTimeout(3*time.Second),
-		server.WithMapSetting(map[linker.Namespace][]byte{
-			linker.Namespace(http.ID): []byte(`{"addr":"127.0.0.1:0"}`),
-		}),
+		server.WithHTTP(httpConfig),
 		server.WithComponents(
 			observabilitycomponent.NewComponent(),
 			applicationcomponent.New(

@@ -23,10 +23,13 @@ import (
 	linker "github.com/neteast-software/linker/v3"
 
 	observabilitycomponent "linker-v3-example/internal/component/observability"
+	observabilityservice "linker-v3-example/internal/service/observability"
 )
 
 func TestLinkerV3HTTPGinExample(t *testing.T) {
 	recorder := eventcore.NewMemoryRecorder()
+	httpConfig := http.DefaultConfig()
+	httpConfig.Addr = "127.0.0.1:0"
 	now := time.Date(2026, 7, 8, 0, 0, 0, 0, time.Local)
 	gate := license.NewGate(license.New(
 		license.WithExpireAt(now.Add(-time.Second)),
@@ -35,9 +38,7 @@ func TestLinkerV3HTTPGinExample(t *testing.T) {
 	app := server.New(
 		server.WithShutdownTimeout(3*time.Second),
 		server.WithEventRecorder(recorder),
-		server.WithMapSetting(map[linker.Namespace][]byte{
-			linker.Namespace(http.ID): []byte(`{"addr":"127.0.0.1:0","recovery":true}`),
-		}),
+		server.WithHTTP(httpConfig),
 		server.WithHTTPRoutes(
 			http.GET("pong", func(c *http.Context) {
 				c.String(stdhttp.StatusOK, "pong")
@@ -79,10 +80,11 @@ func TestLinkerV3HTTPGinExample(t *testing.T) {
 		t.Fatalf("runtime plan = %#v", runtimePlan)
 	}
 	httpRuntimePlan := requireCoreComponentPlan(t, runtimePlan, http.ID)
-	if !httpRuntimePlan.Active || !httpRuntimePlan.Initialized || !httpRuntimePlan.Started {
+	if !httpRuntimePlan.Active || !httpRuntimePlan.Initialized || !httpRuntimePlan.Started ||
+		!httpRuntimePlan.Enabled || !httpRuntimePlan.Effective || httpRuntimePlan.Degraded {
 		t.Fatalf("http runtime plan = %#v", httpRuntimePlan)
 	}
-	if !corePlanHasCapability(runtimePlan, http.ID) {
+	if !corePlanHasCapability(runtimePlan, http.ID, http.ID) {
 		t.Fatalf("runtime plan missing http capability: %#v", runtimePlan.Capabilities)
 	}
 
@@ -159,9 +161,9 @@ func requireCoreComponentPlan(t *testing.T, plan linker.Plan, id linker.ID) link
 	return linker.ComponentPlan{}
 }
 
-func corePlanHasCapability(plan linker.Plan, id linker.ID) bool {
+func corePlanHasCapability(plan linker.Plan, id linker.ID, owner linker.ID) bool {
 	for _, capability := range plan.Capabilities {
-		if capability.ID == id {
+		if capability.ID == id && capability.Owner == owner {
 			return true
 		}
 	}
@@ -170,11 +172,11 @@ func corePlanHasCapability(plan linker.Plan, id linker.ID) bool {
 
 func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 	observability := observabilitycomponent.NewComponent()
+	httpConfig := http.DefaultConfig()
+	httpConfig.Addr = "127.0.0.1:0"
 	app := server.New(
 		server.WithShutdownTimeout(3*time.Second),
-		server.WithMapSetting(map[linker.Namespace][]byte{
-			linker.Namespace(http.ID): []byte(`{"addr":"127.0.0.1:0"}`),
-		}),
+		server.WithHTTP(httpConfig),
 		server.WithComponents(
 			observability,
 		),
@@ -201,6 +203,14 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 			t.Fatalf("stop: %v", err)
 		}
 	})
+	runtimePlan := app.Plan()
+	observabilityPlan := requireCoreComponentPlan(t, runtimePlan, observabilitycomponent.ID)
+	if !observabilityPlan.Enabled || !observabilityPlan.Effective || observabilityPlan.Degraded {
+		t.Fatalf("observability runtime plan = %#v", observabilityPlan)
+	}
+	if !corePlanHasCapability(runtimePlan, observabilityservice.MetricRecorderID, observabilitycomponent.ID) {
+		t.Fatalf("runtime plan missing capability owner: %#v", runtimePlan.Capabilities)
+	}
 
 	httpServer, err := linker.RequireCapability(app, linker.NewCapabilityKey[*http.Server](http.ID))
 	if err != nil {

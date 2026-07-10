@@ -8,35 +8,24 @@ import (
 	linker "github.com/neteast-software/linker/v3"
 )
 
-type configReader struct {
-	id    linker.ID
-	value string
+type initProbe struct {
+	initialized bool
 }
 
-func newConfigReader() *configReader {
-	return &configReader{id: "example/config-reader"}
+func (p *initProbe) Identity() linker.ID {
+	return "example/init-probe"
 }
 
-func (p *configReader) Identity() linker.ID {
-	return p.id
-}
-
-func (p *configReader) Init(_ context.Context, runtime linker.Runtime) error {
-	data, ok := runtime.Setting("example/config")
-	if ok {
-		p.value = string(data)
-	}
+func (p *initProbe) Init(context.Context, linker.Runtime) error {
+	p.initialized = true
 	return nil
 }
 
 func TestCoreBinDoesNotLoadServerDefaults(t *testing.T) {
-	reader := newConfigReader()
+	probe := &initProbe{}
 	app := linker.New(
 		linker.WithMode(linker.Bin),
-		linker.WithSource(linker.MapSource{Setting: linker.NewSetting(map[linker.Namespace][]byte{
-			"example/config": []byte(`{"name":"bin"}`),
-		})}),
-		linker.WithComponents(reader),
+		linker.WithComponents(probe),
 	)
 
 	plan := app.Plan()
@@ -49,8 +38,8 @@ func TestCoreBinDoesNotLoadServerDefaults(t *testing.T) {
 	if err := app.Start(context.Background()); err != nil {
 		t.Fatalf("start: %v", err)
 	}
-	if reader.value != `{"name":"bin"}` {
-		t.Fatalf("reader value = %q", reader.value)
+	if !probe.initialized {
+		t.Fatal("bin component was not initialized")
 	}
 	if _, ok := linker.Resolve(app, linker.NewCapabilityKey[*http.Server](http.ID)); ok {
 		t.Fatalf("http capability should be absent")

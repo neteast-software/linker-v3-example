@@ -35,9 +35,11 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		notificationcomponent.WithMetricRecorder(metricRecorder),
 		notificationcomponent.WithMetricLabels(metrics.Label("service", "example")),
 	)
+	httpConfig := http.DefaultConfig()
+	httpConfig.Addr = "127.0.0.1:0"
 	app := server.New(
 		server.WithShutdownTimeout(2*time.Second),
-		server.WithHTTP(http.Config{Addr: "127.0.0.1:0"}),
+		server.WithHTTP(httpConfig),
 		server.WithEventRecorder(eventRecorder),
 		server.WithAuditRecorder(auditRecorder),
 		server.WithoutNotice(),
@@ -131,6 +133,14 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	waitFor(t, 2*time.Second, func() bool {
 		return hasProviderTrace(notification.Provider().Messages(), "mq", "trace-http-mq")
 	})
+	waitFor(t, time.Second, func() bool {
+		return hasAuditRecord(
+			auditRecorder.Records(),
+			stdhttp.MethodPost,
+			"/api/v1/app2/notification/send",
+			"http.app2.notification.send",
+		)
+	})
 
 	sseReq, err := stdhttp.NewRequest(stdhttp.MethodGet, "http://"+httpServer.Addr()+"/api/v1/app2/notification/events", nil)
 	if err != nil {
@@ -202,6 +212,15 @@ func hasProviderTrace(messages []notificationservice.Message, source string, tra
 func hasProviderNonEmptyTrace(messages []notificationservice.Message, source string) bool {
 	for _, message := range messages {
 		if message.Source == source && message.TraceID != "" {
+			return true
+		}
+	}
+	return false
+}
+
+func hasAuditRecord(records []auditcore.Record, method string, path string, resource string) bool {
+	for _, record := range records {
+		if record.Method == method && record.Path == path && record.Resource == resource {
 			return true
 		}
 	}
