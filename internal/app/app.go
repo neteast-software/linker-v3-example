@@ -57,7 +57,7 @@ func New(config config.Config) (*server.App, error) {
 			graphcomponent.NewComponent(),
 			observability,
 			inspectioncomponent.NewComponent(),
-			usercomponent.NewComponent(),
+			usercomponent.NewComponent([]byte(config.TokenKey)),
 			ttscomponent.NewComponent(),
 			notification,
 			mq.New(),

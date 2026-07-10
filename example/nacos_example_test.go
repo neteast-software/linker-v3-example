@@ -64,7 +64,7 @@ func TestServerFrameworkLoadsNacosSourceAfterLocalSeed(t *testing.T) {
 registry/nacos:
   host: seed.nacos.local
   port: 8848
-http/gin:
+http:
   addr: 127.0.0.1:0
   basePath: local
 `), 0o600); err != nil {
@@ -75,7 +75,7 @@ http/gin:
 		registrynacos.SourceConfig{
 			DataID:    "linker-example.yaml",
 			Group:     "LINKER",
-			Namespace: "http/gin",
+			Namespace: "http",
 		},
 		registrynacos.WithGetter(func(_ context.Context, config registrynacos.SourceConfig) ([]byte, error) {
 			if config.Nacos.Host != "seed.nacos.local" || config.Nacos.Port != 8848 {
@@ -145,7 +145,7 @@ func TestServerFrameworkPlansNacosHTTPAndGRPCRegistries(t *testing.T) {
 
 	plan = app.Plan()
 	assertPlanCapability(t, plan, "registry/nacos/naming")
-	assertPlanCapability(t, plan, "http/gin/registry")
+	assertPlanCapability(t, plan, "http/registry")
 	assertPlanCapability(t, plan, "rpc/grpc/registry")
 }
 

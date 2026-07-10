@@ -1,6 +1,8 @@
 package config
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"os"
 	"strconv"
 	"time"
@@ -19,6 +21,7 @@ type Config struct {
 	TTSClient       rpcgrpc.ClientConfig `json:"ttsClient" yaml:"ttsClient"`
 	PostgreSQL      postgresql.Config    `json:"postgresql" yaml:"postgresql"`
 	ShutdownTimeout time.Duration        `json:"shutdownTimeout" yaml:"shutdownTimeout"`
+	TokenKey        string               `json:"-" yaml:"-"`
 }
 
 func Default() Config {
@@ -53,6 +56,7 @@ func Default() Config {
 			SSLMode: "disable",
 		},
 		ShutdownTimeout: 3 * time.Second,
+		TokenKey:        randomTokenKey(),
 	}
 }
 
@@ -73,6 +77,15 @@ func ApplyEnv(config *Config) {
 	config.PostgreSQL.User = env("LINKER_V3_EXAMPLE_PG_USER", config.PostgreSQL.User)
 	config.PostgreSQL.Password = env("LINKER_V3_EXAMPLE_PG_PASSWORD", config.PostgreSQL.Password)
 	config.PostgreSQL.DBName = env("LINKER_V3_EXAMPLE_PG_DB", config.PostgreSQL.DBName)
+	config.TokenKey = env("LINKER_V3_EXAMPLE_TOKEN_KEY", config.TokenKey)
+}
+
+func randomTokenKey() string {
+	value := make([]byte, 32)
+	if _, err := rand.Read(value); err != nil {
+		return ""
+	}
+	return hex.EncodeToString(value)
 }
 
 func env(key string, fallback string) string {

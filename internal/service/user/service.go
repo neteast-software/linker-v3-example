@@ -73,7 +73,6 @@ func (s Service) login(ctx context.Context, user usermodel.User, account usermod
 	}
 	issued, err := s.signer.Issue(strconv.FormatUint(user.ID, 10), time.Hour,
 		token.WithScope(scope),
-		token.WithMeta(map[string]any{"role": user.Role}),
 	)
 	if err != nil {
 		return usermodel.User{}, "", err

@@ -20,12 +20,13 @@ import (
 const ID linker.ID = "example/user"
 
 type Component struct {
-	store   userservice.Store
-	service userservice.Service
+	store    userservice.Store
+	service  userservice.Service
+	tokenKey []byte
 }
 
-func NewComponent() *Component {
-	return &Component{}
+func NewComponent(tokenKey []byte) *Component {
+	return &Component{tokenKey: append([]byte(nil), tokenKey...)}
 }
 
 func (p *Component) Identity() linker.ID {
@@ -51,7 +52,7 @@ func (p *Component) Init(ctx context.Context, runtime linker.Runtime) error {
 	p.store = userservice.NewStore(db)
 	p.service = userservice.NewService(
 		p.store,
-		token.NewHMAC([]byte("linker-v3-example-token")),
+		token.NewHMAC(p.tokenKey),
 		session.New(session.NewMemoryStore(time.Now)),
 	)
 	return userservice.Seed(ctx, p.store)

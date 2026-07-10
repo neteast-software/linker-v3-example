@@ -37,7 +37,7 @@ func TestServerFrameworkLoadsYAMLSource(t *testing.T) {
 	dir := t.TempDir()
 	file := filepath.Join(dir, "app.yaml")
 	if err := os.WriteFile(file, []byte(`
-http/gin:
+http:
   addr: 127.0.0.1:0
   basePath: api
   recovery: true
@@ -102,7 +102,7 @@ func TestServerFrameworkAppliesEnvOverrideAfterYAML(t *testing.T) {
 	dir := t.TempDir()
 	file := filepath.Join(dir, "app.yaml")
 	if err := os.WriteFile(file, []byte(`
-http/gin:
+http:
   addr: 127.0.0.1:0
   basePath: yaml-api
   recovery: true
@@ -111,7 +111,7 @@ http/gin:
 `), 0o600); err != nil {
 		t.Fatalf("write yaml: %v", err)
 	}
-	t.Setenv("LINKER_HTTP__GIN", `{"addr":"127.0.0.1:0","basePath":"env-api","recovery":true,"health":{"enabled":true,"path":"ready"}}`)
+	t.Setenv("LINKER_HTTP", `{"addr":"127.0.0.1:0","basePath":"env-api","recovery":true,"health":{"enabled":true,"path":"ready"}}`)
 
 	app := server.New(
 		server.WithMode(linker.Server),

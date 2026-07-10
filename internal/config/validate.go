@@ -25,5 +25,8 @@ func (c Config) Validate() error {
 	if c.PostgreSQL.DBName == "" {
 		return fmt.Errorf("PostgreSQL db_name 不能为空")
 	}
+	if len(c.TokenKey) < 32 {
+		return fmt.Errorf("token key 至少需要 32 个字符")
+	}
 	return nil
 }
