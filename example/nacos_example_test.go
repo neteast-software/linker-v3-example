@@ -66,7 +66,7 @@ registry/nacos:
   port: 8848
 http:
   addr: 127.0.0.1:0
-  basePath: local
+  base_path: local
 `), 0o600); err != nil {
 		t.Fatalf("write yaml: %v", err)
 	}
@@ -81,7 +81,7 @@ http:
 			if config.Nacos.Host != "seed.nacos.local" || config.Nacos.Port != 8848 {
 				return nil, fmt.Errorf("nacos seed = %+v", config.Nacos)
 			}
-			return []byte(`{"addr":"127.0.0.1:0","basePath":"nacos","health":{"enabled":true,"path":"ready"}}`), nil
+			return []byte(`{"addr":"127.0.0.1:0","base_path":"nacos","health":{"enabled":true,"path":"ready"}}`), nil
 		}),
 	)
 
