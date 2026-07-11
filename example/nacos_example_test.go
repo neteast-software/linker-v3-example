@@ -7,19 +7,27 @@ import (
 	stdhttp "net/http"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 
 	yaml "github.com/neteast-software/go-module/config/yaml/linker"
 	http "github.com/neteast-software/go-module/http/gin/linker"
-	httpregistry "github.com/neteast-software/go-module/http/gin/registry/nacos/linker"
 	server "github.com/neteast-software/go-module/linker/server"
 	registrynacos "github.com/neteast-software/go-module/registry/nacos/linker"
-	grpcregistry "github.com/neteast-software/go-module/rpc/grpc/registry/nacos/linker"
+	service "github.com/neteast-software/go-module/registry/service"
+	serviceregistry "github.com/neteast-software/go-module/registry/service/nacos/linker"
+	rpc "github.com/neteast-software/go-module/rpc/grpc/linker"
 	linker "github.com/neteast-software/linker/v3"
 	nacoskit "github.com/neteast-software/nacos-kit"
 )
 
 type fakeNacosNaming struct{}
+
+type recordingNacosNaming struct {
+	mu           sync.Mutex
+	registered   []nacoskit.Instance
+	deregistered []nacoskit.Instance
+}
 
 func (fakeNacosNaming) Register(context.Context, nacoskit.Instance) error {
 	return nil
@@ -43,6 +51,42 @@ func (fakeNacosNaming) Deregister(context.Context, nacoskit.Instance) error {
 
 func (fakeNacosNaming) Close() error {
 	return nil
+}
+
+func (p *recordingNacosNaming) Register(_ context.Context, instance nacoskit.Instance) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.registered = append(p.registered, instance)
+	return nil
+}
+
+func (p *recordingNacosNaming) Discover(context.Context, string, ...nacoskit.DiscoverOption) ([]nacoskit.Instance, error) {
+	return nil, nil
+}
+
+func (p *recordingNacosNaming) DiscoverHealthy(context.Context, string, ...nacoskit.DiscoverOption) ([]nacoskit.Instance, error) {
+	return nil, nil
+}
+
+func (p *recordingNacosNaming) Offline(context.Context, nacoskit.Instance) error {
+	return nil
+}
+
+func (p *recordingNacosNaming) Deregister(_ context.Context, instance nacoskit.Instance) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.deregistered = append(p.deregistered, instance)
+	return nil
+}
+
+func (p *recordingNacosNaming) Close() error {
+	return nil
+}
+
+func (p *recordingNacosNaming) counts() (int, int) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return len(p.registered), len(p.deregistered)
 }
 
 type fakeNacosComponent struct {
@@ -113,19 +157,17 @@ http:
 	}
 }
 
-func TestCoreBinPlansNacosHTTPAndGRPCRegistries(t *testing.T) {
+func TestCoreBinPlansNacosServiceRegistry(t *testing.T) {
 	app := linker.New(
 		linker.WithMode(linker.Bin),
 		linker.WithComponents(
 			fakeNacosComponent{naming: fakeNacosNaming{}},
-			httpregistry.New(),
-			grpcregistry.New(),
+			serviceregistry.New(),
 		),
 	)
 
 	plan := app.Plan()
-	if planOrder(plan, registrynacos.ID) >= planOrder(plan, httpregistry.ID) ||
-		planOrder(plan, registrynacos.ID) >= planOrder(plan, grpcregistry.ID) {
+	if planOrder(plan, registrynacos.ID) >= planOrder(plan, "registry/service") {
 		t.Fatalf("registry order = %#v", plan.Components)
 	}
 	if err := app.Start(context.Background()); err != nil {
@@ -137,8 +179,41 @@ func TestCoreBinPlansNacosHTTPAndGRPCRegistries(t *testing.T) {
 
 	plan = app.Plan()
 	assertPlanCapability(t, plan, "registry/nacos/naming")
-	assertPlanCapability(t, plan, "http/registry")
-	assertPlanCapability(t, plan, "rpc/grpc/registry")
+	assertPlanCapability(t, plan, "registry/service")
+}
+
+func TestOneServiceRegistryProvidesHTTPAndGRPC(t *testing.T) {
+	naming := &recordingNacosNaming{}
+	httpConfig := http.DefaultConfig()
+	httpConfig.Addr = "127.0.0.1:0"
+	httpConfig.Registry = service.Config{Policy: service.FailFast, Service: "example-http"}
+	rpcConfig := rpc.ServerConfig{
+		Addr:     "127.0.0.1:0",
+		Registry: service.Config{Policy: service.FailFast, Service: "example-rpc"},
+	}
+	app := linker.New(
+		linker.WithMode(linker.Server),
+		linker.WithComponents(
+			fakeNacosComponent{naming: naming},
+			serviceregistry.New(),
+			http.New(http.WithConfig(httpConfig)),
+			rpc.New(rpc.WithConfig(rpcConfig)),
+		),
+	)
+	if err := app.Start(context.Background()); err != nil {
+		t.Fatalf("start: %v", err)
+	}
+	registered, _ := naming.counts()
+	if registered != 2 {
+		t.Fatalf("registered = %d", registered)
+	}
+	if err := app.Stop(context.Background()); err != nil {
+		t.Fatalf("stop: %v", err)
+	}
+	_, deregistered := naming.counts()
+	if deregistered != 2 {
+		t.Fatalf("deregistered = %d", deregistered)
+	}
 }
 
 func assertPlanCapability(t *testing.T, plan linker.Plan, id linker.ID) {

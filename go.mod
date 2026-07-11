@@ -21,6 +21,7 @@ require (
 	github.com/neteast-software/go-module/db/postgresql/linker v0.0.0
 	github.com/neteast-software/go-module/fault/event v0.0.0
 	github.com/neteast-software/go-module/fault/event/linker v0.0.0
+	github.com/neteast-software/go-module/fault/notice/linker v0.0.0
 	github.com/neteast-software/go-module/http/client v0.0.0
 	github.com/neteast-software/go-module/http/client/linker v0.0.0
 	github.com/neteast-software/go-module/http/gin v0.0.0
@@ -40,6 +41,7 @@ require (
 	github.com/neteast-software/go-module/observe/tracing/rpc/grpc v0.0.0
 	github.com/neteast-software/go-module/observe/tracing/scheduler/cron v0.0.0
 	github.com/neteast-software/go-module/outbox v0.0.0
+	github.com/neteast-software/go-module/registry/service/nacos/linker v0.0.0
 	github.com/neteast-software/go-module/rpc/grpc v0.0.0
 	github.com/neteast-software/go-module/rpc/grpc/linker v0.0.0
 	github.com/neteast-software/go-module/rpc/meta v0.0.0
@@ -103,8 +105,10 @@ require (
 	github.com/neteast-software/go-module/crypto/sm v0.0.0 // indirect
 	github.com/neteast-software/go-module/fault v0.0.0 // indirect
 	github.com/neteast-software/go-module/fault/notice v0.0.0 // indirect
-	github.com/neteast-software/go-module/fault/notice/linker v0.0.0 // indirect
 	github.com/neteast-software/go-module/redact v0.0.0 // indirect
+	github.com/neteast-software/go-module/registry/service v0.0.0 // indirect
+	github.com/neteast-software/go-module/registry/service/linker v0.0.0 // indirect
+	github.com/neteast-software/go-module/registry/service/nacos v0.0.0 // indirect
 	github.com/neteast-software/go-module/scheduler/cron/store/gorm v0.0.0 // indirect
 	github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -151,14 +155,10 @@ require (
 	github.com/neteast-software/go-module/graph/naive/http/gin v0.0.0
 	github.com/neteast-software/go-module/graph/naive/linker v0.0.0
 	github.com/neteast-software/go-module/http/gin/linker v0.0.0
-	github.com/neteast-software/go-module/http/gin/registry/nacos v0.0.0 // indirect
-	github.com/neteast-software/go-module/http/gin/registry/nacos/linker v0.0.0
 	github.com/neteast-software/go-module/license v0.0.0
 	github.com/neteast-software/go-module/license/http/gin v0.0.0
 	github.com/neteast-software/go-module/registry/nacos v0.0.0 // indirect
 	github.com/neteast-software/go-module/registry/nacos/linker v0.0.0
-	github.com/neteast-software/go-module/rpc/grpc/registry/nacos v0.0.0 // indirect
-	github.com/neteast-software/go-module/rpc/grpc/registry/nacos/linker v0.0.0
 	github.com/neteast-software/nacos-kit v0.0.0
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
@@ -295,17 +295,17 @@ replace github.com/neteast-software/go-module/graph/naive/linker => ../modules/g
 
 replace github.com/neteast-software/go-module/registry/nacos/linker => ../modules/registry/nacos/linker
 
-replace github.com/neteast-software/go-module/http/gin/registry/nacos/linker => ../modules/http/gin/registry/nacos/linker
-
-replace github.com/neteast-software/go-module/rpc/grpc/registry/nacos/linker => ../modules/rpc/grpc/registry/nacos/linker
-
 replace github.com/neteast-software/nacos-kit => ../modules/nacos-kit
 
 replace github.com/neteast-software/go-module/registry/nacos => ../modules/registry/nacos
 
-replace github.com/neteast-software/go-module/http/gin/registry/nacos => ../modules/http/gin/registry/nacos
+replace github.com/neteast-software/go-module/registry/service => ../modules/registry/service
 
-replace github.com/neteast-software/go-module/rpc/grpc/registry/nacos => ../modules/rpc/grpc/registry/nacos
+replace github.com/neteast-software/go-module/registry/service/linker => ../modules/registry/service/linker
+
+replace github.com/neteast-software/go-module/registry/service/nacos => ../modules/registry/service/nacos
+
+replace github.com/neteast-software/go-module/registry/service/nacos/linker => ../modules/registry/service/nacos/linker
 
 replace github.com/neteast-software/go-module/license => ../modules/license
 
