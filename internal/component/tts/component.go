@@ -48,7 +48,7 @@ func (p *Component) Init(_ context.Context, runtime linker.Runtime) error {
 	if err != nil {
 		return err
 	}
-	p.service = ttsservice.New(db)
+	p.service = ttsservice.New(ttsservice.NewStore(db))
 	return nil
 }
 
@@ -63,5 +63,9 @@ func (p *Component) Transcribe(ctx context.Context, req *wrapperspb.StringValue)
 	if p.service == nil {
 		return nil, fmt.Errorf("tts 组件未初始化")
 	}
-	return p.service.Transcribe(ctx, req)
+	result, err := p.service.Transcribe(ctx, req.GetValue())
+	if err != nil {
+		return nil, err
+	}
+	return wrapperspb.String(result), nil
 }
