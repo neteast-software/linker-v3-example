@@ -20,6 +20,10 @@ import (
 
 type registryMockSource struct{}
 
+func (registryMockSource) Name() string {
+	return "registry/mock"
+}
+
 func (registryMockSource) Load(ctx context.Context, boot linker.BootstrapContext) (linker.Setting, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
