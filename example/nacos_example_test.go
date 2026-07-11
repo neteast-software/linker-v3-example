@@ -71,22 +71,19 @@ http:
 		t.Fatalf("write yaml: %v", err)
 	}
 
-	source := registrynacos.NewSource(
-		registrynacos.SourceConfig{
-			DataID:    "linker-example.yaml",
-			Group:     "LINKER",
-			Namespace: "http",
-		},
-		registrynacos.WithGetter(func(_ context.Context, config registrynacos.SourceConfig) ([]byte, error) {
-			if config.Nacos.Host != "seed.nacos.local" || config.Nacos.Port != 8848 {
-				return nil, fmt.Errorf("nacos seed = %+v", config.Nacos)
+	source := registrynacos.Config(
+		"linker-example.yaml",
+		registrynacos.Group("LINKER"),
+		registrynacos.Fetch(func(_ context.Context, request registrynacos.Request) ([]byte, error) {
+			if request.Client.Host != "seed.nacos.local" || request.Client.Port != 8848 {
+				return nil, fmt.Errorf("nacos seed = %+v", request.Client)
 			}
-			return []byte(`{"addr":"127.0.0.1:0","base_path":"nacos","health":{"enabled":true,"path":"ready"}}`), nil
+			return []byte("http:\n  addr: 127.0.0.1:0\n  base_path: nacos\n  health:\n    enabled: true\n    path: ready\n"), nil
 		}),
 	)
 
 	app := server.New(
-		server.WithSource(yaml.NewSource(file), source),
+		server.Config(yaml.File(file), source),
 		server.WithHTTPRoutes(http.GET("hello", func(c *http.Context) {
 			c.String(stdhttp.StatusOK, "nacos")
 		})),

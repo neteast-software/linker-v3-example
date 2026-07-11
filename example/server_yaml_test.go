@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	env "github.com/neteast-software/go-module/config/env/linker"
 	yaml "github.com/neteast-software/go-module/config/yaml/linker"
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	"github.com/neteast-software/go-module/http/gin/response"
@@ -49,7 +50,7 @@ http:
 	}
 
 	app := server.New(
-		server.WithSource(yaml.NewSource(file)),
+		server.Config(yaml.File(file)),
 		server.WithHTTPRoutes(http.GET("hello", func(c *http.Context) {
 			response.Data(c, map[string]string{"name": "yaml"})
 		})),
@@ -112,10 +113,14 @@ http:
 `), 0o600); err != nil {
 		t.Fatalf("write yaml: %v", err)
 	}
-	t.Setenv("LINKER_HTTP", `{"addr":"127.0.0.1:0","base_path":"env-api","recovery":true,"health":{"enabled":true,"path":"ready"}}`)
+	t.Setenv("LINKER_HTTP__ADDR", "127.0.0.1:0")
+	t.Setenv("LINKER_HTTP__BASE_PATH", "env-api")
+	t.Setenv("LINKER_HTTP__RECOVERY", "true")
+	t.Setenv("LINKER_HTTP__HEALTH__ENABLED", "true")
+	t.Setenv("LINKER_HTTP__HEALTH__PATH", "ready")
 
 	app := server.New(
-		server.WithSource(yaml.NewSource(file), linker.EnvSource{Prefix: "LINKER_"}),
+		server.Config(yaml.File(file), env.Prefix("LINKER_")),
 		server.WithHTTPRoutes(http.GET("hello", func(c *http.Context) {
 			response.Data(c, map[string]string{"name": "env"})
 		})),
@@ -152,11 +157,11 @@ cache/redis:
 `), 0o600); err != nil {
 		t.Fatalf("write yaml: %v", err)
 	}
-	t.Setenv("LINKER_CACHE__REDIS", `{"addr":"env"}`)
+	t.Setenv("LINKER_CACHE_REDIS__ADDR", "env")
 
 	app := linker.New(
 		linker.WithMode(linker.Bin),
-		linker.WithSource(yaml.NewSource(file), registryMockSource{}, linker.EnvSource{Prefix: "LINKER_"}),
+		linker.WithSource(yaml.File(file), registryMockSource{}, env.Prefix("LINKER_")),
 	)
 	if err := app.Start(context.Background()); err != nil {
 		t.Fatalf("start: %v", err)
