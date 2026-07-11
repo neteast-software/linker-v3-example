@@ -51,7 +51,7 @@ internal/component/<domain>/component.go
 internal/component/msgx/component.go
 ```
 
-如果一个 component 文件同时出现 `http.Context` handler、`response.*`、route tree 聚合、鉴权 helper 和请求解析，它已经退化成 controller 大文件。正确方向是把 HTTP 入口拆回 `internal/route/<domain>/*_api.go`，把跨 route middleware 放到 `internal/route/middleware` 或 domain middleware 文件，把复用流程留给 `internal/service/<domain>`。
+如果一个 component 文件同时出现 `http.Context` handler、`response.*`、route tree 聚合、鉴权 helper 和请求解析，它已经退化成 controller 大文件。正确方向是把 HTTP 入口拆回 `internal/route/<domain>/*_api.go`，把 middleware 实现统一放到 `internal/route/middleware`，把影响面留在 route 声明，把复用流程留给 `internal/service/<domain>`。
 
 ## Route
 
@@ -145,6 +145,7 @@ internal/client/<domain>/<object>.go
 - 业务 typed client 承载第三方 API 的业务对象和方法，例如 `directory.New(api).Badge(ctx, userID)`。
 - 需要 linker 生命周期识别时，用 `http/client/linker` 暴露 capability 和 Plan asset。
 - route/service 不直接散落 `http.NewRequestWithContext`、`Do`、凭据拼接和原始响应解析。
+- typed client package 自己提供 `ClientKey` 和 `Resolve/Require`，业务调用方不手写 capability ID。
 - 真实外部 provider 测试默认使用 mock server；访问真实服务必须通过显式环境变量开启。
 
 ## Config
@@ -179,6 +180,7 @@ local YAML -> registry final -> env override
 - trace id 不作为 metrics label。
 - metrics label 必须低基数、低敏感。
 - 日志或 OpenTelemetry attribute 通过 `observe/tracing/attribute` 做安全投影，不直接输出 payload、token、手机号、邮箱或错误正文。
+- server app 使用 `server.WithObserver(metricserver.Observe(...))`；gRPC 使用 `WithUnaryInterceptors` / `WithStreamInterceptors`，不手写 SDK chain。
 
 ## Example Test
 

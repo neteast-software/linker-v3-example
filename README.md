@@ -2,6 +2,35 @@
 
 `linker-v3-example` 是 linker v3 的演示业务系统，用来验证 framework、HTTP route、ACL resource、PostgreSQL 生命周期和业务组件声明方式。
 
+## 最短运行
+
+本地 YAML server：
+
+```bash
+APP_DB_POSTGRESQL__PASSWORD='...' \
+APP_EXAMPLE_USER__TOKEN_KEY='至少 32 个字符' \
+go run .
+```
+
+在本地 seed 后叠加 Nacos 完整配置，再由 env 最终覆盖：
+
+```bash
+LINKER_V3_EXAMPLE_NACOS_DATA_ID='app.yaml' \
+LINKER_V3_EXAMPLE_NACOS_HOST='nacos.example.internal' \
+APP_DB_POSTGRESQL__PASSWORD='...' \
+APP_EXAMPLE_USER__TOKEN_KEY='至少 32 个字符' \
+go run .
+```
+
+构建 bin 并只查看装配计划，不连接外部资源：
+
+```bash
+go build -o ./bin/linker-v3-example .
+./bin/linker-v3-example --plan
+```
+
+配置来源始终按声明顺序覆盖：`local YAML -> optional Nacos final -> explicit env override`。完整变量、动态配置与集成测试说明见后文。
+
 ## 业务能力
 
 - `POST /system/login`：后台管理员登录。
@@ -69,7 +98,7 @@ record-level 权限建议放在具体业务 store 的查询入口处完成。`in
 - `internal/route/inspection`、`internal/model/inspection`、`internal/service/inspection`、`internal/component/inspection`：接近真实业务的列表接口结构，route 负责 HTTP 参数和输出，service/store 负责批量查询和数据范围。
 - `internal/model/inspection/archive.go`：外部维护表资产示例，只改业务 model 和 component asset，使用 `postgresql.External()` 避免启动期迁移。
 - `internal/component/notification`、`internal/service/notification`、`internal/route/notification`：MQ consumer、cron job、SSE route、trace/metrics wrapper 和 provider mock 的长生命周期组合。
-- `internal/component/observability`、`internal/service/observability`、`internal/route/observability`：Prometheus recorder capability、`/metrics` route、HTTP 请求指标 middleware 和 Plan 里的 metrics/tracing asset。
+- `internal/component/observability`、`internal/service/observability`、`internal/route/observability`：Prometheus recorder capability、`/metrics` route、middleware 影响面和 Plan 里的 metrics/tracing asset；HTTP 指标 middleware 实现统一位于 `internal/route/middleware`。
 - `license/http/gin`：示例只在需要保护的入口显式挂 `licensehttp.Gate(gate)`；license 不进入 core，也不默认挂到 server framework。
 - `internal/rpc/tts`、`internal/client/tts`、`internal/component/tts`：gRPC server/client 的声明、注册、trace/metrics interceptor 和 capability provider。
 - `internal/client/directory`：出站 HTTP typed client 示例，第三方用户目录 API 的业务语义在这里承载，通用 HTTP 执行者来自 `http/client` capability。
