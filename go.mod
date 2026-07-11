@@ -96,6 +96,7 @@ require (
 	github.com/nacos-group/nacos-sdk-go/v2 v2.3.5 // indirect
 	github.com/neteast-software/go-module/audit/operate/store/gorm v0.0.0 // indirect
 	github.com/neteast-software/go-module/cache/redis v0.0.0 // indirect
+	github.com/neteast-software/go-module/config v0.0.0 // indirect
 	github.com/neteast-software/go-module/config/env v0.0.0 // indirect
 	github.com/neteast-software/go-module/crypto/sm v0.0.0 // indirect
 	github.com/neteast-software/go-module/fault v0.0.0 // indirect
@@ -232,6 +233,8 @@ replace github.com/neteast-software/go-module/config/yaml/linker => ../modules/c
 replace github.com/neteast-software/go-module/config/env/linker => ../modules/config/env/linker
 
 replace github.com/neteast-software/go-module/config/env => ../modules/config/env
+
+replace github.com/neteast-software/go-module/config => ../modules/config
 
 replace github.com/neteast-software/go-module/crypto/sm => ../modules/crypto/sm
 

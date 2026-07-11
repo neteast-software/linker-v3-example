@@ -44,6 +44,7 @@ func TestServerFrameworkLoadsYAMLSource(t *testing.T) {
 	if err := os.WriteFile(file, []byte(`
 http:
   addr: 127.0.0.1:0
+  read_timeout: 1s
   base_path: api
   recovery: true
   health:
@@ -120,6 +121,7 @@ http:
 	t.Setenv("LINKER_HTTP__ADDR", "127.0.0.1:0")
 	t.Setenv("LINKER_HTTP__BASE_PATH", "env-api")
 	t.Setenv("LINKER_HTTP__RECOVERY", "true")
+	t.Setenv("LINKER_HTTP__READ_TIMEOUT", "2s")
 	t.Setenv("LINKER_HTTP__HEALTH__ENABLED", "true")
 	t.Setenv("LINKER_HTTP__HEALTH__PATH", "ready")
 
