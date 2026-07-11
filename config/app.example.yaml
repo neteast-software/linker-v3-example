@@ -11,6 +11,13 @@ http:
     startup:
       enabled: true
       path: startup
+  proxy:
+    trusted_proxies:
+      - 127.0.0.1
+      - ::1
+    forwarded_headers:
+      - X-Forwarded-For
+      - X-Real-IP
 
 rpc/grpc:
   addr: 127.0.0.1:9900
