@@ -2,12 +2,19 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"testing"
+
+	yaml "github.com/neteast-software/go-module/config/yaml/linker"
+	postgresql "github.com/neteast-software/go-module/db/postgresql/linker"
+	linker "github.com/neteast-software/linker/v3"
+
+	usercomponent "linker-v3-example/internal/component/user"
 )
 
 func TestPlanCommand(t *testing.T) {
-	t.Setenv("LINKER_V3_EXAMPLE_PG_PASSWORD", "")
+	t.Setenv("LINKER_V3_EXAMPLE_NACOS_DATA_ID", "")
 
 	var output bytes.Buffer
 	if err := printPlan(&output); err != nil {
@@ -40,6 +47,29 @@ func TestPlanCommand(t *testing.T) {
 	}
 	if !jsonPlanHasAsset(assets, "observe/tracing", "http+grpc") {
 		t.Fatalf("plan missing tracing asset: %#v", assets)
+	}
+}
+
+func TestExampleConfigDoesNotCarryCredentials(t *testing.T) {
+	setting, err := yaml.File("config/app.example.yaml").Load(context.Background(), linker.BootstrapContext{})
+	if err != nil {
+		t.Fatalf("load config: %v", err)
+	}
+	for namespace, field := range map[linker.Namespace]string{
+		postgresql.Namespace:    "password",
+		usercomponent.Namespace: "token_key",
+	} {
+		content, ok := setting.Lookup(namespace)
+		if !ok {
+			t.Fatalf("namespace %s missing", namespace)
+		}
+		var value map[string]any
+		if err = json.Unmarshal(content, &value); err != nil {
+			t.Fatalf("decode %s: %v", namespace, err)
+		}
+		if _, exists := value[field]; exists {
+			t.Fatalf("config %s contains credential field %s", namespace, field)
+		}
 	}
 }
 

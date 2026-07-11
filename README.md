@@ -62,7 +62,7 @@ func init() {
 - `internal/route/user`：HTTP 入口和 route 声明。
 - `internal/model/user`：数据表模型，包含 user 主体表和 account 凭据表。
 - `internal/service/user`：登录、资料读取、token/session 和存储流程；service capability key 由 service 自己声明。
-- `internal/constant/user`：业务错误。
+- `internal/constant/user`：业务错误和明确的 example fixture。
 - `internal/component/user`：组件 identity、linker 组件生命周期、表资产和 service capability 挂载。
 
 record-level 权限建议放在具体业务 store 的查询入口处完成。`internal/service/inspection` 用 `TaskAccess` 把 `acl.Access`、`acl.Resource` 和 `RecordRange` 组合在一起：route 只提供当前 application 和 actor，store 在一次查询里同时应用 application scope、业务 filter 和 owner range，避免为了权限判断额外做 N+1 查询或维护 RBAC 关系表。
@@ -92,7 +92,12 @@ record-level 权限建议放在具体业务 store 的查询入口处完成。`in
 
 ## 运行
 
-默认连接 pi2 PostgreSQL 的局域网地址 `192.168.3.13:5432`，账号为 `neteast`，数据库名为 `linker_v3_example`。数据库密码不写入默认配置，必须通过 `LINKER_V3_EXAMPLE_PG_PASSWORD` 显式提供。
+默认读取 `config/app.example.yaml`。文件只声明本地 listener、RPC 和 PostgreSQL 示例目标，不包含数据库密码、Nacos 凭据或 token key。启动前至少需要注入：
+
+```bash
+export APP_DB_POSTGRESQL__PASSWORD='...'
+export APP_EXAMPLE_USER__TOKEN_KEY='至少 32 个字符'
+```
 
 查看 linker 装配计划不需要连接数据库：
 
@@ -100,7 +105,7 @@ record-level 权限建议放在具体业务 store 的查询入口处完成。`in
 go run . --plan
 ```
 
-输出会包含 mode、components、dependencies、capabilities 和 application、route、gRPC、MQ consumer、cron job、metrics、tracing 等 assets。缺少 `LINKER_V3_EXAMPLE_PG_PASSWORD` 时，`--plan` 只使用本地占位值构建计划，不会启动 PostgreSQL component。
+输出会包含 mode、components、dependencies、capabilities、Config mode/revision 和 application、route、gRPC、MQ consumer、cron job、metrics、tracing 等 assets。`--plan` 只在进程内生成一次临时 token key 用于 Bootstrap，不向仓库、Plan 或日志写入凭据，也不会启动 PostgreSQL component。
 
 ```bash
 go run .
@@ -109,38 +114,46 @@ go run .
 本地需要覆盖数据库地址时：
 
 ```bash
-LINKER_V3_EXAMPLE_PG_HOST=127.0.0.1 LINKER_V3_EXAMPLE_PG_PASSWORD=... go run .
+APP_DB_POSTGRESQL__HOST=127.0.0.1 \
+APP_DB_POSTGRESQL__PASSWORD=... \
+APP_EXAMPLE_USER__TOKEN_KEY=... \
+go run .
 ```
 
-typed app 配置源推荐顺序是 `default -> local YAML -> registry source -> env override`。示例 YAML 不包含数据库密码：
+项目只有一条配置主路径：`local YAML -> optional Nacos final -> explicit env override`。每个 component 在 Bootstrap 解码和校验自己的 namespace，`internal/app` 不再接收或拆分一份全局 typed Config：
 
 ```bash
-LINKER_V3_EXAMPLE_CONFIG=config/app.example.yaml LINKER_V3_EXAMPLE_PG_PASSWORD=... go run .
+LINKER_V3_EXAMPLE_CONFIG=config/app.example.yaml \
+APP_DB_POSTGRESQL__PASSWORD=... \
+APP_EXAMPLE_USER__TOKEN_KEY=... \
+go run .
 ```
 
-linker runtime 配置源推荐顺序是 `local seed -> registry final -> env override`。`example/server_yaml_test.go` 用 `registryMockSource` 演示注册中心 source 如何读取本地 seed，再由环境变量覆盖最终配置；`example/nacos_example_test.go` 使用 `registry/nacos/linker.NewSource` 和本地 fake getter 演示真实 Nacos source 入口，不依赖外部 Nacos 服务。
+设置 `LINKER_V3_EXAMPLE_NACOS_DATA_ID` 后会在 local 与 env 之间加入 Nacos Source；bootstrap endpoint 和凭据使用 `LINKER_V3_EXAMPLE_NACOS_HOST/PORT/USERNAME/PASSWORD`，不进入业务 namespace。`example/dynamic_config_test.go` 使用真实 Nacos adapter 的 fake fetch/listen，演示 HTTP client Live snapshot、后置 env 覆盖、非法 YAML 恢复和 PostgreSQL Restart 标记。
 
-server 组合入口优先传递 module 的类型化配置，例如先修改 `http.DefaultConfig()`，再调用 `server.WithHTTP(config)`。HTTP 配置只使用 snake_case 对象结构；业务 app 不拼原始 JSON。
+`Live` namespace 先完成整批 typed decode/validate，再原子发布到新操作；`Restart` namespace 只进入 desired Setting 并标记整个服务需要重启。业务 component 不实现 Nacos reload，也不会被 framework 隐式重启。
 
 ## Example
 
-测试文件集中在 `example/` 目录。真实 PostgreSQL example 会尝试连接 `192.168.3.13`，如果当前环境无法连接，会跳过该集成用例。
+测试文件集中在 `example/` 目录。真实 PostgreSQL example 只在设置 `LINKER_V3_EXAMPLE_PG_PASSWORD` 后运行，host 默认使用 `127.0.0.1` 且可通过同前缀测试变量覆盖；当前环境不可用时会明确 skip。
 
 ```bash
 go test ./...
 ```
 
-Prometheus 可抓取 `GET /metrics`，Grafana 示例面板在 `docs/grafana-dashboard.json`。当前 dashboard 对齐 HTTP、gRPC、MQ consumer、cron 和 linker runtime Plan 指标，例如 `linker_v3_example_http_requests_total`、`linker_v3_example_grpc_server_requests_total`、`linker_v3_example_mq_consumer_messages_total`、`linker_v3_example_scheduler_cron_runs_total` 和 `linker_v3_example_linker_component_state`。
+Prometheus 可抓取 `GET /metrics`，Grafana 示例面板在 `docs/grafana-dashboard.json`。当前 dashboard 对齐 HTTP、gRPC、MQ consumer、cron、linker runtime Plan 和动态配置指标，包括 active/desired revision、`restart_required` 与固定状态事件；namespace 和错误文本不进入 metrics label。
 
 推荐先看：
 
 - `docs/scaffold.md`：推荐项目骨架，说明 main、app、component、route、model、service、config、observability 和 example test 的边界。
 - `docs/example-policy.md`：说明 example 的定位、外部依赖、测试拆分和未来 submodule 边界。
 - `main.go`：保持极薄，只分发 server 启动和 `--plan`。
-- `internal/app/app.go`：集中装配 framework、组件、配置源和 adapter。
+- `source.go`：只读取配置文件位置和 Nacos bootstrap 参数，按顺序声明 Source。
+- `internal/app/app.go`：集中装配 framework、组件和 adapter，不解析业务配置。
 - `internal/route/graph/*_api.go`：一个 API 一个文件，route/resource/middleware 和 handler 放在同一个入口重心内。
 - `example/graph_example_test.go`：验证 graph route、Plan asset 和 renderer capability。
 - `example/nacos_example_test.go`：验证 YAML seed、Nacos source、HTTP/gRPC registry adapter 和 Plan 里的依赖/capability 表达。
+- `example/dynamic_config_test.go`：验证 Nacos 完整快照、Live/Restart、desired/active、env 后置覆盖和可恢复拒绝。
 - `example/reliability_example_test.go`：验证 DB capability 缺失会在组件初始化期失败，以及 Stop timeout 会返回可判断的 `context.DeadlineExceeded`。
 - `example/grpc_example_test.go`：验证 gRPC metadata 和 trace id 通过 interceptor 传播。
 - `example/http_client_example_test.go`：验证出站 HTTP client linker adapter、typed client、credential、trace hook 和 Plan asset。

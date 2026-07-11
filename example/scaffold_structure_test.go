@@ -53,6 +53,30 @@ func TestScaffoldRouteAPIFilesSelfRegister(t *testing.T) {
 	}
 }
 
+func TestScaffoldKeepsOneConfigurationPath(t *testing.T) {
+	if _, err := os.Stat("../internal/config"); !os.IsNotExist(err) {
+		t.Fatalf("global internal/config should not exist: %v", err)
+	}
+	app := readFile(t, "../internal/app/app.go")
+	for _, forbidden := range []string{
+		"postgresql.WithConfig",
+		"rpc.WithConfig",
+		"server.WithHTTP(",
+		"internal/config",
+	} {
+		if strings.Contains(app, forbidden) {
+			t.Fatalf("internal/app should not contain %q", forbidden)
+		}
+	}
+	if !strings.Contains(app, "server.Config(sources...)") {
+		t.Fatal("internal/app should forward the single ordered Source chain")
+	}
+	user := readFile(t, "../internal/component/user/component.go")
+	if !strings.Contains(user, "func (p *Component) Bootstrap(") || !strings.Contains(user, "func (p *Component) Configs()") {
+		t.Fatal("business component should own typed config bootstrap and lifecycle mode")
+	}
+}
+
 func assertFileNotContains(t *testing.T, file string, needle string) {
 	t.Helper()
 	data := readFile(t, file)

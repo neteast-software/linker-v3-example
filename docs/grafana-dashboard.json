@@ -343,6 +343,68 @@
       ],
       "title": "linker component 状态",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 40
+      },
+      "id": 13,
+      "targets": [
+        {
+          "expr": "max(linker_v3_example_linker_config_restart_required)",
+          "legendFormat": "restart required"
+        }
+      ],
+      "title": "动态配置重启状态",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 16,
+        "x": 8,
+        "y": 40
+      },
+      "id": 14,
+      "targets": [
+        {
+          "expr": "max(linker_v3_example_linker_config_active_revision)",
+          "legendFormat": "active revision"
+        },
+        {
+          "expr": "max(linker_v3_example_linker_config_desired_revision)",
+          "legendFormat": "desired revision"
+        },
+        {
+          "expr": "sum by (status) (rate(linker_v3_example_linker_config_events_total[5m]))",
+          "legendFormat": "{{status}} events"
+        }
+      ],
+      "title": "动态配置 revision 与结果",
+      "type": "timeseries"
     }
   ],
   "schemaVersion": 39,

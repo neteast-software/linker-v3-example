@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	session "github.com/neteast-software/go-module/acl/session"
@@ -20,13 +21,30 @@ import (
 const ID linker.ID = "example/user"
 
 type Component struct {
-	store    userservice.Store
-	service  userservice.Service
-	tokenKey []byte
+	store   userservice.Store
+	service userservice.Service
+	config  Config
 }
 
-func NewComponent(tokenKey []byte) *Component {
-	return &Component{tokenKey: append([]byte(nil), tokenKey...)}
+func NewComponent() *Component {
+	return &Component{}
+}
+
+func (p *Component) Configs() []linker.Config {
+	return []linker.Config{linker.Restart(Namespace)}
+}
+
+func (p *Component) Bootstrap(_ context.Context, boot linker.BootstrapContext) error {
+	content, ok := boot.Seed.Lookup(Namespace)
+	if !ok {
+		return fmt.Errorf("缺少 %s 配置", Namespace)
+	}
+	config, err := decodeConfig(content)
+	if err != nil {
+		return err
+	}
+	p.config = config
+	return nil
 }
 
 func (p *Component) Identity() linker.ID {
@@ -52,7 +70,7 @@ func (p *Component) Init(ctx context.Context, runtime linker.Runtime) error {
 	p.store = userservice.NewStore(db)
 	p.service = userservice.NewService(
 		p.store,
-		token.NewHMAC(p.tokenKey),
+		token.NewHMAC([]byte(p.config.TokenKey)),
 		session.New(session.NewMemoryStore(time.Now)),
 	)
 	return userservice.Seed(ctx, p.store)

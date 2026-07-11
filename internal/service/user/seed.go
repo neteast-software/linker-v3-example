@@ -3,16 +3,16 @@ package user
 import (
 	"context"
 
-	"linker-v3-example/internal/config"
+	userconstant "linker-v3-example/internal/constant/user"
 	usermodel "linker-v3-example/internal/model/user"
 )
 
 func Seed(ctx context.Context, store Store) error {
-	adminHash, err := passwordHash(config.ExampleLoginPassword)
+	adminHash, err := passwordHash(userconstant.ExampleLoginPassword)
 	if err != nil {
 		return err
 	}
-	userHash, err := passwordHash(config.ExampleLoginPassword)
+	userHash, err := passwordHash(userconstant.ExampleLoginPassword)
 	if err != nil {
 		return err
 	}
@@ -34,11 +34,11 @@ func Seed(ctx context.Context, store Store) error {
 				Username: "example_user",
 				Avatar:   "https://static.neteast.cn/avatar/user.png",
 				Email:    "example.user@neteast.cn",
-				Phone:    config.ExampleUserPhone,
+				Phone:    userconstant.ExamplePhone,
 				Role:     "user",
 			},
 			Accounts: []usermodel.Account{
-				{Provider: "phone", Identifier: config.ExampleUserPhone, SecretHash: userHash, Salt: passwordSalt},
+				{Provider: "phone", Identifier: userconstant.ExamplePhone, SecretHash: userHash, Salt: passwordSalt},
 			},
 		},
 	)

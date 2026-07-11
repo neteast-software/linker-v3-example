@@ -42,7 +42,7 @@ func WithMetricLabels(labels ...metrics.LabelValue) Option {
 	}
 }
 
-func Provider(config grpclinker.ClientConfig, opts ...Option) linker.Component {
+func Provider(opts ...Option) linker.Component {
 	options := providerOptions{}
 	for _, opt := range opts {
 		if opt != nil {
@@ -59,7 +59,6 @@ func Provider(config grpclinker.ClientConfig, opts ...Option) linker.Component {
 	return grpclinker.NewClientProvider[Client](
 		ID,
 		New,
-		grpclinker.WithClientConfig[Client](config),
 		grpclinker.WithDialOptions[Client](grpc.WithChainUnaryInterceptor(interceptors...)),
 	)
 }

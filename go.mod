@@ -12,8 +12,8 @@ require (
 	github.com/neteast-software/go-module/audit/operate v0.0.0
 	github.com/neteast-software/go-module/audit/operate/http/gin v0.0.0
 	github.com/neteast-software/go-module/audit/operate/linker v0.0.0
+	github.com/neteast-software/go-module/config v0.0.0
 	github.com/neteast-software/go-module/config/env/linker v0.0.0
-	github.com/neteast-software/go-module/config/yaml v0.0.0
 	github.com/neteast-software/go-module/config/yaml/linker v0.0.0
 	github.com/neteast-software/go-module/db/gorm/query v0.0.0
 	github.com/neteast-software/go-module/db/gorm/table v0.0.0
@@ -96,8 +96,8 @@ require (
 	github.com/nacos-group/nacos-sdk-go/v2 v2.3.5 // indirect
 	github.com/neteast-software/go-module/audit/operate/store/gorm v0.0.0 // indirect
 	github.com/neteast-software/go-module/cache/redis v0.0.0 // indirect
-	github.com/neteast-software/go-module/config v0.0.0 // indirect
 	github.com/neteast-software/go-module/config/env v0.0.0 // indirect
+	github.com/neteast-software/go-module/config/yaml v0.0.0 // indirect
 	github.com/neteast-software/go-module/crypto/sm v0.0.0 // indirect
 	github.com/neteast-software/go-module/fault v0.0.0 // indirect
 	github.com/neteast-software/go-module/fault/notice v0.0.0 // indirect

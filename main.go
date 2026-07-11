@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"linker-v3-example/internal/app"
-	"linker-v3-example/internal/config"
 )
 
 func main() {
@@ -29,15 +28,8 @@ func isPlanCommand(args []string) bool {
 }
 
 func run(ctx context.Context) error {
-	cfg, err := config.Load(ctx)
-	if err != nil {
-		return fmt.Errorf("配置加载失败: %w", err)
-	}
-	serverApp, err := app.New(cfg)
-	if err != nil {
-		return fmt.Errorf("配置错误: %w", err)
-	}
-	if err = serverApp.Run(ctx); err != nil {
+	serverApp := app.New(configSources()...)
+	if err := serverApp.Run(ctx); err != nil {
 		return fmt.Errorf("运行失败: %w", err)
 	}
 	return nil

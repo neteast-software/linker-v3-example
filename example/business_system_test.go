@@ -36,21 +36,37 @@ import (
 	observabilitycomponent "linker-v3-example/internal/component/observability"
 	ttscomponent "linker-v3-example/internal/component/tts"
 	usercomponent "linker-v3-example/internal/component/user"
-	exampleconfig "linker-v3-example/internal/config"
+	userconstant "linker-v3-example/internal/constant/user"
 )
 
 func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
-	config := exampleconfig.Default()
-	config.HTTP.Addr = "127.0.0.1:0"
-	config.GRPC.Addr = freeLocalAddr(t)
-	discovery := &exampleDiscovery{addr: config.GRPC.Addr}
+	httpConfig := http.DefaultConfig()
+	httpConfig.Addr = "127.0.0.1:0"
+	grpcConfig := rpccore.ServerConfig{Addr: freeLocalAddr(t)}
+	discovery := &exampleDiscovery{addr: grpcConfig.Addr}
 	rpccore.ConfigureDiscovery("example", discovery)
-	config.PostgreSQL = prepareExampleDatabase(t)
-
-	app, err := exampleapp.New(config)
-	if err != nil {
-		t.Fatalf("new app: %v", err)
+	postgresqlConfig := prepareExampleDatabase(t)
+	ttsConfig := rpccore.ClientConfig{
+		Discovery: rpccore.ClientDiscoveryConfig{
+			Scheme:  "example",
+			Service: "tts",
+			Group:   "DEFAULT_GROUP",
+			Metadata: map[string]string{
+				"version": "v1",
+			},
+		},
+		Timeout: time.Second,
+		Metadata: map[string]string{
+			"scope": "front",
+		},
 	}
+	app := exampleapp.New(businessConfigSource(t, map[linker.Namespace]any{
+		http.Namespace:                 httpConfig,
+		rpc.Namespace:                  grpcConfig,
+		linker.Namespace(ttsclient.ID): ttsConfig,
+		postgresql.Namespace:           postgresqlConfig,
+		usercomponent.Namespace:        usercomponent.Config{TokenKey: strings.Repeat("a", 64)},
+	}))
 	plan := preparedPlan(t, app)
 	if !planHasComponent(plan, postgresql.ID) ||
 		!planHasComponent(plan, applicationcomponent.ID) ||
@@ -76,7 +92,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	if !planHasAsset(plan, "scheduler/cron/job", "notification.health") {
 		t.Fatalf("plan missing notification cron asset: %#v", plan.Assets)
 	}
-	if !planHasAsset(plan, "rpc/grpc/server", config.GRPC.Addr) {
+	if !planHasAsset(plan, "rpc/grpc/server", grpcConfig.Addr) {
 		t.Fatalf("plan missing grpc server asset: %#v", plan.Assets)
 	}
 	if !planHasAsset(plan, "rpc/grpc/client", ttsclient.ID.String()) {
@@ -122,7 +138,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		ttsClientOrder >= httpOrder {
 		t.Fatalf("unexpected startup order: postgresql=%d application=%d audit=%d inspection=%d notification=%d user=%d tts=%d mq=%d cron=%d rpc=%d ttsClient=%d http=%d plan=%#v", postgresqlOrder, applicationOrder, auditOrder, inspectionOrder, notificationOrder, userOrder, ttsOrder, mqOrder, cronOrder, rpcOrder, ttsClientOrder, httpOrder, plan.Components)
 	}
-	if err = app.Start(context.Background()); err != nil {
+	if err := app.Start(context.Background()); err != nil {
 		t.Fatalf("start: %v", err)
 	}
 	t.Cleanup(func() {
@@ -139,7 +155,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 
 	admin := postJSON(t, baseURL+"/system/login", map[string]string{
 		"username": "admin",
-		"password": exampleconfig.ExampleLoginPassword,
+		"password": userconstant.ExampleLoginPassword,
 	}, "")
 	adminData := responseData(t, admin)
 	adminToken, _ := adminData["token"].(string)
@@ -157,8 +173,8 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	}
 
 	front := postJSON(t, baseURL+"/user/login", map[string]string{
-		"phone":    exampleconfig.ExampleUserPhone,
-		"password": exampleconfig.ExampleLoginPassword,
+		"phone":    userconstant.ExamplePhone,
+		"password": userconstant.ExampleLoginPassword,
 	}, "")
 	frontData := responseData(t, front)
 	token, _ := frontData["token"].(string)
@@ -169,7 +185,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	profile := getJSON(t, baseURL+"/api/profile", token)
 	profileData := responseData(t, profile)
 	if profileData["username"] != "example_user" ||
-		profileData["phone"] != exampleconfig.ExampleUserPhone ||
+		profileData["phone"] != userconstant.ExamplePhone ||
 		profileData["email"] != "example.user@neteast.cn" ||
 		profileData["avatar"] == "" {
 		t.Fatalf("unexpected profile: %#v", profileData)
@@ -182,7 +198,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	app2Profile := getJSON(t, fmt.Sprintf("%s/api/v1/app2/user/%d/profile", baseURL, int(userID)), "")
 	app2ProfileData := responseData(t, app2Profile)
 	if app2ProfileData["username"] != "example_user" ||
-		app2ProfileData["phone"] != exampleconfig.ExampleUserPhone ||
+		app2ProfileData["phone"] != userconstant.ExamplePhone ||
 		app2ProfileData["application"] != "app2" {
 		t.Fatalf("unexpected app2 profile: %#v", app2ProfileData)
 	}
@@ -253,11 +269,23 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	}
 }
 
+func businessConfigSource(t *testing.T, values map[linker.Namespace]any) linker.Source {
+	t.Helper()
+	setting := make(map[linker.Namespace][]byte, len(values))
+	for namespace, value := range values {
+		content, err := json.Marshal(value)
+		if err != nil {
+			t.Fatalf("marshal config %s: %v", namespace, err)
+		}
+		setting[namespace] = content
+	}
+	return linker.MapSource{Label: "config/test", Setting: linker.NewSetting(setting)}
+}
+
 func prepareExampleDatabase(t *testing.T) postgresqlcore.Config {
 	t.Helper()
-	defaultConfig := exampleconfig.Default().PostgreSQL
 	config := postgresqlcore.Config{
-		Host:     getenv("LINKER_V3_EXAMPLE_PG_HOST", defaultConfig.Host),
+		Host:     getenv("LINKER_V3_EXAMPLE_PG_HOST", "127.0.0.1"),
 		Port:     getenvInt("LINKER_V3_EXAMPLE_PG_PORT", 5432),
 		User:     getenv("LINKER_V3_EXAMPLE_PG_USER", "neteast"),
 		Password: os.Getenv("LINKER_V3_EXAMPLE_PG_PASSWORD"),

@@ -8,15 +8,15 @@
 
 ```text
 main.go
+source.go
 internal/app/app.go
-internal/config/config.go
-internal/config/load.go
-internal/config/validate.go
+internal/component/<domain>/config.go
 ```
 
 - `main.go` 只负责 CLI/server/bin 入口分发、中文错误表达和退出码。
-- `internal/app` 负责装配 linker framework、components、config source 和 adapter。
-- `internal/config` 负责 typed config、默认值、本地 YAML、注册中心 source、env override 和启动前校验。
+- `source.go` 只读取文件位置、注册中心 bootstrap 等最小启动参数，并按顺序声明 Source。
+- `internal/app` 负责装配 linker framework、components 和 adapter，只接收 Source，不拆分全局业务 Config。
+- 每个 component 或自治 module 在自己的 package 定义、解码和校验 typed config；业务配置不回收到中心 `internal/config`。
 - 不在 `main.go` 里拼组件细节，不在业务 route 里读取全局配置。
 
 ## 组件
@@ -32,6 +32,7 @@ internal/component/<domain>/component.go
 - `const ID linker.ID = "example/<domain>"`。
 - `func (p *Component) Identity() linker.ID`。
 - `Dependencies()`、`Assets()`、`Init()`、`OnMounted()`、`Start()`、`Stop()`。
+- `Bootstrap()` 和 `Configs()`，由配置对象自己声明 `Live` 或 `Restart`。
 - capability provide 和 component 自己拥有的 table、route、rpc、consumer、job 等资产声明。
 
 约束：
@@ -151,14 +152,16 @@ internal/client/<domain>/<object>.go
 推荐配置加载顺序：
 
 ```text
-default -> local YAML -> registry source -> env override -> Validate()
+local YAML -> registry final -> env override
 ```
 
 要求：
 
 - 示例 YAML 不写真实密码、token、secret。
 - 敏感字段通过 env 或部署系统注入。
-- `Validate()` 在启动边界给出中文、可定位的错误。
+- Source 只负责完整配置层；component 在 Bootstrap 从 effective Setting 解码并校验自己的 namespace。
+- `Live` 配置先准备整批 immutable snapshot，成功后只影响新操作；`Restart` 配置只更新 desired 并标记服务重启。
+- 未声明 namespace 默认 `Restart`，但标准 component 应显式声明 owner 和 mode。
 - registry source 只提供配置来源，不把业务逻辑塞进配置层。
 
 ## Observability

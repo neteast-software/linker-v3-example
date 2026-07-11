@@ -1,15 +1,30 @@
-linker-v3-example:
-  http:
-    addr: 127.0.0.1:8800
-    recovery: true
-    health:
-      enabled: true
-      path: ping
-  grpc:
-    addr: 127.0.0.1:9900
-  postgresql:
-    host: 192.168.3.13
-    port: 5432
-    user: neteast
-    db_name: linker_v3_example
-    ssl_mode: disable
+http:
+  addr: 127.0.0.1:8800
+  recovery: true
+  health:
+    enabled: true
+    path: ping
+
+rpc/grpc:
+  addr: 127.0.0.1:9900
+
+rpc/client/tts:
+  discovery:
+    scheme: example
+    service: tts
+    group: DEFAULT_GROUP
+    metadata:
+      version: v1
+  timeout: 1s
+  metadata:
+    scope: front
+
+db/postgresql:
+  host: 127.0.0.1
+  port: 5432
+  user: neteast
+  db_name: linker_v3_example
+  ssl_mode: disable
+
+# token_key 由 APP_EXAMPLE_USER__TOKEN_KEY 或 secret provider 注入。
+example/user: {}

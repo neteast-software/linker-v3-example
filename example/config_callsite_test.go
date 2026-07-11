@@ -12,7 +12,7 @@ import (
 func TestConfigurationCallSiteCompiles(t *testing.T) {
 	app := server.New(
 		server.Config(
-			yaml.File("config/app.yaml"),
+			yaml.File("config/app.example.yaml"),
 			nacos.Config("app.yaml", nacos.Group("LINKER")),
 			env.Prefix("APP_"),
 		),
