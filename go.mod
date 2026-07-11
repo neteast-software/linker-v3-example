@@ -103,6 +103,7 @@ require (
 	github.com/neteast-software/go-module/fault/notice v0.0.0 // indirect
 	github.com/neteast-software/go-module/fault/notice/linker v0.0.0 // indirect
 	github.com/neteast-software/go-module/mq/consumer v0.0.0 // indirect
+	github.com/neteast-software/go-module/redact v0.0.0 // indirect
 	github.com/neteast-software/go-module/scheduler/cron v0.0.0 // indirect
 	github.com/neteast-software/go-module/scheduler/cron/store/gorm v0.0.0 // indirect
 	github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc // indirect
@@ -309,3 +310,5 @@ replace github.com/neteast-software/go-module/rpc/grpc/registry/nacos => ../modu
 replace github.com/neteast-software/go-module/license => ../modules/license
 
 replace github.com/neteast-software/go-module/license/http/gin => ../modules/license/http/gin
+
+replace github.com/neteast-software/go-module/redact => ../modules/redact
