@@ -17,13 +17,12 @@ import (
 	"github.com/neteast-software/go-module/license"
 	licensehttp "github.com/neteast-software/go-module/license/http/gin"
 	server "github.com/neteast-software/go-module/linker/server"
-	"github.com/neteast-software/go-module/observe/metrics"
-	metricserver "github.com/neteast-software/go-module/observe/metrics/linker/server"
+	metricscomponent "github.com/neteast-software/go-module/observe/metrics/linker"
+	prometheus "github.com/neteast-software/go-module/observe/metrics/prometheus/linker"
 	"github.com/neteast-software/go-module/observe/tracing"
+	tracingcomponent "github.com/neteast-software/go-module/observe/tracing/linker"
+	opentelemetry "github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker"
 	linker "github.com/neteast-software/linker/v3"
-
-	observabilitycomponent "linker-v3-example/internal/component/observability"
-	observabilityservice "linker-v3-example/internal/service/observability"
 )
 
 func TestLinkerV3HTTPGinExample(t *testing.T) {
@@ -171,19 +170,19 @@ func corePlanHasCapability(plan linker.Plan, id linker.ID, owner linker.ID) bool
 }
 
 func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
-	observability := observabilitycomponent.NewComponent()
+	metricComponent := prometheus.New(prometheus.WithConfig(prometheus.Config{
+		Enabled: true, Namespace: "linker_v3_example", ConstLabels: map[string]string{"service": "linker-v3-example"},
+	}))
+	traceComponent := opentelemetry.New(opentelemetry.WithConfig(opentelemetry.Config{
+		Mode: opentelemetry.ModeMemory, Service: "linker-v3-example",
+	}))
 	httpConfig := http.DefaultConfig()
 	httpConfig.Addr = "127.0.0.1:0"
 	app := server.New(
 		server.WithShutdownTimeout(3*time.Second),
 		server.WithHTTP(httpConfig),
-		server.WithObserver(metricserver.Observe(
-			observability.Recorder(),
-			metricserver.WithConstLabels(metrics.Label("service", "linker-v3-example")),
-		)),
-		server.WithComponents(
-			observability,
-		),
+		server.WithMetrics(metricComponent),
+		server.WithComponents(traceComponent),
 		server.WithHTTPRoutes(
 			http.GET("pong", func(c *http.Context) {
 				c.String(stdhttp.StatusOK, "pong")
@@ -192,10 +191,11 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 	)
 
 	plan := preparedPlan(t, app)
-	if !planHasComponent(plan, observabilitycomponent.ID) ||
-		!planHasRouteAsset(plan, "GET", "/metrics", "http.observe.metrics") ||
+	if !planHasComponent(plan, metricscomponent.ID) ||
+		!planHasComponent(plan, tracingcomponent.ID) ||
+		!planHasRouteAsset(plan, "GET", "/metrics", "") ||
 		!planHasAsset(plan, "observe/metrics", "prometheus") ||
-		!planHasAsset(plan, "observe/tracing", "http+grpc") {
+		!planHasAsset(plan, "observe/tracing", "linker-v3-example") {
 		t.Fatalf("plan missing observability assets: components=%#v assets=%#v", plan.Components, plan.Assets)
 	}
 
@@ -208,11 +208,11 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 		}
 	})
 	runtimePlan := app.Plan()
-	observabilityPlan := requireCoreComponentPlan(t, runtimePlan, observabilitycomponent.ID)
+	observabilityPlan := requireCoreComponentPlan(t, runtimePlan, metricscomponent.ID)
 	if !observabilityPlan.Enabled || !observabilityPlan.Effective || observabilityPlan.Degraded {
 		t.Fatalf("observability runtime plan = %#v", observabilityPlan)
 	}
-	if !corePlanHasCapability(runtimePlan, observabilityservice.MetricRecorderID, observabilitycomponent.ID) {
+	if !corePlanHasCapability(runtimePlan, metricscomponent.ID, metricscomponent.ID) {
 		t.Fatalf("runtime plan missing capability owner: %#v", runtimePlan.Capabilities)
 	}
 
@@ -224,12 +224,13 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new pong request: %v", err)
 	}
-	req.Header.Set(tracing.HeaderTraceID, "trace-example")
+	req.Header.Set(tracing.HeaderTraceID, exampleTraceID)
+	req.Header.Set(tracing.HeaderSpanID, exampleSpanID)
 	resp, err := stdhttp.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatalf("get pong: %v", err)
 	}
-	if resp.Header.Get(tracing.HeaderTraceID) != "trace-example" || resp.Header.Get(tracing.HeaderRequestID) == "" {
+	if resp.Header.Get(tracing.HeaderTraceID) != exampleTraceID || resp.Header.Get(tracing.HeaderRequestID) == "" {
 		t.Fatalf("trace headers missing: %#v", resp.Header)
 	}
 	_ = resp.Body.Close()
@@ -246,7 +247,7 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 	text := string(body)
 	if !strings.Contains(text, "linker_v3_example_http_requests_total") ||
 		!strings.Contains(text, "linker_v3_example_linker_component_state") ||
-		!strings.Contains(text, `component="example/observability"`) ||
+		!strings.Contains(text, `component="observe/metrics"`) ||
 		!strings.Contains(text, `route="/pong"`) ||
 		!strings.Contains(text, `status="200"`) {
 		t.Fatalf("unexpected metrics body:\n%s", text)

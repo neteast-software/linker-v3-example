@@ -33,6 +33,18 @@ rpc/client/tts:
   metadata:
     scope: front
 
+observe/metrics:
+  enabled: true
+  namespace: linker_v3_example
+  const_labels:
+    service: linker-v3-example
+
+observe/tracing:
+  mode: memory
+  service: linker-v3-example
+  environment: local
+  sample_ratio: 1
+
 db/postgresql:
   host: 127.0.0.1
   port: 5432

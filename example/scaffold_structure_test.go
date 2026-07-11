@@ -94,9 +94,6 @@ func TestScaffoldCentralizesMiddlewareImplementation(t *testing.T) {
 			t.Fatalf("middleware 实现必须集中在 internal/route/middleware: %s", file)
 		}
 	}
-	if _, err := os.Stat("../internal/route/middleware/metrics.go"); err != nil {
-		t.Fatalf("metrics middleware 应位于统一目录: %v", err)
-	}
 }
 
 func TestScaffoldKeepsFrameworkAssemblySemantic(t *testing.T) {
@@ -107,11 +104,19 @@ func TestScaffoldKeepsFrameworkAssemblySemantic(t *testing.T) {
 		"WithServerOptions",
 		"ChainUnaryInterceptor",
 		"UnaryServerMeta",
+		"metricserver.Observe",
+		"metricgrpc.",
+		"tracegrpc.",
 		"google.golang.org/grpc",
 	} {
 		if strings.Contains(app, forbidden) {
 			t.Fatalf("internal/app 不应手工装配底层入口 %q", forbidden)
 		}
+	}
+	if !strings.Contains(app, "server.WithMetrics(prometheus.New())") ||
+		!strings.Contains(app, "rpc.WithTracing()") ||
+		!strings.Contains(app, "rpc.WithMetrics()") {
+		t.Fatal("internal/app 应通过 framework 语义入口装配观测能力")
 	}
 	for _, file := range goFilesUnder(t, "../internal/component") {
 		if strings.Contains(readFile(t, file), "NewCapabilityKey") {

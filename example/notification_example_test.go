@@ -16,27 +16,30 @@ import (
 	server "github.com/neteast-software/go-module/linker/server"
 	consumer "github.com/neteast-software/go-module/mq/consumer"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
-	"github.com/neteast-software/go-module/observe/metrics"
+	prometheus "github.com/neteast-software/go-module/observe/metrics/prometheus/linker"
 	"github.com/neteast-software/go-module/observe/tracing"
 	traceconsumer "github.com/neteast-software/go-module/observe/tracing/mq/consumer"
+	opentelemetry "github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker"
 	cron "github.com/neteast-software/go-module/scheduler/cron"
 	schedule "github.com/neteast-software/go-module/scheduler/cron/linker"
 	linker "github.com/neteast-software/linker/v3"
 
 	notificationcomponent "linker-v3-example/internal/component/notification"
-	observabilitycomponent "linker-v3-example/internal/component/observability"
 	notificationservice "linker-v3-example/internal/service/notification"
 )
 
 func TestNotificationLifecycleExample(t *testing.T) {
 	eventRecorder := eventcore.NewMemoryRecorder()
 	auditRecorder := auditcore.NewMemoryRecorder()
-	metricRecorder := metrics.Memory()
 	notification := notificationcomponent.NewComponent(
 		notificationcomponent.WithCronSpec("@every 1s"),
-		notificationcomponent.WithMetricRecorder(metricRecorder),
-		notificationcomponent.WithMetricLabels(metrics.Label("service", "example")),
 	)
+	metricComponent := prometheus.New(prometheus.WithConfig(prometheus.Config{
+		Enabled: true, Namespace: "linker_v3_example", ConstLabels: map[string]string{"service": "example"},
+	}))
+	traceComponent := opentelemetry.New(opentelemetry.WithConfig(opentelemetry.Config{
+		Mode: opentelemetry.ModeMemory, Service: "linker-v3-example",
+	}))
 	httpConfig := http.DefaultConfig()
 	httpConfig.Addr = "127.0.0.1:0"
 	app := server.New(
@@ -45,12 +48,15 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		server.WithEventRecorder(eventRecorder),
 		server.WithAuditRecorder(auditRecorder),
 		server.WithoutNotice(),
+		server.WithMetrics(metricComponent),
 		server.WithComponents(
-			observabilitycomponent.NewComponent(),
+			traceComponent,
 			notification,
-			mq.New(),
+			mq.New(mq.WithTracing(), mq.WithMetrics()),
 			schedule.New(
 				schedule.WithStore(cron.NewMemoryStore()),
+				schedule.WithTracing(),
+				schedule.WithMetrics(),
 			),
 		),
 	)
@@ -82,7 +88,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	if err != nil {
 		t.Fatalf("consumer capability: %v", err)
 	}
-	mqCtx, _ := tracing.Ensure(context.Background(), tracing.WithTraceID("trace-notification-message"))
+	mqCtx, _ := tracing.Ensure(context.Background(), tracing.WithTraceID(exampleTraceID), tracing.WithSpanID(exampleSpanID))
 	message := traceconsumer.InjectMessage(mqCtx, consumer.Message{
 		Topic: "notification.message",
 		Key:   "n1",
@@ -93,12 +99,10 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	}
 	waitFor(t, 2*time.Second, func() bool {
 		return hasProviderMessage(notification.Provider().Messages(), "mq") &&
-			hasProviderTrace(notification.Provider().Messages(), "mq", "trace-notification-message") &&
+			hasProviderTrace(notification.Provider().Messages(), "mq", exampleTraceID) &&
 			len(auditRecorder.Records()) > 0 &&
 			len(eventRecorder.Events()) > 0
 	})
-	assertMetricLabel(t, metricRecorder, "mq_consumer_messages_total", "status", "handled")
-	assertMetricLabel(t, metricRecorder, "mq_consumer_messages_total", "service", "example")
 
 	httpServer, err := http.RequireServer(app)
 	if err != nil {
@@ -117,7 +121,8 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		t.Fatalf("new send request: %v", err)
 	}
 	sendReq.Header.Set("Content-Type", "application/json")
-	sendReq.Header.Set(tracing.HeaderTraceID, "trace-http-mq")
+	sendReq.Header.Set(tracing.HeaderTraceID, httpMQTraceID)
+	sendReq.Header.Set(tracing.HeaderSpanID, httpMQSpanID)
 	sendResp, err := stdhttp.DefaultClient.Do(sendReq)
 	if err != nil {
 		t.Fatalf("post notification send: %v", err)
@@ -128,12 +133,12 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		t.Fatalf("read send response: %v", err)
 	}
 	if sendResp.StatusCode != stdhttp.StatusOK ||
-		sendResp.Header.Get(tracing.HeaderTraceID) != "trace-http-mq" ||
+		sendResp.Header.Get(tracing.HeaderTraceID) != httpMQTraceID ||
 		!strings.Contains(string(sendPayload), "queued") {
 		t.Fatalf("unexpected send response: status=%d header=%#v body=%q", sendResp.StatusCode, sendResp.Header, sendPayload)
 	}
 	waitFor(t, 2*time.Second, func() bool {
-		return hasProviderTrace(notification.Provider().Messages(), "mq", "trace-http-mq")
+		return hasProviderTrace(notification.Provider().Messages(), "mq", httpMQTraceID)
 	})
 	waitFor(t, time.Second, func() bool {
 		return hasAuditRecord(
@@ -148,7 +153,8 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new sse request: %v", err)
 	}
-	sseReq.Header.Set(tracing.HeaderTraceID, "trace-sse")
+	sseReq.Header.Set(tracing.HeaderTraceID, sseTraceID)
+	sseReq.Header.Set(tracing.HeaderSpanID, sseSpanID)
 	resp, err := stdhttp.DefaultClient.Do(sseReq)
 	if err != nil {
 		t.Fatalf("get sse: %v", err)
@@ -160,7 +166,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	}
 	if resp.StatusCode != stdhttp.StatusOK ||
 		!strings.Contains(resp.Header.Get("Content-Type"), "text/event-stream") ||
-		resp.Header.Get(tracing.HeaderTraceID) != "trace-sse" ||
+		resp.Header.Get(tracing.HeaderTraceID) != sseTraceID ||
 		!strings.Contains(string(body), "ready") {
 		t.Fatalf("unexpected sse response: status=%d content-type=%q body=%q", resp.StatusCode, resp.Header.Get("Content-Type"), body)
 	}
@@ -169,7 +175,16 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		return hasProviderMessage(notification.Provider().Messages(), "cron") &&
 			hasProviderNonEmptyTrace(notification.Provider().Messages(), "cron")
 	})
-	assertMetricLabel(t, metricRecorder, "scheduler_cron_runs_total", "status", "success")
+	metricsText := getRaw(t, "http://"+httpServer.Addr()+"/metrics")
+	assertMetricText(t, metricsText, "linker_v3_example_mq_consumer_messages_total", "status", "handled")
+	assertMetricText(t, metricsText, "linker_v3_example_scheduler_cron_runs_total", "status", "success")
+}
+
+func assertMetricText(t *testing.T, text string, name string, label string, value string) {
+	t.Helper()
+	if !strings.Contains(text, name) || !strings.Contains(text, label+`="`+value+`"`) {
+		t.Fatalf("metric %s missing %s=%s:\n%s", name, label, value, text)
+	}
 }
 
 func planHasAsset(plan linker.Plan, kind string, name string) bool {

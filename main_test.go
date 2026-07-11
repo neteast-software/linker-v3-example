@@ -45,7 +45,7 @@ func TestPlanCommand(t *testing.T) {
 	if !jsonPlanHasAsset(assets, "observe/metrics", "prometheus") {
 		t.Fatalf("plan missing metrics asset: %#v", assets)
 	}
-	if !jsonPlanHasAsset(assets, "observe/tracing", "http+grpc") {
+	if !jsonPlanHasAsset(assets, "observe/tracing", "linker-v3-example") {
 		t.Fatalf("plan missing tracing asset: %#v", assets)
 	}
 }

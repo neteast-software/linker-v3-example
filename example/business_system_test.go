@@ -21,7 +21,11 @@ import (
 	postgresql "github.com/neteast-software/go-module/db/postgresql/linker"
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
+	metricscomponent "github.com/neteast-software/go-module/observe/metrics/linker"
+	prometheus "github.com/neteast-software/go-module/observe/metrics/prometheus/linker"
 	"github.com/neteast-software/go-module/observe/tracing"
+	tracingcomponent "github.com/neteast-software/go-module/observe/tracing/linker"
+	opentelemetry "github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker"
 	rpccore "github.com/neteast-software/go-module/rpc/grpc"
 	rpc "github.com/neteast-software/go-module/rpc/grpc/linker"
 	schedule "github.com/neteast-software/go-module/scheduler/cron/linker"
@@ -32,7 +36,6 @@ import (
 	ttsclient "linker-v3-example/internal/client/tts"
 	inspectioncomponent "linker-v3-example/internal/component/inspection"
 	notificationcomponent "linker-v3-example/internal/component/notification"
-	observabilitycomponent "linker-v3-example/internal/component/observability"
 	ttscomponent "linker-v3-example/internal/component/tts"
 	usercomponent "linker-v3-example/internal/component/user"
 	userconstant "linker-v3-example/internal/constant/user"
@@ -65,6 +68,12 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		linker.Namespace(ttsclient.ID): ttsConfig,
 		postgresql.Namespace:           postgresqlConfig,
 		usercomponent.Namespace:        usercomponent.Config{TokenKey: strings.Repeat("a", 64)},
+		prometheus.Namespace: prometheus.Config{
+			Enabled: true, Namespace: "linker_v3_example", ConstLabels: map[string]string{"service": "linker-v3-example"},
+		},
+		opentelemetry.Namespace: opentelemetry.Config{
+			Mode: opentelemetry.ModeMemory, Service: "linker-v3-example",
+		},
 	}))
 	plan := preparedPlan(t, app)
 	if !planHasComponent(plan, postgresql.ID) ||
@@ -72,7 +81,8 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		!planHasComponent(plan, audit.ID) ||
 		!planHasComponent(plan, inspectioncomponent.ID) ||
 		!planHasComponent(plan, notificationcomponent.ID) ||
-		!planHasComponent(plan, observabilitycomponent.ID) ||
+		!planHasComponent(plan, metricscomponent.ID) ||
+		!planHasComponent(plan, tracingcomponent.ID) ||
 		!planHasComponent(plan, usercomponent.ID) ||
 		!planHasComponent(plan, ttscomponent.ID) ||
 		!planHasComponent(plan, mq.ID) ||
@@ -97,7 +107,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	if !planHasAsset(plan, "rpc/grpc/client", ttsclient.ID.String()) {
 		t.Fatalf("plan missing tts grpc client asset: %#v", plan.Assets)
 	}
-	if !planHasAsset(plan, "observe/metrics", "prometheus") || !planHasAsset(plan, "observe/tracing", "http+grpc") {
+	if !planHasAsset(plan, "observe/metrics", "prometheus") || !planHasAsset(plan, "observe/tracing", "linker-v3-example") {
 		t.Fatalf("plan missing observability asset: %#v", plan.Assets)
 	}
 	if !planHasRouteAsset(plan, "GET", "/api/v1/app2/notification/events", "http.app2.notification.events") {
@@ -227,9 +237,10 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	httpTTS, traceHeaders := postJSONHeaders(t, baseURL+"/api/v1/app2/tts/transcribe", map[string]string{
 		"text": "hello-http",
 	}, "", map[string]string{
-		tracing.HeaderTraceID: "trace-http-grpc",
+		tracing.HeaderTraceID: exampleTraceID,
+		tracing.HeaderSpanID:  exampleSpanID,
 	})
-	if traceHeaders.Get(tracing.HeaderTraceID) != "trace-http-grpc" ||
+	if traceHeaders.Get(tracing.HeaderTraceID) != exampleTraceID ||
 		traceHeaders.Get(tracing.HeaderRequestID) == "" {
 		t.Fatalf("trace headers missing from http tts response: %#v", traceHeaders)
 	}

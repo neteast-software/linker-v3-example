@@ -12,10 +12,8 @@ import (
 	server "github.com/neteast-software/go-module/linker/server"
 	consumer "github.com/neteast-software/go-module/mq/consumer"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
-	"github.com/neteast-software/go-module/observe/metrics"
-	metricserver "github.com/neteast-software/go-module/observe/metrics/linker/server"
-	metricgrpc "github.com/neteast-software/go-module/observe/metrics/rpc/grpc"
-	tracegrpc "github.com/neteast-software/go-module/observe/tracing/rpc/grpc"
+	prometheus "github.com/neteast-software/go-module/observe/metrics/prometheus/linker"
+	opentelemetry "github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker"
 	rpc "github.com/neteast-software/go-module/rpc/grpc/linker"
 	cron "github.com/neteast-software/go-module/scheduler/cron"
 	schedule "github.com/neteast-software/go-module/scheduler/cron/linker"
@@ -23,15 +21,16 @@ import (
 )
 
 func TestRecommendedSemanticAPIsCompile(t *testing.T) {
-	recorder := metrics.Memory()
-	observation := metricserver.Observe(recorder)
-	var _ server.Observer = observation
-	if server.WithObserver(observation) == nil {
-		t.Fatal("server observer option 不能为空")
+	if server.WithMetrics(prometheus.New()) == nil {
+		t.Fatal("server metrics option 不能为空")
 	}
-	if rpc.WithUnaryInterceptors(tracegrpc.UnaryServer(), metricgrpc.UnaryServer(recorder)) == nil ||
-		rpc.WithStreamInterceptors(tracegrpc.StreamServer(), metricgrpc.StreamServer(recorder)) == nil {
-		t.Fatal("rpc interceptor option 不能为空")
+	if rpc.WithTracing() == nil || rpc.WithMetrics() == nil ||
+		rpc.WithClientTracing[any]() == nil || rpc.WithClientMetrics[any]() == nil {
+		t.Fatal("rpc observability option 不能为空")
+	}
+	if mq.WithTracing() == nil || mq.WithMetrics() == nil ||
+		schedule.WithTracing() == nil || schedule.WithMetrics() == nil {
+		t.Fatal("后台入口 observability option 不能为空")
 	}
 
 	item := consumer.New("notice", consumer.HandlerFunc(func(context.Context, consumer.Message) error { return nil }))
@@ -47,6 +46,8 @@ func TestRecommendedSemanticAPIsCompile(t *testing.T) {
 	_, _ = notice.ResolveDispatcher(runtime)
 	_, _ = mq.Resolve(runtime, "notice")
 	_, _ = schedule.Resolve(runtime)
+	_, _ = prometheus.Resolve(runtime)
+	_, _ = opentelemetry.Resolve(runtime)
 
 	_ = http.RegisterIn
 	_ = response.Success

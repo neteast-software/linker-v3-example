@@ -13,10 +13,10 @@ import (
 	graphlinker "github.com/neteast-software/go-module/graph/naive/linker"
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	server "github.com/neteast-software/go-module/linker/server"
+	prometheus "github.com/neteast-software/go-module/observe/metrics/prometheus/linker"
 	"github.com/neteast-software/go-module/observe/tracing"
 
 	graphcomponent "linker-v3-example/internal/component/graph"
-	observabilitycomponent "linker-v3-example/internal/component/observability"
 )
 
 func TestGraphNaiveExample(t *testing.T) {
@@ -25,8 +25,10 @@ func TestGraphNaiveExample(t *testing.T) {
 	app := server.New(
 		server.WithShutdownTimeout(3*time.Second),
 		server.WithHTTP(httpConfig),
+		server.WithMetrics(prometheus.New(prometheus.WithConfig(prometheus.Config{
+			Enabled: true, Namespace: "linker_v3_example",
+		}))),
 		server.WithComponents(
-			observabilitycomponent.NewComponent(),
 			applicationcomponent.New(
 				applicationcomponent.WithDBTarget(""),
 				applicationcomponent.WithApplications(applicationcore.Application{

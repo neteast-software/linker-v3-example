@@ -8,10 +8,8 @@ import (
 	postgresql "github.com/neteast-software/go-module/db/postgresql/linker"
 	server "github.com/neteast-software/go-module/linker/server"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
-	"github.com/neteast-software/go-module/observe/metrics"
-	metricserver "github.com/neteast-software/go-module/observe/metrics/linker/server"
-	metricgrpc "github.com/neteast-software/go-module/observe/metrics/rpc/grpc"
-	tracegrpc "github.com/neteast-software/go-module/observe/tracing/rpc/grpc"
+	prometheus "github.com/neteast-software/go-module/observe/metrics/prometheus/linker"
+	opentelemetry "github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker"
 	rpc "github.com/neteast-software/go-module/rpc/grpc/linker"
 	schedule "github.com/neteast-software/go-module/scheduler/cron/linker"
 	linker "github.com/neteast-software/linker/v3"
@@ -20,26 +18,17 @@ import (
 	graphcomponent "linker-v3-example/internal/component/graph"
 	inspectioncomponent "linker-v3-example/internal/component/inspection"
 	notificationcomponent "linker-v3-example/internal/component/notification"
-	observabilitycomponent "linker-v3-example/internal/component/observability"
 	ttscomponent "linker-v3-example/internal/component/tts"
 	usercomponent "linker-v3-example/internal/component/user"
 )
 
 func New(sources ...linker.Source) *linker.App {
-	observability := observabilitycomponent.NewComponent()
-	metricLabels := []metrics.LabelValue{metrics.Label("service", "linker-v3-example")}
-	notification := notificationcomponent.NewComponent(
-		notificationcomponent.WithMetricRecorder(observability.Recorder()),
-		notificationcomponent.WithMetricLabels(metricLabels...),
-	)
 	return server.New(
 		server.Config(sources...),
 		server.WithShutdownTimeout(3*time.Second),
-		server.WithObserver(metricserver.Observe(
-			observability.Recorder(),
-			metricserver.WithConstLabels(metricLabels...),
-		)),
+		server.WithMetrics(prometheus.New()),
 		server.WithComponents(
+			opentelemetry.New(),
 			postgresql.New(),
 			applicationcomponent.New(
 				applicationcomponent.WithApplications(
@@ -49,27 +38,17 @@ func New(sources ...linker.Source) *linker.App {
 				),
 			),
 			graphcomponent.NewComponent(),
-			observability,
 			inspectioncomponent.NewComponent(),
 			usercomponent.NewComponent(),
 			ttscomponent.NewComponent(),
-			notification,
-			mq.New(),
-			schedule.New(),
+			notificationcomponent.NewComponent(),
+			mq.New(mq.WithTracing(), mq.WithMetrics()),
+			schedule.New(schedule.WithTracing(), schedule.WithMetrics()),
 			rpc.New(
-				rpc.WithUnaryInterceptors(
-					tracegrpc.UnaryServer(),
-					metricgrpc.UnaryServer(observability.Recorder(), metricgrpc.WithConstLabels(metricLabels...)),
-				),
-				rpc.WithStreamInterceptors(
-					tracegrpc.StreamServer(),
-					metricgrpc.StreamServer(observability.Recorder(), metricgrpc.WithConstLabels(metricLabels...)),
-				),
+				rpc.WithTracing(),
+				rpc.WithMetrics(),
 			),
-			ttsclient.Provider(
-				ttsclient.WithMetricRecorder(observability.Recorder()),
-				ttsclient.WithMetricLabels(metricLabels...),
-			),
+			ttsclient.Provider(),
 		),
 	)
 }
