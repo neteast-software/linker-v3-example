@@ -12,6 +12,8 @@ require (
 	github.com/neteast-software/go-module/audit/operate v0.0.0
 	github.com/neteast-software/go-module/audit/operate/http/gin v0.0.0
 	github.com/neteast-software/go-module/audit/operate/linker v0.0.0
+	github.com/neteast-software/go-module/cache/redis v0.0.0
+	github.com/neteast-software/go-module/cache/redis/linker v0.0.0
 	github.com/neteast-software/go-module/config v0.0.0
 	github.com/neteast-software/go-module/config/env/linker v0.0.0
 	github.com/neteast-software/go-module/config/yaml/linker v0.0.0
@@ -106,7 +108,6 @@ require (
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/nacos-group/nacos-sdk-go/v2 v2.3.5 // indirect
 	github.com/neteast-software/go-module/audit/operate/store/gorm v0.0.0 // indirect
-	github.com/neteast-software/go-module/cache/redis v0.0.0 // indirect
 	github.com/neteast-software/go-module/config/env v0.0.0 // indirect
 	github.com/neteast-software/go-module/config/yaml v0.0.0 // indirect
 	github.com/neteast-software/go-module/crypto/sm v0.0.0 // indirect
@@ -122,6 +123,7 @@ require (
 	github.com/neteast-software/go-module/observe/tracing/http/gin v0.0.0 // indirect
 	github.com/neteast-software/go-module/observe/tracing/http/gin/linker v0.0.0 // indirect
 	github.com/neteast-software/go-module/observe/tracing/scheduler/cron v0.0.0 // indirect
+	github.com/neteast-software/go-module/provider v0.0.0 // indirect
 	github.com/neteast-software/go-module/redact v0.0.0 // indirect
 	github.com/neteast-software/go-module/registry/service/linker v0.0.0 // indirect
 	github.com/neteast-software/go-module/registry/service/nacos v0.0.0 // indirect
@@ -183,7 +185,7 @@ require (
 	github.com/neteast-software/go-module/http/gin/linker v0.0.0
 	github.com/neteast-software/go-module/license v0.0.0
 	github.com/neteast-software/go-module/license/http/gin v0.0.0
-	github.com/neteast-software/go-module/registry/nacos v0.0.0 // indirect
+	github.com/neteast-software/go-module/registry/nacos v0.0.0
 	github.com/neteast-software/go-module/registry/nacos/linker v0.0.0
 	github.com/neteast-software/nacos-kit v0.0.0
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
@@ -316,6 +318,12 @@ replace github.com/neteast-software/go-module/outbox => ../modules/outbox
 replace github.com/neteast-software/go-module/config/yaml => ../modules/config/yaml
 
 replace github.com/neteast-software/go-module/cache/redis => ../modules/cache/redis
+
+replace github.com/neteast-software/go-module/cache/redis/linker => ../modules/cache/redis/linker
+
+replace github.com/neteast-software/go-module/provider => ../modules/provider
+
+replace github.com/neteast-software/go-module/test/integration => ../modules/test/integration
 
 replace github.com/neteast-software/go-module/scheduler/cron => ../modules/scheduler/cron
 

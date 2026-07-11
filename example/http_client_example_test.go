@@ -58,7 +58,7 @@ func TestHTTPClientExample(t *testing.T) {
 	if !planHasComponent(plan, clientcomponent.ID) {
 		t.Fatalf("plan missing http client component: %#v", plan.Components)
 	}
-	if !planHasAsset(plan, "http/client", clientcomponent.ID.String()) {
+	if !planHasAsset(plan, "http/client", external.URL) {
 		t.Fatalf("plan missing http client asset: %#v", plan.Assets)
 	}
 

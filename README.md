@@ -164,7 +164,7 @@ go run .
 
 ## Example
 
-测试文件集中在 `example/` 目录。真实 PostgreSQL example 只在设置 `LINKER_V3_EXAMPLE_PG_PASSWORD` 后运行，host 默认使用 `127.0.0.1` 且可通过同前缀测试变量覆盖；当前环境不可用时会明确 skip。`signal_example_test.go` 会启动真实 server 子进程，分别在 startup 和 running 阶段发送 SIGTERM，验证反向关闭和退出码，不依赖外部 provider。`production_http_example_test.go` 展示 body limit、trusted proxy、health endpoint 和负载中 graceful stop；`docs/Caddyfile` 是部署层终止 TLS 的最小样板。
+测试文件集中在 `example/` 目录。真实 PostgreSQL example 只在设置 `LINKER_V3_EXAMPLE_PG_PASSWORD` 后运行，host 默认使用 `127.0.0.1` 且可通过同前缀测试变量覆盖；当前环境不可用时会明确 skip。真实 Redis 和 Nacos 样板分别由 `LINKER_V3_EXAMPLE_REDIS_ADDR`、`LINKER_V3_EXAMPLE_NACOS_HOST` 显式开启，并只创建带唯一名称且可清理的测试资产；凭据只从同前缀环境变量读取。`signal_example_test.go` 会启动真实 server 子进程，分别在 startup 和 running 阶段发送 SIGTERM，验证反向关闭和退出码，不依赖外部 provider。`production_http_example_test.go` 展示 body limit、trusted proxy、health endpoint 和负载中 graceful stop；`docs/Caddyfile` 是部署层终止 TLS 的最小样板。
 
 ```bash
 go test ./...
@@ -182,6 +182,8 @@ Prometheus 可抓取 `GET /metrics`，最小 scrape、OTel Collector 和 Grafana
 - `internal/route/graph/*_api.go`：一个 API 一个文件，route/resource/middleware 和 handler 放在同一个入口重心内。
 - `example/graph_example_test.go`：验证 graph route、Plan asset 和 renderer capability。
 - `example/nacos_example_test.go`：验证 YAML seed、Nacos source、HTTP/gRPC registry adapter 和 Plan 里的依赖/capability 表达。
+- `example/nacos_provider_example_test.go`：在显式 Nacos 环境中发布独立 data id，经 Source 启动最小 App，并验证清理和关闭。
+- `example/redis_example_test.go`：在显式 Redis 环境中验证 component、capability、读写、Plan 资产和 graceful close。
 - `example/dynamic_config_test.go`：验证 Nacos 完整快照、Live/Restart、desired/active、env 后置覆盖和可恢复拒绝。
 - `example/reliability_example_test.go`：验证 DB capability 缺失会在组件初始化期失败，以及 Stop timeout 会返回可判断的 `context.DeadlineExceeded`。
 - `example/signal_example_test.go`：验证真实 server 在启动期和运行期收到 SIGTERM 后都执行 graceful close；运行期正常退出，启动期返回可判断的取消原因。
