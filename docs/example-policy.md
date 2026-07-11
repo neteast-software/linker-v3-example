@@ -44,6 +44,7 @@
 - `grpc_example_test.go`：gRPC metadata 和 trace。
 - `outbox_example_test.go`：delivery 和 dead-letter。
 - `reliability_example_test.go`：依赖缺失、Stop timeout 和失败反馈。
+- `signal_example_test.go`：真实 server 子进程的 startup/runtime SIGTERM 和 graceful close。
 - `nacos_example_test.go`：YAML seed、Nacos source 和 registry adapter。
 
 如果单个测试文件开始承载多个不相干流程，优先按场景拆分，不把所有能力塞回一个大测试。

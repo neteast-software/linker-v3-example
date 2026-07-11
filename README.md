@@ -164,7 +164,7 @@ go run .
 
 ## Example
 
-测试文件集中在 `example/` 目录。真实 PostgreSQL example 只在设置 `LINKER_V3_EXAMPLE_PG_PASSWORD` 后运行，host 默认使用 `127.0.0.1` 且可通过同前缀测试变量覆盖；当前环境不可用时会明确 skip。
+测试文件集中在 `example/` 目录。真实 PostgreSQL example 只在设置 `LINKER_V3_EXAMPLE_PG_PASSWORD` 后运行，host 默认使用 `127.0.0.1` 且可通过同前缀测试变量覆盖；当前环境不可用时会明确 skip。`signal_example_test.go` 会启动真实 server 子进程，分别在 startup 和 running 阶段发送 SIGTERM，验证反向关闭和退出码，不依赖外部 provider。
 
 ```bash
 go test ./...
@@ -184,6 +184,7 @@ Prometheus 可抓取 `GET /metrics`，Grafana 示例面板在 `docs/grafana-dash
 - `example/nacos_example_test.go`：验证 YAML seed、Nacos source、HTTP/gRPC registry adapter 和 Plan 里的依赖/capability 表达。
 - `example/dynamic_config_test.go`：验证 Nacos 完整快照、Live/Restart、desired/active、env 后置覆盖和可恢复拒绝。
 - `example/reliability_example_test.go`：验证 DB capability 缺失会在组件初始化期失败，以及 Stop timeout 会返回可判断的 `context.DeadlineExceeded`。
+- `example/signal_example_test.go`：验证真实 server 在启动期和运行期收到 SIGTERM 后都执行 graceful close；运行期正常退出，启动期返回可判断的取消原因。
 - `example/grpc_example_test.go`：验证 gRPC metadata 和 trace id 通过 interceptor 传播。
 - `example/http_client_example_test.go`：验证出站 HTTP client linker adapter、typed client、credential、trace hook 和 Plan asset。
 - `example/notification_example_test.go`：验证 MQ/cron/SSE lifecycle，并覆盖 HTTP -> MQ mock 的 trace id 贯穿。
