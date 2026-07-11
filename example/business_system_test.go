@@ -146,7 +146,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		}
 	})
 
-	httpServer, err := linker.RequireCapability(app, linker.NewCapabilityKey[*http.Server](http.ID))
+	httpServer, err := http.RequireServer(app)
 	if err != nil {
 		t.Fatalf("http capability: %v", err)
 	}

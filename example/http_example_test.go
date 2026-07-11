@@ -88,7 +88,7 @@ func TestLinkerV3HTTPGinExample(t *testing.T) {
 		t.Fatalf("runtime plan missing http capability: %#v", runtimePlan.Capabilities)
 	}
 
-	httpServer, err := linker.RequireCapability(app, linker.NewCapabilityKey[*http.Server](http.ID))
+	httpServer, err := http.RequireServer(app)
 	if err != nil {
 		t.Fatalf("server capability: %v", err)
 	}
@@ -216,7 +216,7 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 		t.Fatalf("runtime plan missing capability owner: %#v", runtimePlan.Capabilities)
 	}
 
-	httpServer, err := linker.RequireCapability(app, linker.NewCapabilityKey[*http.Server](http.ID))
+	httpServer, err := http.RequireServer(app)
 	if err != nil {
 		t.Fatalf("server capability: %v", err)
 	}

@@ -128,7 +128,7 @@ func (p *Component) Assets(context.Context, linker.Runtime) ([]linker.Asset, err
 }
 
 func (p *Component) Init(_ context.Context, runtime linker.Runtime) error {
-	if recorder, ok := linker.Resolve(runtime, audit.RecorderKey()); ok && recorder != nil {
+	if recorder, ok := audit.Resolve(runtime); ok && recorder != nil {
 		p.audit = recorder
 	}
 	if recorder, ok := event.Resolve(runtime); ok && recorder != nil {

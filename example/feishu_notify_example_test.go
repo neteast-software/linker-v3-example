@@ -32,7 +32,7 @@ func TestFeishuNotifyCapabilityExample(t *testing.T) {
 		}
 	})
 
-	got, err := linker.RequireCapability(app, feishucomponent.SenderKey())
+	got, err := feishucomponent.RequireSender(app)
 	if err != nil {
 		t.Fatalf("sender capability: %v", err)
 	}

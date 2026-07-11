@@ -54,7 +54,7 @@ func (p fakeNacosComponent) Identity() linker.ID {
 }
 
 func (p fakeNacosComponent) OnMounted(_ context.Context, runtime linker.Runtime) error {
-	return linker.Provide(runtime, linker.NewCapabilityKey[nacoskit.Naming]("registry/nacos/naming"), p.naming)
+	return linker.Provide(runtime, registrynacos.NamingKey(), p.naming)
 }
 
 func TestServerFrameworkLoadsNacosSourceAfterLocalSeed(t *testing.T) {
@@ -95,7 +95,7 @@ http:
 		_ = app.Stop(context.Background())
 	})
 
-	httpServer, err := linker.RequireCapability(app, http.ServerKey())
+	httpServer, err := http.RequireServer(app)
 	if err != nil {
 		t.Fatalf("http capability: %v", err)
 	}

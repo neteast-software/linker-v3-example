@@ -41,7 +41,7 @@ func TestCoreBinDoesNotLoadServerDefaults(t *testing.T) {
 	if !probe.initialized {
 		t.Fatal("bin component was not initialized")
 	}
-	if _, ok := linker.Resolve(app, linker.NewCapabilityKey[*http.Server](http.ID)); ok {
+	if _, ok := http.ResolveServer(app); ok {
 		t.Fatalf("http capability should be absent")
 	}
 	if err := app.Stop(context.Background()); err != nil {

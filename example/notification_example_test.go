@@ -100,7 +100,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	assertMetricLabel(t, metricRecorder, "mq_consumer_messages_total", "status", "handled")
 	assertMetricLabel(t, metricRecorder, "mq_consumer_messages_total", "service", "example")
 
-	httpServer, err := linker.RequireCapability(app, linker.NewCapabilityKey[*http.Server](http.ID))
+	httpServer, err := http.RequireServer(app)
 	if err != nil {
 		t.Fatalf("http capability: %v", err)
 	}

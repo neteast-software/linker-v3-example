@@ -71,7 +71,7 @@ func TestHTTPClientExample(t *testing.T) {
 		}
 	})
 
-	api, err := linker.RequireCapability(app, clientcomponent.ClientKey())
+	api, err := clientcomponent.Require(app)
 	if err != nil {
 		t.Fatalf("http client capability: %v", err)
 	}

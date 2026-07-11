@@ -14,7 +14,6 @@ import (
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	server "github.com/neteast-software/go-module/linker/server"
 	"github.com/neteast-software/go-module/observe/tracing"
-	linker "github.com/neteast-software/linker/v3"
 
 	graphcomponent "linker-v3-example/internal/component/graph"
 	observabilitycomponent "linker-v3-example/internal/component/observability"
@@ -58,11 +57,11 @@ func TestGraphNaiveExample(t *testing.T) {
 		}
 	})
 
-	if _, err := linker.RequireCapability(app, graphlinker.RendererKey()); err != nil {
+	if _, err := graphlinker.Require(app); err != nil {
 		t.Fatalf("graph renderer capability: %v", err)
 	}
 
-	httpServer, err := linker.RequireCapability(app, linker.NewCapabilityKey[*http.Server](http.ID))
+	httpServer, err := http.RequireServer(app)
 	if err != nil {
 		t.Fatalf("http capability: %v", err)
 	}
