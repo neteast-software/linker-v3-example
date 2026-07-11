@@ -1,2 +1,2 @@
-// Package observability declares example observability routes and middleware.
+// Package observability declares example observability routes and their middleware impact.
 package observability

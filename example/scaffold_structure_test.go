@@ -1,8 +1,10 @@
 package example
 
 import (
+	"go/ast"
 	"go/parser"
 	"go/token"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -46,9 +48,74 @@ func TestScaffoldRouteAPIFilesSelfRegister(t *testing.T) {
 		t.Fatalf("missing route api files")
 	}
 	for _, file := range files {
-		data := readFile(t, file)
-		if !strings.Contains(data, ".RegisterIn(") && !strings.Contains(data, ".Register(") {
-			t.Fatalf("%s should declare its route with RegisterIn or Register", file)
+		parsed, err := parser.ParseFile(token.NewFileSet(), file, nil, 0)
+		if err != nil {
+			t.Fatalf("parse %s: %v", file, err)
+		}
+		inits := 0
+		methods := 0
+		registers := 0
+		for _, decl := range parsed.Decls {
+			fn, ok := decl.(*ast.FuncDecl)
+			if ok && fn.Recv == nil && fn.Name.Name == "init" {
+				inits++
+			}
+		}
+		ast.Inspect(parsed, func(node ast.Node) bool {
+			call, ok := node.(*ast.CallExpr)
+			if !ok {
+				return true
+			}
+			selector, ok := call.Fun.(*ast.SelectorExpr)
+			if !ok {
+				return true
+			}
+			switch selector.Sel.Name {
+			case "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD", "Any", "Match":
+				methods++
+			case "Register", "RegisterIn":
+				registers++
+			}
+			return true
+		})
+		if inits != 1 || registers != 1 || methods != 1 {
+			t.Fatalf("%s 应保持一个 init、一个注册入口和一个 method route: init=%d register=%d method=%d", file, inits, registers, methods)
+		}
+	}
+}
+
+func TestScaffoldCentralizesMiddlewareImplementation(t *testing.T) {
+	files := goFilesUnder(t, "../internal/route")
+	for _, file := range files {
+		if filepath.Base(filepath.Dir(file)) == "middleware" {
+			continue
+		}
+		if strings.Contains(readFile(t, file), ".Next()") {
+			t.Fatalf("middleware 实现必须集中在 internal/route/middleware: %s", file)
+		}
+	}
+	if _, err := os.Stat("../internal/route/middleware/metrics.go"); err != nil {
+		t.Fatalf("metrics middleware 应位于统一目录: %v", err)
+	}
+}
+
+func TestScaffoldKeepsFrameworkAssemblySemantic(t *testing.T) {
+	app := readFile(t, "../internal/app/app.go")
+	for _, forbidden := range []string{
+		"WithLifecycleObserver",
+		"WithConfigObserver",
+		"WithServerOptions",
+		"ChainUnaryInterceptor",
+		"UnaryServerMeta",
+		"google.golang.org/grpc",
+	} {
+		if strings.Contains(app, forbidden) {
+			t.Fatalf("internal/app 不应手工装配底层入口 %q", forbidden)
+		}
+	}
+	for _, file := range goFilesUnder(t, "../internal/component") {
+		if strings.Contains(readFile(t, file), "NewCapabilityKey") {
+			t.Fatalf("业务 component 应使用能力归属 package 的语义入口: %s", file)
 		}
 	}
 }
@@ -113,4 +180,22 @@ func readFile(t *testing.T, file string) string {
 		t.Fatalf("read %s: %v", file, err)
 	}
 	return string(data)
+}
+
+func goFilesUnder(t *testing.T, root string) []string {
+	t.Helper()
+	var files []string
+	err := filepath.WalkDir(root, func(path string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !entry.IsDir() && strings.HasSuffix(path, ".go") && !strings.HasSuffix(path, "_test.go") {
+			files = append(files, path)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("scan %s: %v", root, err)
+	}
+	return files
 }

@@ -1,4 +1,4 @@
-package observability
+package middleware
 
 import (
 	"strconv"
@@ -7,6 +7,8 @@ import (
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	"github.com/neteast-software/go-module/observe/metrics"
 	"github.com/neteast-software/go-module/observe/tracing"
+
+	observabilityservice "linker-v3-example/internal/service/observability"
 )
 
 var httpRequests = metrics.Counter(
@@ -23,11 +25,7 @@ var httpRequestSeconds = metrics.Histogram(
 	metrics.WithBuckets(0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5),
 )
 
-func init() {
-	http.Register(http.Use(HTTPMetrics()))
-}
-
-func HTTPMetrics() http.HandlerFunc {
+func Metrics() http.HandlerFunc {
 	return func(c *http.Context) {
 		started := time.Now()
 		ctx, trace := tracing.Ensure(c.Request.Context(), tracing.WithTrace(tracing.FromHeaders(c.GetHeader)))
@@ -42,6 +40,11 @@ func HTTPMetrics() http.HandlerFunc {
 		_ = httpRequests.Add(ctx, recorder, 1, labels...)
 		_ = httpRequestSeconds.Observe(ctx, recorder, time.Since(started).Seconds(), labels...)
 	}
+}
+
+func metricRecorder(c *http.Context) (metrics.Recorder, bool) {
+	recorder, ok := http.Resolve(c, observabilityservice.MetricRecorderKey())
+	return recorder, ok && recorder != nil
 }
 
 func requestLabels(c *http.Context) []metrics.LabelValue {
