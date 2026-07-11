@@ -33,8 +33,9 @@ http:
   addr: 127.0.0.1:8080
   read_timeout: 2s
   health:
-    enabled: true
-    path: ready
+    readiness:
+      enabled: true
+      path: ready
 cache/redis:
   addr: 127.0.0.1:6379
   db: 0

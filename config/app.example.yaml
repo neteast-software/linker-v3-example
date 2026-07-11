@@ -2,8 +2,15 @@ http:
   addr: 127.0.0.1:8800
   recovery: true
   health:
-    enabled: true
-    path: ping
+    liveness:
+      enabled: true
+      path: live
+    readiness:
+      enabled: true
+      path: ready
+    startup:
+      enabled: true
+      path: startup
 
 rpc/grpc:
   addr: 127.0.0.1:9900

@@ -48,8 +48,9 @@ http:
   base_path: api
   recovery: true
   health:
-    enabled: true
-    path: health
+    readiness:
+      enabled: true
+      path: health
 `), 0o600); err != nil {
 		t.Fatalf("write yaml: %v", err)
 	}
@@ -113,8 +114,9 @@ http:
   base_path: yaml-api
   recovery: true
   health:
-    enabled: true
-    path: yaml-health
+    readiness:
+      enabled: true
+      path: yaml-health
 `), 0o600); err != nil {
 		t.Fatalf("write yaml: %v", err)
 	}
@@ -122,8 +124,8 @@ http:
 	t.Setenv("LINKER_HTTP__BASE_PATH", "env-api")
 	t.Setenv("LINKER_HTTP__RECOVERY", "true")
 	t.Setenv("LINKER_HTTP__READ_TIMEOUT", "2s")
-	t.Setenv("LINKER_HTTP__HEALTH__ENABLED", "true")
-	t.Setenv("LINKER_HTTP__HEALTH__PATH", "ready")
+	t.Setenv("LINKER_HTTP__HEALTH__READINESS__ENABLED", "true")
+	t.Setenv("LINKER_HTTP__HEALTH__READINESS__PATH", "ready")
 
 	app := server.New(
 		server.Config(yaml.File(file), env.Prefix("LINKER_")),

@@ -78,7 +78,7 @@ http:
 			if request.Client.Host != "seed.nacos.local" || request.Client.Port != 8848 {
 				return nil, fmt.Errorf("nacos seed = %+v", request.Client)
 			}
-			return []byte("http:\n  addr: 127.0.0.1:0\n  base_path: nacos\n  health:\n    enabled: true\n    path: ready\n"), nil
+			return []byte("http:\n  addr: 127.0.0.1:0\n  base_path: nacos\n  health:\n    readiness:\n      enabled: true\n      path: ready\n"), nil
 		}),
 	)
 
