@@ -26,10 +26,6 @@ func New(conn grpc.ClientConnInterface) Client {
 	return ttsrpc.NewClient(conn)
 }
 
-func ClientKey() linker.CapabilityKey[Client] {
-	return grpclinker.ClientKey[Client](ID)
-}
-
 func WithMetricRecorder(recorder metrics.Recorder) Option {
 	return func(p *providerOptions) {
 		p.recorder = recorder
@@ -50,8 +46,13 @@ func Provider(opts ...Option) linker.Component {
 		}
 	}
 	interceptors := []grpc.UnaryClientInterceptor{tracegrpc.UnaryClient()}
+	streamInterceptors := []grpc.StreamClientInterceptor{tracegrpc.StreamClient()}
 	if options.recorder != nil {
 		interceptors = append(interceptors, metricgrpc.UnaryClient(
+			options.recorder,
+			metricgrpc.WithConstLabels(options.labels...),
+		))
+		streamInterceptors = append(streamInterceptors, metricgrpc.StreamClient(
 			options.recorder,
 			metricgrpc.WithConstLabels(options.labels...),
 		))
@@ -59,6 +60,7 @@ func Provider(opts ...Option) linker.Component {
 	return grpclinker.NewClientProvider[Client](
 		ID,
 		New,
-		grpclinker.WithDialOptions[Client](grpc.WithChainUnaryInterceptor(interceptors...)),
+		grpclinker.WithClientUnaryInterceptors[Client](interceptors...),
+		grpclinker.WithClientStreamInterceptors[Client](streamInterceptors...),
 	)
 }

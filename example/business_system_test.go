@@ -213,7 +213,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		t.Fatalf("unexpected scoped task: %#v", task)
 	}
 
-	tts, err := linker.RequireCapability(app, ttsclient.ClientKey())
+	tts, err := ttsclient.Require(app)
 	if err != nil {
 		t.Fatalf("tts client capability: %v", err)
 	}

@@ -177,7 +177,7 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 	app := server.New(
 		server.WithShutdownTimeout(3*time.Second),
 		server.WithHTTP(httpConfig),
-		server.WithLifecycleObserver(metricserver.Observer(
+		server.WithObserver(metricserver.Observe(
 			observability.Recorder(),
 			metricserver.WithConstLabels(metrics.Label("service", "linker-v3-example")),
 		)),

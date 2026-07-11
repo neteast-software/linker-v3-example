@@ -12,11 +12,9 @@ import (
 	metricserver "github.com/neteast-software/go-module/observe/metrics/linker/server"
 	metricgrpc "github.com/neteast-software/go-module/observe/metrics/rpc/grpc"
 	tracegrpc "github.com/neteast-software/go-module/observe/tracing/rpc/grpc"
-	rpccore "github.com/neteast-software/go-module/rpc/grpc"
 	rpc "github.com/neteast-software/go-module/rpc/grpc/linker"
 	schedule "github.com/neteast-software/go-module/scheduler/cron/linker"
 	linker "github.com/neteast-software/linker/v3"
-	stdgrpc "google.golang.org/grpc"
 
 	ttsclient "linker-v3-example/internal/client/tts"
 	graphcomponent "linker-v3-example/internal/component/graph"
@@ -37,11 +35,7 @@ func New(sources ...linker.Source) *linker.App {
 	return server.New(
 		server.Config(sources...),
 		server.WithShutdownTimeout(3*time.Second),
-		server.WithLifecycleObserver(metricserver.Observer(
-			observability.Recorder(),
-			metricserver.WithConstLabels(metricLabels...),
-		)),
-		server.WithConfigObserver(metricserver.ConfigObserver(
+		server.WithObserver(metricserver.Observe(
 			observability.Recorder(),
 			metricserver.WithConstLabels(metricLabels...),
 		)),
@@ -63,11 +57,14 @@ func New(sources ...linker.Source) *linker.App {
 			mq.New(),
 			schedule.New(),
 			rpc.New(
-				rpc.WithServerOptions(stdgrpc.ChainUnaryInterceptor(
+				rpc.WithUnaryInterceptors(
 					tracegrpc.UnaryServer(),
 					metricgrpc.UnaryServer(observability.Recorder(), metricgrpc.WithConstLabels(metricLabels...)),
-					rpccore.UnaryServerMeta(),
-				)),
+				),
+				rpc.WithStreamInterceptors(
+					tracegrpc.StreamServer(),
+					metricgrpc.StreamServer(observability.Recorder(), metricgrpc.WithConstLabels(metricLabels...)),
+				),
 			),
 			ttsclient.Provider(
 				ttsclient.WithMetricRecorder(observability.Recorder()),
