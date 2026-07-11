@@ -405,6 +405,172 @@
       ],
       "title": "动态配置 revision 与结果",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 48
+      },
+      "id": 15,
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(linker_v3_example_linker_component_lifecycle_seconds_bucket[5m])) by (le, component, stage, result))",
+          "legendFormat": "{{component}} {{stage}} {{result}}"
+        }
+      ],
+      "title": "组件生命周期耗时 p95",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 48
+      },
+      "id": 16,
+      "targets": [
+        {
+          "expr": "sum by (stage, result) (rate(linker_v3_example_linker_component_lifecycle_total[5m]))",
+          "legendFormat": "{{stage}} {{result}}"
+        }
+      ],
+      "title": "组件启动与关闭结果",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 56
+      },
+      "id": 17,
+      "targets": [
+        {
+          "expr": "max by (component) (linker_v3_example_linker_fault_recovery_seconds)",
+          "legendFormat": "{{component}}"
+        }
+      ],
+      "title": "故障恢复耗时",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 56
+      },
+      "id": 18,
+      "targets": [
+        {
+          "expr": "max by (component) (linker_v3_example_linker_component_fault_active)",
+          "legendFormat": "active {{component}}"
+        },
+        {
+          "expr": "max by (component) (linker_v3_example_linker_component_fault_terminal)",
+          "legendFormat": "terminal {{component}}"
+        }
+      ],
+      "title": "当前异常与 terminal 组件",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 56
+      },
+      "id": 19,
+      "targets": [
+        {
+          "expr": "sum by (state) (rate(linker_v3_example_linker_fault_transition_total[5m]))",
+          "legendFormat": "{{state}}"
+        }
+      ],
+      "title": "故障状态变化",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 64
+      },
+      "id": 20,
+      "targets": [
+        {
+          "expr": "sum by (severity, state, status) (rate(linker_v3_example_linker_fault_notice_results_total[5m]))",
+          "legendFormat": "{{severity}} {{state}} {{status}}"
+        }
+      ],
+      "title": "故障通知发送、失败与丢弃",
+      "type": "timeseries"
     }
   ],
   "schemaVersion": 39,

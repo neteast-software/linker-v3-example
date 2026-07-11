@@ -42,7 +42,7 @@ go build -o ./bin/linker-v3-example .
 - `GET /api/v1/app2/notification/events`：SSE 事件入口，演示长连接 route 的局部声明。
 - `POST /api/v1/app2/notification/send`：HTTP 到 MQ mock 的 trace 贯穿示例。
 - `POST /api/v1/app2/tts/transcribe`：HTTP 到 typed gRPC client 的 trace 贯穿示例。
-- `GET /metrics`：Prometheus scrape 入口，演示 observability 组件、HTTP/gRPC/MQ/cron 指标、低基数 label 和 Grafana dashboard。
+- `GET /metrics`：Prometheus scrape 入口，由 `server.WithMetrics` 统一装配 HTTP/gRPC/MQ/cron/component/fault/notice 指标。
 - `GET /api/v1/app2/graph/orders`：graph/naive viewer 示例。
 - `GET /api/v1/app2/graph/orders/form`：graph/naive form 示例。
 - `GET /api/v1/app2/graph/refresh`：graph/naive behavior 示例。
@@ -97,8 +97,8 @@ func init() {
 record-level 权限建议放在具体业务 store 的查询入口处完成。`internal/service/inspection` 用 `TaskAccess` 把 `acl.Access`、`acl.Resource` 和 `RecordRange` 组合在一起：route 只提供当前 application 和 actor，store 在一次查询里同时应用 application scope、业务 filter 和 owner range，避免为了权限判断额外做 N+1 查询或维护 RBAC 关系表。
 - `internal/route/inspection`、`internal/model/inspection`、`internal/service/inspection`、`internal/component/inspection`：接近真实业务的列表接口结构，route 负责 HTTP 参数和输出，service/store 负责批量查询和数据范围。
 - `internal/model/inspection/archive.go`：外部维护表资产示例，只改业务 model 和 component asset，使用 `postgresql.External()` 避免启动期迁移。
-- `internal/component/notification`、`internal/service/notification`、`internal/route/notification`：MQ consumer、cron job、SSE route、trace/metrics wrapper 和 provider mock 的长生命周期组合。
-- `internal/component/observability`、`internal/service/observability`、`internal/route/observability`：Prometheus recorder capability、`/metrics` route、middleware 影响面和 Plan 里的 metrics/tracing asset；HTTP 指标 middleware 实现统一位于 `internal/route/middleware`。
+- `internal/component/notification`、`internal/service/notification`、`internal/route/notification`：MQ consumer、cron job、SSE route 和 provider mock 的长生命周期组合；观测 wrapper 由 MQ/cron adapter 统一装配。
+- `observe/metrics/prometheus/linker`、`observe/tracing/opentelemetry/linker`：标准 metrics/tracing 组件；example 不维护平行 recorder capability 或手写 interceptor chain。
 - `license/http/gin`：示例只在需要保护的入口显式挂 `licensehttp.Gate(gate)`；license 不进入 core，也不默认挂到 server framework。
 - `internal/rpc/tts`、`internal/client/tts`、`internal/component/tts`：gRPC server/client 的声明、注册、trace/metrics interceptor 和 capability provider。
 - `internal/client/directory`：出站 HTTP typed client 示例，第三方用户目录 API 的业务语义在这里承载，通用 HTTP 执行者来自 `http/client` capability。
@@ -170,7 +170,7 @@ go run .
 go test ./...
 ```
 
-Prometheus 可抓取 `GET /metrics`，Grafana 示例面板在 `docs/grafana-dashboard.json`。当前 dashboard 对齐 HTTP、gRPC、MQ consumer、cron、linker runtime Plan 和动态配置指标，包括 active/desired revision、`restart_required` 与固定状态事件；namespace 和错误文本不进入 metrics label。
+Prometheus 可抓取 `GET /metrics`，最小 scrape、OTel Collector 和 Grafana 样板分别位于 `docs/prometheus.yaml`、`docs/otel-collector.yaml`、`docs/grafana-dashboard.json`。默认 trace 使用 memory exporter；部署时通过 `APP_OBSERVE_TRACING__*` 显式切换 OTLP，详见 `docs/observability.md`。dashboard 覆盖 HTTP、gRPC、MQ、cron、component lifecycle、动态配置、fault recovery、terminal、当前异常组件和 notice 投递结果。
 
 推荐先看：
 
@@ -191,5 +191,7 @@ Prometheus 可抓取 `GET /metrics`，Grafana 示例面板在 `docs/grafana-dash
 - `example/grpc_example_test.go`：验证 gRPC metadata 和 trace id 通过 interceptor 传播。
 - `example/http_client_example_test.go`：验证出站 HTTP client linker adapter、typed client、credential、trace hook 和 Plan asset。
 - `example/notification_example_test.go`：验证 MQ/cron/SSE lifecycle，并覆盖 HTTP -> MQ mock 的 trace id 贯穿。
+- `example/observability_example_test.go`：用本地可控依赖验证 HTTP -> gRPC、HTTP -> MQ、cron span parent/child 和全套指标。
+- `example/fault_observability_example_test.go`：用 fake sender 验证 detected/recovering/recovered、notice 和 metrics 闭环。
 - `example/feishu_notify_example_test.go`：验证 component 上报 Fault 后由 server 自动发现飞书 Sender，并形成 detected/recovered 通知闭环。
 - `example/business_system_test.go`：验证完整业务系统，并覆盖 HTTP -> gRPC typed client 的 trace id 贯穿。

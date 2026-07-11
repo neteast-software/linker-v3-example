@@ -1,0 +1,9 @@
+# 该文件只展示结构，不由默认 example 加载。
+# app_id、app_secret 和真实 receive_id 必须来自 env 或 secret provider。
+notify/feishu:
+  base_url: https://open.feishu.cn
+  timeout: 15s
+  token_skew: 60s
+  targets:
+    - receive_id_type: chat_id
+      receive_id: <configured-chat-id>

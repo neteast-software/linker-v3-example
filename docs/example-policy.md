@@ -27,6 +27,7 @@
 
 - Nacos 使用 fake getter 演示 source 和 registry adapter。
 - MQ 使用 mock consumer/provider 演示生命周期和 trace。
+- tracing 默认使用有界 memory exporter；只有显式 OTLP 配置才访问 collector。
 - gRPC typed client 使用本地可控地址和测试 discovery。
 - 出站 HTTP typed client 使用本地 mock server 演示 credential、trace hook、错误反馈和 Plan asset。
 - 外部通知、地图、短信等 provider 不在默认测试中访问真实服务。

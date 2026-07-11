@@ -180,7 +180,7 @@ local YAML -> registry final -> env override
 - trace id 不作为 metrics label。
 - metrics label 必须低基数、低敏感。
 - 日志或 OpenTelemetry attribute 通过 `observe/tracing/attribute` 做安全投影，不直接输出 payload、token、手机号、邮箱或错误正文。
-- server app 使用 `server.WithObserver(metricserver.Observe(...))`；gRPC 使用 `WithUnaryInterceptors` / `WithStreamInterceptors`，不手写 SDK chain。
+- server app 使用 `server.WithMetrics(prometheus.New())`；gRPC/MQ/cron 使用所属 linker adapter 的 `WithTracing()` / `WithMetrics()`，不持有 recorder、不手写 SDK chain。
 
 ## Example Test
 
