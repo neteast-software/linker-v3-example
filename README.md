@@ -187,4 +187,5 @@ Prometheus 可抓取 `GET /metrics`，Grafana 示例面板在 `docs/grafana-dash
 - `example/grpc_example_test.go`：验证 gRPC metadata 和 trace id 通过 interceptor 传播。
 - `example/http_client_example_test.go`：验证出站 HTTP client linker adapter、typed client、credential、trace hook 和 Plan asset。
 - `example/notification_example_test.go`：验证 MQ/cron/SSE lifecycle，并覆盖 HTTP -> MQ mock 的 trace id 贯穿。
+- `example/feishu_notify_example_test.go`：验证 component 上报 Fault 后由 server 自动发现飞书 Sender，并形成 detected/recovered 通知闭环。
 - `example/business_system_test.go`：验证完整业务系统，并覆盖 HTTP -> gRPC typed client 的 trace id 贯穿。
