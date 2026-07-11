@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -14,14 +15,18 @@ import (
 const configPathEnv = "LINKER_V3_EXAMPLE_CONFIG"
 const configOverridePrefix = "APP_"
 
-func configSources(extra ...linker.Source) []linker.Source {
+func configSources(extra ...linker.Source) ([]linker.Source, error) {
 	sources := []linker.Source{yaml.File(configPaths()...)}
-	if source := nacosSource(); source != nil {
+	source, err := nacosSource()
+	if err != nil {
+		return nil, err
+	}
+	if source != nil {
 		sources = append(sources, source)
 	}
 	sources = append(sources, extra...)
 	sources = append(sources, env.Prefix(configOverridePrefix))
-	return sources
+	return sources, nil
 }
 
 func configPaths() []string {
@@ -32,23 +37,27 @@ func configPaths() []string {
 	return paths
 }
 
-func nacosSource() linker.Source {
+func nacosSource() (linker.Source, error) {
 	dataID := strings.TrimSpace(os.Getenv("LINKER_V3_EXAMPLE_NACOS_DATA_ID"))
 	if dataID == "" {
-		return nil
+		return nil, nil
 	}
 	client := nacos.DefaultClient()
 	client.Host = strings.TrimSpace(os.Getenv("LINKER_V3_EXAMPLE_NACOS_HOST"))
 	client.Username = strings.TrimSpace(os.Getenv("LINKER_V3_EXAMPLE_NACOS_USERNAME"))
 	client.Password = os.Getenv("LINKER_V3_EXAMPLE_NACOS_PASSWORD")
-	if port, err := strconv.ParseUint(strings.TrimSpace(os.Getenv("LINKER_V3_EXAMPLE_NACOS_PORT")), 10, 64); err == nil && port > 0 {
+	if value := strings.TrimSpace(os.Getenv("LINKER_V3_EXAMPLE_NACOS_PORT")); value != "" {
+		port, err := strconv.ParseUint(value, 10, 16)
+		if err != nil || port == 0 {
+			return nil, fmt.Errorf("LINKER_V3_EXAMPLE_NACOS_PORT 必须是 1 到 65535 的端口")
+		}
 		client.Port = port
 	}
 	return nacos.Config(
 		dataID,
 		nacos.Group(strings.TrimSpace(os.Getenv("LINKER_V3_EXAMPLE_NACOS_GROUP"))),
 		nacos.Bootstrap(client),
-	)
+	), nil
 }
 
 func splitValues(value string) []string {

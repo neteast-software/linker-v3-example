@@ -28,7 +28,11 @@ func isPlanCommand(args []string) bool {
 }
 
 func run(ctx context.Context) error {
-	serverApp := app.New(configSources()...)
+	sources, err := configSources()
+	if err != nil {
+		return fmt.Errorf("配置来源错误: %w", err)
+	}
+	serverApp := app.New(sources...)
 	if err := serverApp.Run(ctx); err != nil {
 		return fmt.Errorf("运行失败: %w", err)
 	}

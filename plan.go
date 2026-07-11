@@ -18,7 +18,11 @@ func printPlan(output io.Writer) error {
 	if err != nil {
 		return err
 	}
-	serverApp := app.New(configSources(secret)...)
+	sources, err := configSources(secret)
+	if err != nil {
+		return err
+	}
+	serverApp := app.New(sources...)
 	if err = serverApp.Prepare(context.Background()); err != nil {
 		return err
 	}

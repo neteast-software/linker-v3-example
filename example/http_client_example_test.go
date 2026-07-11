@@ -35,12 +35,12 @@ func TestHTTPClientExample(t *testing.T) {
 	}))
 	defer external.Close()
 
+	clientConfig := httpclient.DefaultConfig()
+	clientConfig.BaseURL = external.URL
+	clientConfig.Timeout = 2 * time.Second
+	clientConfig.Retry = httpclient.Retry(2, time.Millisecond)
 	component := clientcomponent.New(
-		clientcomponent.WithConfig(httpclient.Config{
-			BaseURL: external.URL,
-			Timeout: 2 * time.Second,
-			Retry:   httpclient.Retry(2, time.Millisecond),
-		}),
+		clientcomponent.WithConfig(clientConfig),
 		clientcomponent.WithCredential(httpclient.Bearer(httpclient.StaticToken("example-token"))),
 		clientcomponent.WithBefore(httpclient.BeforeFunc(func(_ context.Context, req *http.Request) error {
 			req.Header.Set("X-Trace-ID", "trace-http-client-example")
