@@ -3,10 +3,10 @@ package notification
 import (
 	"context"
 
-	mq "github.com/neteast-software/go-module/mq/consumer/linker"
+	consumer "github.com/neteast-software/go-module/mq/consumer"
 )
 
-func (p *Component) handleMessage(ctx context.Context, message mq.Message) error {
+func (p *Component) handleMessage(ctx context.Context, message consumer.Message) error {
 	body := string(message.Body)
 	if body == "" {
 		body = message.Key

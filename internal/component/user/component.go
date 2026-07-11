@@ -9,7 +9,6 @@ import (
 	postgresql "github.com/neteast-software/go-module/db/postgresql/linker"
 	"github.com/neteast-software/go-module/token"
 	linker "github.com/neteast-software/linker/v3"
-	"gorm.io/gorm"
 
 	usermodel "linker-v3-example/internal/model/user"
 	_ "linker-v3-example/internal/route/user" // route 声明随组件进入编译
@@ -63,7 +62,7 @@ func (p *Component) Assets(context.Context, linker.Runtime) ([]linker.Asset, err
 }
 
 func (p *Component) Init(ctx context.Context, runtime linker.Runtime) error {
-	db, err := linker.RequireCapability(runtime, linker.NewCapabilityKey[*gorm.DB](postgresql.ID))
+	db, err := postgresql.Require(runtime)
 	if err != nil {
 		return err
 	}

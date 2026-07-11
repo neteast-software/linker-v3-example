@@ -4,6 +4,7 @@ import (
 	"github.com/neteast-software/go-module/acl"
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	"github.com/neteast-software/go-module/http/gin/response"
+	consumer "github.com/neteast-software/go-module/mq/consumer"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
 	traceconsumer "github.com/neteast-software/go-module/observe/tracing/mq/consumer"
 )
@@ -30,17 +31,17 @@ func sendAPI(c *http.Context) {
 			return
 		}
 	}
-	consumer, err := http.Require(c, mq.ConsumerKey("notification"))
+	executor, err := http.Require(c, mq.ConsumerKey("notification"))
 	if err != nil {
 		response.Warning(c, "%s", err.Error())
 		return
 	}
-	message := traceconsumer.InjectMessage(c.Request.Context(), mq.Message{
+	message := traceconsumer.InjectMessage(c.Request.Context(), consumer.Message{
 		Topic: "notification.message",
 		Key:   req.Key,
 		Body:  []byte(req.Body),
 	})
-	if err = consumer.Submit(c.Request.Context(), message); err != nil {
+	if err = executor.Submit(c.Request.Context(), message); err != nil {
 		response.Warning(c, "%s", err.Error())
 		return
 	}

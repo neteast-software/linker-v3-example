@@ -24,10 +24,9 @@ import (
 	"github.com/neteast-software/go-module/observe/tracing"
 	rpccore "github.com/neteast-software/go-module/rpc/grpc"
 	rpc "github.com/neteast-software/go-module/rpc/grpc/linker"
-	cron "github.com/neteast-software/go-module/scheduler/cron/linker"
+	schedule "github.com/neteast-software/go-module/scheduler/cron/linker"
 	grpcdiscovery "github.com/neteast-software/grpc-discovery"
 	linker "github.com/neteast-software/linker/v3"
-	"gorm.io/gorm"
 
 	exampleapp "linker-v3-example/internal/app"
 	ttsclient "linker-v3-example/internal/client/tts"
@@ -77,7 +76,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		!planHasComponent(plan, usercomponent.ID) ||
 		!planHasComponent(plan, ttscomponent.ID) ||
 		!planHasComponent(plan, mq.ID) ||
-		!planHasComponent(plan, cron.ID) ||
+		!planHasComponent(plan, schedule.ID) ||
 		!planHasComponent(plan, rpc.ID) ||
 		!planHasComponent(plan, ttsclient.ID) ||
 		!planHasComponent(plan, http.ID) {
@@ -118,7 +117,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	userOrder := planOrder(plan, usercomponent.ID)
 	ttsOrder := planOrder(plan, ttscomponent.ID)
 	mqOrder := planOrder(plan, mq.ID)
-	cronOrder := planOrder(plan, cron.ID)
+	cronOrder := planOrder(plan, schedule.ID)
 	rpcOrder := planOrder(plan, rpc.ID)
 	ttsClientOrder := planOrder(plan, ttsclient.ID)
 	httpOrder := planOrder(plan, http.ID)
@@ -245,7 +244,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		t.Fatalf("expected canceled transcribe error")
 	}
 
-	db, err := linker.RequireCapability(app, linker.NewCapabilityKey[*gorm.DB](postgresql.ID))
+	db, err := postgresql.Require(app)
 	if err != nil {
 		t.Fatalf("db capability: %v", err)
 	}

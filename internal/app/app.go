@@ -14,7 +14,7 @@ import (
 	tracegrpc "github.com/neteast-software/go-module/observe/tracing/rpc/grpc"
 	rpccore "github.com/neteast-software/go-module/rpc/grpc"
 	rpc "github.com/neteast-software/go-module/rpc/grpc/linker"
-	cron "github.com/neteast-software/go-module/scheduler/cron/linker"
+	schedule "github.com/neteast-software/go-module/scheduler/cron/linker"
 	linker "github.com/neteast-software/linker/v3"
 	stdgrpc "google.golang.org/grpc"
 
@@ -61,7 +61,7 @@ func New(sources ...linker.Source) *linker.App {
 			ttscomponent.NewComponent(),
 			notification,
 			mq.New(),
-			cron.New(),
+			schedule.New(),
 			rpc.New(
 				rpc.WithServerOptions(stdgrpc.ChainUnaryInterceptor(
 					tracegrpc.UnaryServer(),

@@ -14,11 +14,13 @@ import (
 	eventcore "github.com/neteast-software/go-module/fault/event"
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	server "github.com/neteast-software/go-module/linker/server"
+	consumer "github.com/neteast-software/go-module/mq/consumer"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
 	"github.com/neteast-software/go-module/observe/metrics"
 	"github.com/neteast-software/go-module/observe/tracing"
 	traceconsumer "github.com/neteast-software/go-module/observe/tracing/mq/consumer"
-	cron "github.com/neteast-software/go-module/scheduler/cron/linker"
+	cron "github.com/neteast-software/go-module/scheduler/cron"
+	schedule "github.com/neteast-software/go-module/scheduler/cron/linker"
 	linker "github.com/neteast-software/linker/v3"
 
 	notificationcomponent "linker-v3-example/internal/component/notification"
@@ -47,8 +49,8 @@ func TestNotificationLifecycleExample(t *testing.T) {
 			observabilitycomponent.NewComponent(),
 			notification,
 			mq.New(),
-			cron.New(
-				cron.WithStore(cron.NewMemoryStore()),
+			schedule.New(
+				schedule.WithStore(cron.NewMemoryStore()),
 			),
 		),
 	)
@@ -76,17 +78,17 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		}
 	})
 
-	consumer, err := linker.RequireCapability(app, mq.ConsumerKey("notification"))
+	executor, err := mq.Require(app, "notification")
 	if err != nil {
 		t.Fatalf("consumer capability: %v", err)
 	}
 	mqCtx, _ := tracing.Ensure(context.Background(), tracing.WithTraceID("trace-notification-message"))
-	message := traceconsumer.InjectMessage(mqCtx, mq.Message{
+	message := traceconsumer.InjectMessage(mqCtx, consumer.Message{
 		Topic: "notification.message",
 		Key:   "n1",
 		Body:  []byte("hello notification"),
 	})
-	if err = consumer.Submit(context.Background(), message); err != nil {
+	if err = executor.Submit(context.Background(), message); err != nil {
 		t.Fatalf("submit: %v", err)
 	}
 	waitFor(t, 2*time.Second, func() bool {

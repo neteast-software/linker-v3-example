@@ -25,6 +25,7 @@ require (
 	github.com/neteast-software/go-module/http/client/linker v0.0.0
 	github.com/neteast-software/go-module/http/gin v0.0.0
 	github.com/neteast-software/go-module/linker/server v0.0.0
+	github.com/neteast-software/go-module/mq/consumer v0.0.0
 	github.com/neteast-software/go-module/mq/consumer/linker v0.0.0
 	github.com/neteast-software/go-module/notify/feishu v0.0.0
 	github.com/neteast-software/go-module/notify/feishu/linker v0.0.0
@@ -42,6 +43,7 @@ require (
 	github.com/neteast-software/go-module/rpc/grpc v0.0.0
 	github.com/neteast-software/go-module/rpc/grpc/linker v0.0.0
 	github.com/neteast-software/go-module/rpc/meta v0.0.0
+	github.com/neteast-software/go-module/scheduler/cron v0.0.0
 	github.com/neteast-software/go-module/scheduler/cron/linker v0.0.0
 	github.com/neteast-software/go-module/token v0.0.0
 	github.com/neteast-software/go-module/user/account v0.0.0
@@ -102,9 +104,7 @@ require (
 	github.com/neteast-software/go-module/fault v0.0.0 // indirect
 	github.com/neteast-software/go-module/fault/notice v0.0.0 // indirect
 	github.com/neteast-software/go-module/fault/notice/linker v0.0.0 // indirect
-	github.com/neteast-software/go-module/mq/consumer v0.0.0 // indirect
 	github.com/neteast-software/go-module/redact v0.0.0 // indirect
-	github.com/neteast-software/go-module/scheduler/cron v0.0.0 // indirect
 	github.com/neteast-software/go-module/scheduler/cron/store/gorm v0.0.0 // indirect
 	github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc // indirect
 	github.com/pkg/errors v0.9.1 // indirect

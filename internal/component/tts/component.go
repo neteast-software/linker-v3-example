@@ -9,7 +9,6 @@ import (
 	linker "github.com/neteast-software/linker/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/wrapperspb"
-	"gorm.io/gorm"
 
 	ttsmodel "linker-v3-example/internal/model/tts"
 	_ "linker-v3-example/internal/route/tts" // route 声明随组件进入编译
@@ -45,7 +44,7 @@ func (p *Component) Assets(context.Context, linker.Runtime) ([]linker.Asset, err
 }
 
 func (p *Component) Init(_ context.Context, runtime linker.Runtime) error {
-	db, err := linker.RequireCapability(runtime, linker.NewCapabilityKey[*gorm.DB](postgresql.ID))
+	db, err := postgresql.Require(runtime)
 	if err != nil {
 		return err
 	}
