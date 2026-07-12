@@ -42,7 +42,7 @@ func nacosSource() (linker.Source, error) {
 	if dataID == "" {
 		return nil, nil
 	}
-	client := nacos.DefaultClient()
+	client := nacos.DefaultClientConfig()
 	client.Host = strings.TrimSpace(os.Getenv("LINKER_V3_EXAMPLE_NACOS_HOST"))
 	client.Username = strings.TrimSpace(os.Getenv("LINKER_V3_EXAMPLE_NACOS_USERNAME"))
 	client.Password = os.Getenv("LINKER_V3_EXAMPLE_NACOS_PASSWORD")
