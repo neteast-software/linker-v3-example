@@ -52,11 +52,9 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		server.WithComponents(
 			traceComponent,
 			notification,
-			mq.New(mq.WithTracing(), mq.WithMetrics()),
+			mq.New(),
 			schedule.New(
 				schedule.WithStore(cron.NewMemoryStore()),
-				schedule.WithTracing(),
-				schedule.WithMetrics(),
 			),
 		),
 	)

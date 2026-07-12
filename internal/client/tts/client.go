@@ -20,7 +20,5 @@ func Provider() linker.Component {
 	return grpclinker.NewClientProvider[Client](
 		ID,
 		New,
-		grpclinker.WithClientTracing[Client](),
-		grpclinker.WithClientMetrics[Client](),
 	)
 }

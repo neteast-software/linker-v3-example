@@ -42,12 +42,9 @@ func New(sources ...linker.Source) *linker.App {
 			usercomponent.NewComponent(),
 			ttscomponent.NewComponent(),
 			notificationcomponent.NewComponent(),
-			mq.New(mq.WithTracing(), mq.WithMetrics()),
-			schedule.New(schedule.WithTracing(), schedule.WithMetrics()),
-			rpc.New(
-				rpc.WithTracing(),
-				rpc.WithMetrics(),
-			),
+			mq.New(),
+			schedule.New(),
+			rpc.New(),
 			ttsclient.Provider(),
 		),
 	)

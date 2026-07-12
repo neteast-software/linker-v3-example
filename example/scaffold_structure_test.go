@@ -108,14 +108,14 @@ func TestScaffoldKeepsFrameworkAssemblySemantic(t *testing.T) {
 		"metricgrpc.",
 		"tracegrpc.",
 		"google.golang.org/grpc",
+		"WithTracing()",
+		"WithMetrics()",
 	} {
 		if strings.Contains(app, forbidden) {
 			t.Fatalf("internal/app 不应手工装配底层入口 %q", forbidden)
 		}
 	}
-	if !strings.Contains(app, "server.WithMetrics(prometheus.New())") ||
-		!strings.Contains(app, "rpc.WithTracing()") ||
-		!strings.Contains(app, "rpc.WithMetrics()") {
+	if !strings.Contains(app, "server.WithMetrics(prometheus.New())") {
 		t.Fatal("internal/app 应通过 framework 语义入口装配观测能力")
 	}
 	for _, file := range goFilesUnder(t, "../internal/component") {

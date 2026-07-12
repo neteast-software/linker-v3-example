@@ -7,6 +7,7 @@ import (
 	postgresql "github.com/neteast-software/go-module/db/postgresql/linker"
 	event "github.com/neteast-software/go-module/fault/event/linker"
 	notice "github.com/neteast-software/go-module/fault/notice/linker"
+	httpclient "github.com/neteast-software/go-module/http/client/linker"
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	"github.com/neteast-software/go-module/http/gin/response"
 	server "github.com/neteast-software/go-module/linker/server"
@@ -24,13 +25,12 @@ func TestRecommendedSemanticAPIsCompile(t *testing.T) {
 	if server.WithMetrics(prometheus.New()) == nil {
 		t.Fatal("server metrics option 不能为空")
 	}
-	if rpc.WithTracing() == nil || rpc.WithMetrics() == nil ||
-		rpc.WithClientTracing[any]() == nil || rpc.WithClientMetrics[any]() == nil {
-		t.Fatal("rpc observability option 不能为空")
-	}
-	if mq.WithTracing() == nil || mq.WithMetrics() == nil ||
-		schedule.WithTracing() == nil || schedule.WithMetrics() == nil {
-		t.Fatal("后台入口 observability option 不能为空")
+	if rpc.WithoutTracing() == nil || rpc.WithoutMetrics() == nil ||
+		rpc.WithoutClientTracing[any]() == nil || rpc.WithoutClientMetrics[any]() == nil ||
+		mq.WithoutTracing() == nil || mq.WithoutMetrics() == nil ||
+		schedule.WithoutTracing() == nil || schedule.WithoutMetrics() == nil ||
+		httpclient.WithoutTracing() == nil {
+		t.Fatal("观测关闭 option 不能为空")
 	}
 
 	item := consumer.New("notice", consumer.HandlerFunc(func(context.Context, consumer.Message) error { return nil }))

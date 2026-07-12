@@ -73,17 +73,13 @@ func TestFrameworkObservabilityExample(t *testing.T) {
 		),
 		server.WithComponents(
 			traceComponent,
-			mq.New(mq.WithConsumers(item), mq.WithTracing(), mq.WithMetrics()),
+			mq.New(mq.WithConsumers(item)),
 			schedule.New(
 				schedule.WithStore(cron.NewMemoryStore()),
 				schedule.WithJobs(job),
-				schedule.WithTracing(),
-				schedule.WithMetrics(),
 			),
 			rpc.New(
 				rpc.WithRegisters(func(server *stdgrpc.Server) { ttsrpc.Register(server, traceTTS{}) }),
-				rpc.WithTracing(),
-				rpc.WithMetrics(),
 			),
 			ttsclient.Provider(),
 		),
