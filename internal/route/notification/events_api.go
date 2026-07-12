@@ -1,24 +1,24 @@
 package notification
 
 import (
-	"net/http"
+	stdhttp "net/http"
 
 	"github.com/neteast-software/go-module/acl"
-	ginhttp "github.com/neteast-software/go-module/http/gin/linker"
+	http "github.com/neteast-software/go-module/http/gin/linker"
 )
 
 func init() {
-	ginhttp.RegisterIn("api/v1/app2/notification",
-		ginhttp.GET("events", eventsAPI).
-			With(ginhttp.SSEHeader).
+	http.RegisterIn("api/v1/app2/notification",
+		http.GET("events", eventsAPI).
+			With(http.SSEHeader).
 			Resource("http.app2.notification.events", acl.Scope("app2", 1, "通知事件流", acl.Read)),
 	)
 }
 
-func eventsAPI(c *ginhttp.Context) {
+func eventsAPI(c *http.Context) {
 	c.SSEvent("ready", map[string]string{"status": "connected"})
-	c.Status(http.StatusOK)
-	if flusher, ok := c.Writer.(http.Flusher); ok {
+	c.Status(stdhttp.StatusOK)
+	if flusher, ok := c.Writer.(stdhttp.Flusher); ok {
 		flusher.Flush()
 	}
 }
