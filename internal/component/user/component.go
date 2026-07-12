@@ -72,7 +72,12 @@ func (p *Component) Init(ctx context.Context, runtime linker.Runtime) error {
 		token.NewHMAC([]byte(p.config.TokenKey)),
 		session.New(session.NewMemoryStore(time.Now)),
 	)
-	return userservice.Seed(ctx, p.store)
+	password := p.config.SeedPassword
+	p.config.SeedPassword = ""
+	if password == "" {
+		return nil
+	}
+	return userservice.Seed(ctx, p.store, password)
 }
 
 func (p *Component) OnMounted(_ context.Context, runtime linker.Runtime) error {

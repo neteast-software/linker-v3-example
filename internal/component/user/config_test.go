@@ -24,4 +24,9 @@ func TestComponentOwnsTokenConfig(t *testing.T) {
 	})}); err != nil {
 		t.Fatalf("bootstrap: %v", err)
 	}
+	if err := component.Bootstrap(context.Background(), linker.BootstrapContext{Seed: linker.NewSetting(map[linker.Namespace][]byte{
+		Namespace: []byte(`{"token_key":"0123456789abcdef0123456789abcdef","seed_password":"short"}`),
+	})}); err == nil || !strings.Contains(err.Error(), "至少需要 12") {
+		t.Fatalf("short seed password err = %v", err)
+	}
 }

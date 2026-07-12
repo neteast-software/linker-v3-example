@@ -7,12 +7,12 @@ import (
 	usermodel "linker-v3-example/internal/model/user"
 )
 
-func Seed(ctx context.Context, store Store) error {
-	adminHash, err := passwordHash(userconstant.ExampleLoginPassword)
+func Seed(ctx context.Context, store Store, password string) error {
+	adminHash, adminSalt, err := passwordHash(password)
 	if err != nil {
 		return err
 	}
-	userHash, err := passwordHash(userconstant.ExampleLoginPassword)
+	userHash, userSalt, err := passwordHash(password)
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func Seed(ctx context.Context, store Store) error {
 				Role:     "admin",
 			},
 			Accounts: []usermodel.Account{
-				{Provider: "password", Identifier: "admin", SecretHash: adminHash, Salt: passwordSalt},
+				{Provider: "password", Identifier: "admin", SecretHash: adminHash, Salt: adminSalt},
 			},
 		},
 		DefaultUser{
@@ -38,7 +38,7 @@ func Seed(ctx context.Context, store Store) error {
 				Role:     "user",
 			},
 			Accounts: []usermodel.Account{
-				{Provider: "phone", Identifier: userconstant.ExamplePhone, SecretHash: userHash, Salt: passwordSalt},
+				{Provider: "phone", Identifier: userconstant.ExamplePhone, SecretHash: userHash, Salt: userSalt},
 			},
 		},
 	)

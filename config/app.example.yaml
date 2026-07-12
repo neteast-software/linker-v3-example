@@ -53,4 +53,5 @@ db/postgresql:
   ssl_mode: disable
 
 # token_key 由 APP_EXAMPLE_USER__TOKEN_KEY 或 secret provider 注入。
+# seed_password 可选；只在明确需要创建演示账号时通过 APP_EXAMPLE_USER__SEED_PASSWORD 注入。
 example/user: {}

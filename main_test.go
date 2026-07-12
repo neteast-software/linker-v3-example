@@ -55,9 +55,9 @@ func TestExampleConfigDoesNotCarryCredentials(t *testing.T) {
 	if err != nil {
 		t.Fatalf("load config: %v", err)
 	}
-	for namespace, field := range map[linker.Namespace]string{
-		postgresql.Namespace:    "password",
-		usercomponent.Namespace: "token_key",
+	for namespace, fields := range map[linker.Namespace][]string{
+		postgresql.Namespace:    {"password"},
+		usercomponent.Namespace: {"token_key", "seed_password"},
 	} {
 		content, ok := setting.Lookup(namespace)
 		if !ok {
@@ -67,8 +67,10 @@ func TestExampleConfigDoesNotCarryCredentials(t *testing.T) {
 		if err = json.Unmarshal(content, &value); err != nil {
 			t.Fatalf("decode %s: %v", namespace, err)
 		}
-		if _, exists := value[field]; exists {
-			t.Fatalf("config %s contains credential field %s", namespace, field)
+		for _, field := range fields {
+			if _, exists := value[field]; exists {
+				t.Fatalf("config %s contains credential field %s", namespace, field)
+			}
 		}
 	}
 }

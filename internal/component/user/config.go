@@ -10,12 +10,16 @@ import (
 const Namespace linker.Namespace = "example/user"
 
 type Config struct {
-	TokenKey string `json:"token_key" yaml:"token_key"`
+	TokenKey     string `json:"token_key" yaml:"token_key"`
+	SeedPassword string `json:"seed_password" yaml:"seed_password"`
 }
 
 func (p Config) Validate() error {
 	if len(p.TokenKey) < 32 {
 		return fmt.Errorf("example/user token_key 至少需要 32 个字符")
+	}
+	if p.SeedPassword != "" && len(p.SeedPassword) < 12 {
+		return fmt.Errorf("example/user seed_password 至少需要 12 个字符")
 	}
 	return nil
 }

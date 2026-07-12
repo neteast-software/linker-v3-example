@@ -113,11 +113,11 @@ record-level 权限建议放在具体业务 store 的查询入口处完成。`in
 - service capability key 由 `service/user` 声明，route 通过 `http.Require(c, user.ServiceKey())` 获取能力，避免 route 反向依赖 component。
 - 跨 route middleware 应集中在明确位置；单个 API 只声明 middleware 影响面。
 
-默认演示数据只作为本地 example fixture：
+仅在显式注入 `APP_EXAMPLE_USER__SEED_PASSWORD` 时创建本地演示数据：
 
 - 后台账号：`admin`
 - 前台手机号：`18558755877`
-- 默认密码：`linfunlinfun`
+- 登录密码：使用启动时注入的值；仓库不提供默认值，每个账号写入独立随机盐。
 
 ## 运行
 
@@ -126,6 +126,13 @@ record-level 权限建议放在具体业务 store 的查询入口处完成。`in
 ```bash
 export APP_DB_POSTGRESQL__PASSWORD='...'
 export APP_EXAMPLE_USER__TOKEN_KEY='至少 32 个字符'
+```
+
+需要创建演示账号时，在当前终端无回显读取初始密码：
+
+```bash
+read -rsp '演示账号初始密码: ' APP_EXAMPLE_USER__SEED_PASSWORD && echo
+export APP_EXAMPLE_USER__SEED_PASSWORD
 ```
 
 查看 linker 装配计划不需要连接数据库：

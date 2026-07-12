@@ -41,6 +41,8 @@ import (
 	userconstant "linker-v3-example/internal/constant/user"
 )
 
+const testLoginPassword = "example-test-password"
+
 func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	httpConfig := http.DefaultConfig()
 	httpConfig.Addr = "127.0.0.1:0"
@@ -67,7 +69,10 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		rpc.Namespace:                  grpcConfig,
 		linker.Namespace(ttsclient.ID): ttsConfig,
 		postgresql.Namespace:           postgresqlConfig,
-		usercomponent.Namespace:        usercomponent.Config{TokenKey: strings.Repeat("a", 64)},
+		usercomponent.Namespace: usercomponent.Config{
+			TokenKey:     strings.Repeat("a", 64),
+			SeedPassword: testLoginPassword,
+		},
 		prometheus.Namespace: prometheus.Config{
 			Enabled: true, Namespace: "linker_v3_example", ConstLabels: map[string]string{"service": "linker-v3-example"},
 		},
@@ -164,7 +169,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 
 	admin := postJSON(t, baseURL+"/system/login", map[string]string{
 		"username": "admin",
-		"password": userconstant.ExampleLoginPassword,
+		"password": testLoginPassword,
 	}, "")
 	adminData := responseData(t, admin)
 	adminToken, _ := adminData["token"].(string)
@@ -183,7 +188,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 
 	front := postJSON(t, baseURL+"/user/login", map[string]string{
 		"phone":    userconstant.ExamplePhone,
-		"password": userconstant.ExampleLoginPassword,
+		"password": testLoginPassword,
 	}, "")
 	frontData := responseData(t, front)
 	token, _ := frontData["token"].(string)
