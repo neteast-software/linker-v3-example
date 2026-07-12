@@ -42,6 +42,7 @@
 - `business_system_test.go`：接近真实业务系统的组合启动、登录、DB、gRPC、MQ、cron。
 - `graph_example_test.go`：graph/naive route、resource、observability。
 - `notification_example_test.go`：MQ、cron、SSE 和 HTTP -> MQ trace。
+- `rocketmq_example_test.go`：显式环境下的 RocketMQ adapter、capability、Plan、发送接收和 graceful stop。
 - `grpc_example_test.go`：gRPC metadata 和 trace。
 - `outbox_example_test.go`：delivery 和 dead-letter。
 - `reliability_example_test.go`：依赖缺失、Stop timeout 和失败反馈。

@@ -171,7 +171,27 @@ go run .
 
 ## Example
 
-测试文件集中在 `example/` 目录。真实 PostgreSQL example 只在设置 `LINKER_V3_EXAMPLE_PG_PASSWORD` 后运行，host 默认使用 `127.0.0.1` 且可通过同前缀测试变量覆盖；当前环境不可用时会明确 skip。真实 Redis 和 Nacos 样板分别由 `LINKER_V3_EXAMPLE_REDIS_ADDR`、`LINKER_V3_EXAMPLE_NACOS_HOST` 显式开启，并只创建带唯一名称且可清理的测试资产；凭据只从同前缀环境变量读取。`signal_example_test.go` 会启动真实 server 子进程，分别在 startup 和 running 阶段发送 SIGTERM，验证反向关闭和退出码，不依赖外部 provider。`production_http_example_test.go` 展示 body limit、trusted proxy、health endpoint 和负载中 graceful stop；`docs/Caddyfile` 是部署层终止 TLS 的最小样板。
+测试文件集中在 `example/` 目录。真实 PostgreSQL example 只在设置 `LINKER_V3_EXAMPLE_PG_PASSWORD` 后运行，host 默认使用 `127.0.0.1` 且可通过同前缀测试变量覆盖；当前环境不可用时会明确 skip。真实 Redis、Nacos 和 RocketMQ 样板分别由 `LINKER_V3_EXAMPLE_REDIS_ADDR`、`LINKER_V3_EXAMPLE_NACOS_HOST`、`LINKER_V3_EXAMPLE_ROCKETMQ_ENDPOINT` 显式开启；凭据只从同前缀环境变量读取。RocketMQ 的 topic/group 是部署资产，测试只引用预建名称并用唯一 message key 识别本次消息。`signal_example_test.go` 会启动真实 server 子进程，分别在 startup 和 running 阶段发送 SIGTERM，验证反向关闭和退出码，不依赖外部 provider。`production_http_example_test.go` 展示 body limit、trusted proxy、health endpoint 和负载中 graceful stop；`docs/Caddyfile` 是部署层终止 TLS 的最小样板。
+
+RocketMQ 5.5 Proxy 测试前先在部署主机预建专用资产；仓库辅助工具只创建不存在的普通 topic/group，不覆盖已有配置：
+
+```bash
+ssh rocketmq-host 'bash -s -- topic ensure linker-v3-example' \
+  < ../modules/support/rocketmq-admin/rocketmq-admin.sh
+ssh rocketmq-host 'bash -s -- group ensure linker-v3-example-consumer' \
+  < ../modules/support/rocketmq-admin/rocketmq-admin.sh
+
+LINKER_V3_EXAMPLE_ROCKETMQ_ENDPOINT='<rocketmq-proxy>:8081' \
+LINKER_V3_EXAMPLE_ROCKETMQ_TOPIC='linker-v3-example' \
+LINKER_V3_EXAMPLE_ROCKETMQ_CONSUMER_GROUP='linker-v3-example-consumer' \
+go test ./example -run TestOptionalRocketMQProviderExample -count=1
+```
+
+工具默认从当前 Docker 主机的 `rmqbroker` 容器执行 `mqadmin`；容器、NameServer 或集群名不同，通过工具 README 中的环境变量覆盖。不要依赖 `autoCreateTopicEnable` 或 `autoCreateSubscriptionGroup` 代替资产声明。
+
+RocketMQ PushConsumer 停止时会等待 SDK 当前 receive request、long poll 和异步 ack。示例因此显式设置 component `shutdown_timeout=45s` 和 framework `shutdown_timeout=50s`；外层必须大于内层，避免 framework 在组件完成 graceful stop 前先终止关闭漏斗。
+
+Apache RocketMQ Go SDK 5.1.4 在真实 PushConsumer 的 settings/metrics 并发路径存在上游 race detector 报告。`go test -race` 可用于复现和跟踪该边界，但当前不能作为这条真实 provider 示例的通过门禁；项目不复制私有 SDK fork，也不通过全局关闭 race detector 隐藏证据。未启用真实 RocketMQ 环境时，example 自身仍完整执行普通 `-race` 门禁。
 
 ```bash
 go test ./...
@@ -191,6 +211,7 @@ Prometheus 可抓取 `GET /metrics`，最小 scrape、OTel Collector 和 Grafana
 - `example/nacos_example_test.go`：验证 YAML seed、Nacos source、HTTP/gRPC registry adapter 和 Plan 里的依赖/capability 表达。
 - `example/nacos_provider_example_test.go`：在显式 Nacos 环境中发布独立 data id，经 Source 启动最小 App，并验证清理和关闭。
 - `example/redis_example_test.go`：在显式 Redis 环境中验证 component、capability、读写、Plan 资产和 graceful close。
+- `example/rocketmq_example_test.go`：在显式 RocketMQ 环境中验证 adapter、producer/consumer capability、消息发送接收、Plan 资产和 graceful close。
 - `example/dynamic_config_test.go`：验证 Nacos 完整快照、Live/Restart、desired/active、env 后置覆盖和可恢复拒绝。
 - `example/reliability_example_test.go`：验证 DB capability 缺失会在组件初始化期失败，以及 Stop timeout 会返回可判断的 `context.DeadlineExceeded`。
 - `example/signal_example_test.go`：验证真实 server 在启动期和运行期收到 SIGTERM 后都执行 graceful close；运行期正常退出，启动期返回可判断的取消原因。
