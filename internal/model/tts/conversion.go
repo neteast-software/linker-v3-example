@@ -13,5 +13,5 @@ type Conversion struct {
 }
 
 func (Conversion) TableName() string {
-	return "tts_conversion"
+	return "conversion"
 }

@@ -14,14 +14,14 @@ type transcribeRequest struct {
 
 func init() {
 	http.RegisterIn("api/v1/app2/tts",
-		http.POST("transcribe", transcribeAPI).Resource(
+		http.POST("transcribe", transcribe).Resource(
 			"http.app2.tts.transcribe",
 			acl.Scope("app2", 1, "TTS 转写", acl.Write),
 		),
 	)
 }
 
-func transcribeAPI(c *http.Context) {
+func transcribe(c *http.Context) {
 	var req transcribeRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Warning(c, "TTS 参数错误: %s", err.Error())

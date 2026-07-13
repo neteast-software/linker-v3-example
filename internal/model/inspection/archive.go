@@ -14,5 +14,5 @@ type Archive struct {
 }
 
 func (Archive) TableName() string {
-	return "linker_v3_example_inspection_archives"
+	return "archive"
 }

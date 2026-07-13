@@ -11,5 +11,5 @@ type Task struct {
 }
 
 func (Task) TableName() string {
-	return "linker_v3_example_inspection_tasks"
+	return "task"
 }

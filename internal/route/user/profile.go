@@ -8,14 +8,14 @@ import (
 
 func init() {
 	http.RegisterIn("api",
-		http.GET("profile", profileAPI).Resource(
+		http.GET("profile", frontProfile).Resource(
 			"http.front.user.profile",
 			acl.Scope("front", 1, "前台用户信息"),
 		),
 	)
 }
 
-func profileAPI(c *http.Context) {
+func frontProfile(c *http.Context) {
 	token, err := bearerToken(c)
 	if err != nil {
 		response.Warning(c, "%s", err.Error())

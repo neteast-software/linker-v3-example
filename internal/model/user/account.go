@@ -12,5 +12,5 @@ type Account struct {
 }
 
 func (Account) TableName() string {
-	return "linker_v3_example_accounts"
+	return "account"
 }

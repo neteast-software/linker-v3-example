@@ -57,7 +57,7 @@ go build -o ./bin/linker-v3-example .
 - `acl.Resource`：每个 route 自己声明权限资源和 scope。
 - `audit/operate`：登录这类敏感操作记录 actor、client、request、resource 和成功状态。
 
-HTTP API 按文件自声明 route：`system_login.go`、`user_login.go`、`profile_api.go` 各自通过 `init()` 注册自己的入口，常用形式是 `http.RegisterIn("api", http.GET("profile", profileAPI).Resource("http.front.user.profile", acl.Scope(...)))`。组件声明自己的 identity、表资产、生命周期和 service capability，API 通过 `http.Require(c, user.ServiceKey())` 从 linker runtime 解析能力，不在业务侧维护全局 runtime 容器。
+HTTP API 按业务文件自声明 route：`system_login.go`、`user_login.go`、`profile.go` 各自通过 `init()` 注册自己的入口，常用形式是 `http.RegisterIn("api", http.GET("profile", frontProfile).Resource("http.front.user.profile", acl.Scope(...)))`。`route` 已经表达 API 归属，文件和 handler 不重复携带 `_api` / `API` 后缀；同一 package 存在多个 profile 入口时，用 `frontProfile`、`systemProfile` 这类最小业务词区分。组件声明自己的 identity、表资产、生命周期和 service capability，API 通过 `http.Require(c, user.ServiceKey())` 从 linker runtime 解析能力，不在业务侧维护全局 runtime 容器。
 
 多层 route 可以把稳定前缀放进 `RegisterIn`：
 
@@ -89,7 +89,7 @@ func init() {
 业务代码按职责域 package 组织：
 
 - `internal/route/user`：HTTP 入口和 route 声明。
-- `internal/model/user`：数据表模型，包含 user 主体表和 account 凭据表。
+- `internal/model/user`：数据表模型，包含 `user` 主体表和 `account` 凭据表；业务名直接成为 model/table 节点，不增加项目 prefix。
 - `internal/service/user`：登录、资料读取、token/session 和存储流程；service capability key 由 service 自己声明。
 - `internal/constant/user`：业务错误和明确的 example fixture。
 - `internal/component/user`：组件 identity、linker 组件生命周期、表资产和 service capability 挂载。
@@ -206,7 +206,7 @@ Prometheus 可抓取 `GET /metrics`，最小 scrape、OTel Collector 和 Grafana
 - `main.go`：保持极薄，只分发 server 启动和 `--plan`。
 - `source.go`：只读取配置文件位置和 Nacos bootstrap 参数，按顺序声明 Source。
 - `internal/app/app.go`：集中装配 framework、组件和 adapter，不解析业务配置。
-- `internal/route/graph/*_api.go`：一个 API 一个文件，route/resource/middleware 和 handler 放在同一个入口重心内。
+- `internal/route/graph/*.go`：一个稳定 API 一个业务文件，route/resource/middleware 和 handler 放在同一个入口重心内；辅助对象按自己的语义单独成文件。
 - `example/graph_example_test.go`：验证 graph route、Plan asset 和 renderer capability。
 - `example/nacos_example_test.go`：验证 YAML seed、Nacos source、HTTP/gRPC registry adapter 和 Plan 里的依赖/capability 表达。
 - `example/nacos_provider_example_test.go`：在显式 Nacos 环境中发布独立 data id，经 Source 启动最小 App，并验证清理和关闭。

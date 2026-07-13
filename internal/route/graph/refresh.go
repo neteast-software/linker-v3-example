@@ -15,7 +15,7 @@ func init() {
 	http.RegisterIn("api/v1/app2",
 		http.Group("graph",
 			http.Use(routemiddleware.Application("app2")),
-			http.GET("refresh", refreshAPI).Resource(
+			http.GET("refresh", refresh).Resource(
 				refreshResource,
 				acl.Scope("app2", 1, "应用二 graph 行为"),
 			),
@@ -23,6 +23,6 @@ func init() {
 	)
 }
 
-func refreshAPI(c *http.Context) {
+func refresh(c *http.Context) {
 	graphhttp.Behavior(c, behavior.Refresh(behavior.WithMessage("已刷新"), behavior.WithWait(0.2)))
 }

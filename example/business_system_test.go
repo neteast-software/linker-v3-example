@@ -265,7 +265,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		t.Fatalf("db capability: %v", err)
 	}
 	var ttsCount int64
-	if err = db.Table("tts_conversion").
+	if err = db.Table("conversion").
 		Where("text = ? AND result = ? AND scope = ?", "hello", "tts:hello:front", "front").
 		Count(&ttsCount).Error; err != nil {
 		t.Fatalf("count tts request: %v", err)

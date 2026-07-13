@@ -51,14 +51,14 @@ internal/component/<domain>/component.go
 internal/component/msgx/component.go
 ```
 
-如果一个 component 文件同时出现 `http.Context` handler、`response.*`、route tree 聚合、鉴权 helper 和请求解析，它已经退化成 controller 大文件。正确方向是把 HTTP 入口拆回 `internal/route/<domain>/*_api.go`，把 middleware 实现统一放到 `internal/route/middleware`，把影响面留在 route 声明，把复用流程留给 `internal/service/<domain>`。
+如果一个 component 文件同时出现 `http.Context` handler、`response.*`、route tree 聚合、鉴权 helper 和请求解析，它已经退化成 controller 大文件。正确方向是把 HTTP 入口拆回 `internal/route/<domain>/<action>.go`，把 middleware 实现统一放到 `internal/route/middleware`，把影响面留在 route 声明，把复用流程留给 `internal/service/<domain>`。
 
 ## Route
 
 一个 API 一个 route 文件：
 
 ```text
-internal/route/<domain>/<action>_api.go
+internal/route/<domain>/<action>.go
 internal/route/<domain>/query.go
 internal/route/<domain>/response.go
 internal/route/middleware/<name>.go
@@ -69,7 +69,7 @@ internal/route/middleware/<name>.go
 ```go
 func init() {
     http.RegisterIn("api/v1/app2",
-        http.GET("user/:id/profile", profileAPI).Resource(
+        http.GET("user/:id/profile", profile).Resource(
             "http.app2.user.profile",
             acl.Scope("app2", 1, "应用二用户资料"),
         ),
@@ -103,6 +103,8 @@ internal/model/<domain>/<object>.go
 推荐：
 
 - 一个对象一个文件，例如 `user.go`、`account.go`、`conversion.go`。
+- 把 model 当作 package 语义节点理解：`user` 已表达用户后，字段和方法只需要 `Email`、`Phone`、`Validate` 等相对名称；这不强制每个 model 建一个 package。
+- 默认表名使用单数业务名，例如 `user`、`account`、`task`；不增加 `sys_`、`tbl_`、项目名或 `model_` prefix。数据库保留字由 adapter 正确引用。
 - 默认有 `id`，优先复用约定好的 DB head。
 - model 可以承载表名、基础格式化、转换、映射、批处理等资源自身能力。
 - 数据库约束尽量保持 GORM 兼容，不优先依赖数据库自定义函数、触发器或外键。
@@ -112,6 +114,7 @@ internal/model/<domain>/<object>.go
 - 把 request payload、query param、response view 默认放进 `model`。
 - 用一个 `model.go` 装多个中心不同的表对象。
 - 让 model 反向依赖 route、component 或 framework。
+- 使用 `UserModel`、`UserEntity`、`IUserRepository`、`UserServiceImpl` 等重复业务归属或技术分层的名称。
 
 ## Service
 
@@ -202,7 +205,7 @@ example/<domain>_example_test.go
 
 ## 最小新增 API 流程
 
-1. 新增 `internal/route/<domain>/<action>_api.go`，在 `init()` 里声明 route/resource/scope。
+1. 新增 `internal/route/<domain>/<action>.go`，在 `init()` 里声明 route/resource/scope；route 已表达 API 归属，不重复 `_api` / `API` 后缀。
 2. 如果需要持久化对象，新增 `internal/model/<domain>/<object>.go`。
 3. 如果流程会被复用，新增或扩展 `internal/service/<domain>`。
 4. 如果这是新业务域，新增 `internal/component/<domain>/component.go` 并声明 identity、依赖、资产和 capability。

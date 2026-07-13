@@ -39,14 +39,9 @@ func TestScaffoldStructureKeepsRouteOwnershipLocal(t *testing.T) {
 	}
 }
 
-func TestScaffoldRouteAPIFilesSelfRegister(t *testing.T) {
-	files, err := filepath.Glob("../internal/route/*/*_api.go")
-	if err != nil {
-		t.Fatalf("scan route api files: %v", err)
-	}
-	if len(files) == 0 {
-		t.Fatalf("missing route api files")
-	}
+func TestScaffoldRouteFilesSelfRegister(t *testing.T) {
+	files := goFilesUnder(t, "../internal/route")
+	routeFiles := 0
 	for _, file := range files {
 		parsed, err := parser.ParseFile(token.NewFileSet(), file, nil, 0)
 		if err != nil {
@@ -59,6 +54,9 @@ func TestScaffoldRouteAPIFilesSelfRegister(t *testing.T) {
 			fn, ok := decl.(*ast.FuncDecl)
 			if ok && fn.Recv == nil && fn.Name.Name == "init" {
 				inits++
+			}
+			if ok && strings.HasSuffix(fn.Name.Name, "API") {
+				t.Fatalf("route 已表达 API 归属，函数名不应重复 API 后缀: %s:%s", file, fn.Name.Name)
 			}
 		}
 		ast.Inspect(parsed, func(node ast.Node) bool {
@@ -78,8 +76,29 @@ func TestScaffoldRouteAPIFilesSelfRegister(t *testing.T) {
 			}
 			return true
 		})
+		if methods == 0 {
+			continue
+		}
+		routeFiles++
+		if strings.HasSuffix(file, "_api.go") {
+			t.Fatalf("route 路径已表达 API 归属，文件名不应重复 _api 后缀: %s", file)
+		}
 		if inits != 1 || registers != 1 || methods != 1 {
 			t.Fatalf("%s 应保持一个 init、一个注册入口和一个 method route: init=%d register=%d method=%d", file, inits, registers, methods)
+		}
+	}
+	if routeFiles == 0 {
+		t.Fatal("missing self-registering route files")
+	}
+}
+
+func TestScaffoldModelNamesStayBusinessFacing(t *testing.T) {
+	for _, file := range goFilesUnder(t, "../internal/model") {
+		content := readFile(t, file)
+		for _, forbidden := range []string{"linker_v3_example_", "Model struct", "Entity struct", "DTO struct", "VO struct"} {
+			if strings.Contains(content, forbidden) {
+				t.Fatalf("model 应使用业务节点和相对语义，不应包含 %q: %s", forbidden, file)
+			}
 		}
 	}
 }

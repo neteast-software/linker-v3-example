@@ -16,14 +16,14 @@ type sendRequest struct {
 
 func init() {
 	http.RegisterIn("api/v1/app2/notification",
-		http.POST("send", sendAPI).Resource(
+		http.POST("send", send).Resource(
 			"http.app2.notification.send",
 			acl.Scope("app2", 1, "通知发送", acl.Write),
 		),
 	)
 }
 
-func sendAPI(c *http.Context) {
+func send(c *http.Context) {
 	req := sendRequest{Key: "http", Body: "hello notification"}
 	if c.Request.Body != nil && c.Request.ContentLength != 0 {
 		if err := c.ShouldBindJSON(&req); err != nil {

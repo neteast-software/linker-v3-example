@@ -20,7 +20,7 @@ func init() {
 	http.RegisterIn("api/v1/app2",
 		http.Group("graph",
 			http.Use(routemiddleware.Application("app2")),
-			http.GET("orders", ordersAPI).Resource(
+			http.GET("orders", orders).Resource(
 				ordersResource,
 				acl.Scope("app2", 1, "应用二订单 graph 列表"),
 			),
@@ -28,7 +28,7 @@ func init() {
 	)
 }
 
-func ordersAPI(c *http.Context) {
+func orders(c *http.Context) {
 	rows := sampleOrders()
 	graph := viewer.New[order]("订单").
 		WithResource(ordersResource).

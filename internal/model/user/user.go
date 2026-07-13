@@ -12,5 +12,5 @@ type User struct {
 }
 
 func (User) TableName() string {
-	return "linker_v3_example_users"
+	return "user"
 }
