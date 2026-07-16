@@ -191,9 +191,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
-	github.com/neteast-software/go-module/graph/naive v0.0.0
-	github.com/neteast-software/go-module/graph/naive/http/gin v0.0.0
-	github.com/neteast-software/go-module/graph/naive/linker v0.0.0
+	github.com/neteast-software/go-module/graph/console v0.0.0
 	github.com/neteast-software/go-module/http/gin/linker v0.2.0
 	github.com/neteast-software/go-module/license v0.0.0
 	github.com/neteast-software/go-module/license/http/gin v0.0.0
@@ -255,12 +253,6 @@ replace github.com/neteast-software/go-module/scheduler/cron/store/gorm => ../mo
 
 replace github.com/neteast-software/go-module/user/account => ../modules/user/account
 
-replace github.com/neteast-software/go-module/graph/naive => ../modules/graph/naive
-
-replace github.com/neteast-software/go-module/graph/naive/http/gin => ../modules/graph/naive/http/gin
-
-replace github.com/neteast-software/go-module/graph/naive/linker => ../modules/graph/naive/linker
-
 replace github.com/neteast-software/go-module/registry/nacos/linker => ../modules/registry/nacos/linker
 
 replace github.com/neteast-software/nacos-kit => ../modules/nacos-kit
@@ -274,3 +266,5 @@ replace github.com/neteast-software/go-module/registry/service/nacos/linker => .
 replace github.com/neteast-software/go-module/license => ../modules/license
 
 replace github.com/neteast-software/go-module/license/http/gin => ../modules/license/http/gin
+
+replace github.com/neteast-software/go-module/graph/console => ../modules/graph/console

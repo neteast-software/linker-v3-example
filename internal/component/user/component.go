@@ -21,12 +21,12 @@ const ID linker.ID = "example/user"
 
 type Component struct {
 	store   userservice.Store
-	service userservice.Service
+	service *userservice.Service
 	config  Config
 }
 
 func NewComponent() *Component {
-	return &Component{}
+	return &Component{service: userservice.New()}
 }
 
 func (p *Component) Configs() []linker.Config {
@@ -67,7 +67,7 @@ func (p *Component) Init(ctx context.Context, runtime linker.Runtime) error {
 		return err
 	}
 	p.store = userservice.NewStore(db)
-	p.service = userservice.NewService(
+	p.service.Configure(
 		p.store,
 		token.NewHMAC([]byte(p.config.TokenKey)),
 		session.New(session.NewMemoryStore(time.Now)),
@@ -81,5 +81,12 @@ func (p *Component) Init(ctx context.Context, runtime linker.Runtime) error {
 }
 
 func (p *Component) OnMounted(_ context.Context, runtime linker.Runtime) error {
+	if err := linker.Provide(runtime, userservice.AuthKey(), userservice.Auth(p.service)); err != nil {
+		return err
+	}
 	return linker.Provide(runtime, userservice.ServiceKey(), p.service)
+}
+
+func (p *Component) Service() *userservice.Service {
+	return p.service
 }

@@ -1,53 +1,140 @@
 package example
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"io"
 	stdhttp "net/http"
-	"strings"
+	"strconv"
 	"testing"
+	"testing/fstest"
 	"time"
 
 	applicationcore "github.com/neteast-software/go-module/application"
 	applicationcomponent "github.com/neteast-software/go-module/application/linker"
-	graphlinker "github.com/neteast-software/go-module/graph/naive/linker"
+	graphconsole "github.com/neteast-software/go-module/graph/console"
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	server "github.com/neteast-software/go-module/linker/server"
-	prometheus "github.com/neteast-software/go-module/observe/metrics/prometheus/linker"
-	"github.com/neteast-software/go-module/observe/tracing"
+	"github.com/neteast-software/go-module/token"
+	linker "github.com/neteast-software/linker/v3"
 
-	graphcomponent "linker-v3-example/internal/component/graph"
+	consolecomponent "linker-v3-example/internal/component/console"
+	ordercomponent "linker-v3-example/internal/component/order"
+	permissioncomponent "linker-v3-example/internal/component/permission"
+	usercomponent "linker-v3-example/internal/component/user"
+	usermodel "linker-v3-example/internal/model/user"
+	userservice "linker-v3-example/internal/service/user"
 )
 
-func TestGraphNaiveExample(t *testing.T) {
+type graphUser struct {
+	user usermodel.User
+}
+
+func (p *graphUser) AdminLogin(_ context.Context, username string, password string) (usermodel.User, string, error) {
+	if username != "admin" || password != "demo-password" {
+		return usermodel.User{}, "", context.Canceled
+	}
+	return p.user, "graph-token", nil
+}
+
+func (p *graphUser) Current(_ context.Context, raw string, scope string) (usermodel.User, token.Claims, error) {
+	if raw != "graph-token" || scope != "console" {
+		return usermodel.User{}, token.Claims{}, context.Canceled
+	}
+	return p.user, graphClaims(p.user.ID), nil
+}
+
+func (p *graphUser) Refresh(_ context.Context, raw string, scope string) (usermodel.User, token.Token, error) {
+	if raw != "graph-token" || scope != "console" {
+		return usermodel.User{}, token.Token{}, context.Canceled
+	}
+	return p.user, token.Token{Raw: raw, Claims: graphClaims(p.user.ID)}, nil
+}
+
+func (p *graphUser) Revoke(_ context.Context, raw string, scope string) error {
+	if raw != "graph-token" || scope != "console" {
+		return context.Canceled
+	}
+	return nil
+}
+
+func (p *graphUser) ProfileByID(_ context.Context, id uint64) (usermodel.User, error) {
+	if id != p.user.ID {
+		return usermodel.User{}, context.Canceled
+	}
+	return p.user, nil
+}
+
+type graphUserComponent struct {
+	user *graphUser
+}
+
+func (p graphUserComponent) Identity() linker.ID {
+	return usercomponent.ID
+}
+
+func (p graphUserComponent) OnMounted(_ context.Context, runtime linker.Runtime) error {
+	return linker.Provide(runtime, userservice.AuthKey(), userservice.Auth(p.user))
+}
+
+func TestGraphConsoleExample(t *testing.T) {
 	httpConfig := http.DefaultConfig()
 	httpConfig.Addr = "127.0.0.1:0"
+	user := &graphUser{user: usermodel.User{
+		Username: "admin",
+		Avatar:   "https://static.neteast.cn/avatar/admin.png",
+		Email:    "admin@neteast.cn",
+		Phone:    "18558755877",
+		Role:     "admin",
+	}}
+	user.user.ID = 1
 	app := server.New(
 		server.WithShutdownTimeout(3*time.Second),
 		server.WithHTTP(httpConfig),
-		server.WithMetrics(prometheus.New(prometheus.WithConfig(prometheus.Config{
-			Enabled: true, Namespace: "linker_v3_example",
-		}))),
 		server.WithComponents(
 			applicationcomponent.New(
 				applicationcomponent.WithDBTarget(""),
 				applicationcomponent.WithApplications(applicationcore.Application{
-					ID:     "app2",
-					Scope:  "app2",
-					Name:   "应用二",
-					Status: applicationcore.StatusEnabled,
+					ID: "app2", Scope: "app2", Name: "应用二", Status: applicationcore.StatusEnabled,
 				}),
 			),
-			graphcomponent.NewComponent(),
+			graphUserComponent{user: user},
+			ordercomponent.New(),
+			permissioncomponent.New(),
+			consolecomponent.New(user, graphconsole.WithStatic(fstest.MapFS{
+				"index.html":    {Data: []byte("<!doctype html><title>Graph Console</title>")},
+				"assets/app.js": {Data: []byte("console.log('graph-console')")},
+			})),
 		),
 	)
 
 	plan := preparedPlan(t, app)
-	if !planHasComponent(plan, graphcomponent.ID) ||
-		!planHasRouteAsset(plan, "GET", "/api/v1/app2/graph/orders", "http.app2.graph.orders") ||
-		!planHasRouteAsset(plan, "GET", "/api/v1/app2/graph/orders/form", "http.app2.graph.order.form") ||
-		!planHasRouteAsset(plan, "GET", "/api/v1/app2/graph/refresh", "http.app2.graph.refresh") {
-		t.Fatalf("plan missing graph example assets: components=%#v assets=%#v", plan.Components, plan.Assets)
+	for _, id := range []linker.ID{
+		graphconsole.ID,
+		ordercomponent.ID,
+		permissioncomponent.ID,
+		usercomponent.ID,
+	} {
+		if !planHasComponent(plan, id) {
+			t.Fatalf("plan missing component %s: %#v", id, plan.Components)
+		}
+	}
+	for _, route := range []struct {
+		method   string
+		path     string
+		resource string
+	}{
+		{"GET", "/console/entry", ""},
+		{"POST", "/console/login", ""},
+		{"GET", "/console/menu", "graph.console.menu"},
+		{"GET", "/console/page/:id", "graph.console.page"},
+		{"PUT", "/api/v1/app2/order", "http.app2.order.update"},
+		{"GET", "/api/v1/app2/permission/role/:id/resource", "http.app2.permission.role-resource.read"},
+	} {
+		if !planHasRouteAsset(plan, route.method, route.path, route.resource) {
+			t.Fatalf("plan missing route %#v: %#v", route, plan.Assets)
+		}
 	}
 
 	if err := app.Start(context.Background()); err != nil {
@@ -58,9 +145,8 @@ func TestGraphNaiveExample(t *testing.T) {
 			t.Fatalf("stop: %v", err)
 		}
 	})
-
-	if _, err := graphlinker.Require(app); err != nil {
-		t.Fatalf("graph renderer capability: %v", err)
+	if _, ok := graphconsole.Resolve(app); !ok {
+		t.Fatal("Graph Console service capability 未发布")
 	}
 
 	httpServer, err := http.RequireServer(app)
@@ -68,55 +154,115 @@ func TestGraphNaiveExample(t *testing.T) {
 		t.Fatalf("http capability: %v", err)
 	}
 	baseURL := "http://" + httpServer.Addr()
-
-	viewerReq, err := stdhttp.NewRequest(stdhttp.MethodGet, baseURL+"/api/v1/app2/graph/orders", nil)
-	if err != nil {
-		t.Fatalf("new graph request: %v", err)
+	if body := getRaw(t, baseURL+"/"); body != "<!doctype html><title>Graph Console</title>" {
+		t.Fatalf("unexpected static index: %s", body)
 	}
-	viewerReq.Header.Set(tracing.HeaderTraceID, "trace-graph")
-	viewerPayload, viewerHeaders := doJSONHeaders(t, viewerReq)
-	if viewerHeaders.Get(tracing.HeaderTraceID) != "trace-graph" || viewerHeaders.Get(tracing.HeaderRequestID) == "" {
-		t.Fatalf("trace headers missing from graph response: %#v", viewerHeaders)
-	}
-	viewerData := responseData(t, viewerPayload)
-	if viewerData["type"] != "viewer" {
-		t.Fatalf("unexpected viewer payload: %#v", viewerData)
-	}
-	viewerGraph := responseMap(t, viewerData["graph"])
-	if viewerGraph["name"] != "订单" || viewerGraph["resource"] != "http.app2.graph.orders" {
-		t.Fatalf("unexpected viewer graph: %#v", viewerGraph)
+	if body := getRaw(t, baseURL+"/assets/app.js"); body != "console.log('graph-console')" {
+		t.Fatalf("unexpected static asset: %s", body)
 	}
 
-	formPayload := getJSON(t, baseURL+"/api/v1/app2/graph/orders/form", "")
-	formData := responseData(t, formPayload)
-	if formData["type"] != "popForm" {
-		t.Fatalf("unexpected form payload: %#v", formData)
+	entry := getJSON(t, baseURL+"/console/entry", "")
+	if responseData(t, entry)["type"] != "config" {
+		t.Fatalf("unexpected entry: %#v", entry)
+	}
+	loginPayload := postJSON(t, baseURL+"/console/login", map[string]any{
+		"method": "password",
+		"values": map[string]any{"username": "admin", "password": "demo-password"},
+	}, "")
+	loginData := responseData(t, loginPayload)
+	access, _ := responseMap(t, loginData["token"])["access"].(string)
+	if access == "" {
+		t.Fatalf("missing console token: %#v", loginData)
 	}
 
-	behaviorPayload := getJSON(t, baseURL+"/api/v1/app2/graph/refresh", "")
-	behaviorData := responseData(t, behaviorPayload)
-	behavior := responseMap(t, behaviorData["behavior"])
-	if behavior["type"] != "refresh" {
-		t.Fatalf("unexpected behavior payload: %#v", behaviorData)
+	menu := getJSON(t, baseURL+"/console/menu", access)
+	if responseData(t, menu)["type"] != "menu" {
+		t.Fatalf("unexpected menu: %#v", menu)
+	}
+	for _, pageCase := range []struct {
+		identity string
+		kind     string
+	}{
+		{"dashboard", "layout"},
+		{"order.list", "viewer"},
+		{"order.form", "form"},
+		{"permission.role-resource", "multilist"},
+	} {
+		page := getJSON(t, baseURL+"/console/page/"+pageCase.identity, access)
+		if responseData(t, page)["type"] != pageCase.kind {
+			t.Fatalf("page %s = %#v", pageCase.identity, page)
+		}
 	}
 
-	metricsPayload := getRaw(t, baseURL+"/metrics")
-	if !strings.Contains(metricsPayload, `route="/api/v1/app2/graph/orders"`) ||
-		!strings.Contains(metricsPayload, `status="200"`) {
-		t.Fatalf("graph metrics missing:\n%s", metricsPayload)
+	status, unauthorized := putJSONStatus(t, baseURL+"/api/v1/app2/order", map[string]any{
+		"id": 1, "number": "NO-20260716-009", "status": "closed", "amount": 16800,
+	}, "")
+	if status != stdhttp.StatusUnauthorized || unauthorized["code"] != float64(stdhttp.StatusUnauthorized) {
+		t.Fatalf("业务 API 未执行最终认证: status=%d payload=%#v", status, unauthorized)
+	}
+	invalidStatus, invalid := putJSONStatus(t, baseURL+"/api/v1/app2/order", map[string]any{
+		"id": 1, "number": "", "status": "open", "amount": 100,
+	}, access)
+	if invalidStatus != stdhttp.StatusOK || invalid["code"] == float64(0) {
+		t.Fatalf("服务端验证未拒绝无效订单: status=%d payload=%#v", invalidStatus, invalid)
+	}
+	valid := putJSON(t, baseURL+"/api/v1/app2/order", map[string]any{
+		"id": 1, "number": "NO-20260716-009", "status": "closed", "amount": 16800,
+	}, access)
+	if responseData(t, valid)["number"] != "NO-20260716-009" {
+		t.Fatalf("unexpected saved order: %#v", valid)
 	}
 }
 
-func getRaw(t *testing.T, url string) string {
+func graphClaims(id uint64) token.Claims {
+	now := time.Now()
+	return token.Claims{
+		Subject:   strconv.FormatUint(id, 10),
+		Scope:     "console",
+		IssuedAt:  now.Unix(),
+		ExpiresAt: now.Add(time.Hour).Unix(),
+		Nonce:     "graph-example",
+	}
+}
+
+func putJSON(t *testing.T, url string, value any, access string) map[string]any {
 	t.Helper()
-	resp, err := stdhttp.Get(url)
-	if err != nil {
-		t.Fatalf("get raw: %v", err)
+	status, payload := putJSONStatus(t, url, value, access)
+	if status != stdhttp.StatusOK {
+		t.Fatalf("unexpected status=%d payload=%#v", status, payload)
 	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatalf("read raw: %v", err)
+	if code, _ := payload["code"].(float64); code != 0 {
+		t.Fatalf("business response failed: %#v", payload)
 	}
-	return string(body)
+	return payload
+}
+
+func putJSONStatus(t *testing.T, url string, value any, access string) (int, map[string]any) {
+	t.Helper()
+	data, err := json.Marshal(value)
+	if err != nil {
+		t.Fatalf("marshal request: %v", err)
+	}
+	request, err := stdhttp.NewRequest(stdhttp.MethodPut, url, bytes.NewReader(data))
+	if err != nil {
+		t.Fatalf("new request: %v", err)
+	}
+	request.Header.Set("Content-Type", "application/json")
+	if access != "" {
+		request.Header.Set("Authorization", "Bearer "+access)
+	}
+	result, err := stdhttp.DefaultClient.Do(request)
+	if err != nil {
+		t.Fatalf("http request: %v", err)
+	}
+	defer result.Body.Close()
+	body, err := io.ReadAll(result.Body)
+	if err != nil {
+		t.Fatalf("read response: %v", err)
+	}
+	var payload map[string]any
+	if err = json.Unmarshal(body, &payload); err != nil {
+		t.Fatalf("decode response: %v body=%s", err, body)
+	}
+	return result.StatusCode, payload
 }

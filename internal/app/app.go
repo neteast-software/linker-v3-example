@@ -15,14 +15,17 @@ import (
 	linker "github.com/neteast-software/linker/v3"
 
 	ttsclient "linker-v3-example/internal/client/tts"
-	graphcomponent "linker-v3-example/internal/component/graph"
+	consolecomponent "linker-v3-example/internal/component/console"
 	inspectioncomponent "linker-v3-example/internal/component/inspection"
 	notificationcomponent "linker-v3-example/internal/component/notification"
+	ordercomponent "linker-v3-example/internal/component/order"
+	permissioncomponent "linker-v3-example/internal/component/permission"
 	ttscomponent "linker-v3-example/internal/component/tts"
 	usercomponent "linker-v3-example/internal/component/user"
 )
 
 func New(sources ...linker.Source) *linker.App {
+	users := usercomponent.NewComponent()
 	return server.New(
 		server.Config(sources...),
 		server.WithShutdownTimeout(3*time.Second),
@@ -37,9 +40,11 @@ func New(sources ...linker.Source) *linker.App {
 					applicationcore.Application{ID: "app2", Scope: "app2", Name: "应用二", Host: "app2.local", Status: applicationcore.StatusEnabled},
 				),
 			),
-			graphcomponent.NewComponent(),
 			inspectioncomponent.NewComponent(),
-			usercomponent.NewComponent(),
+			users,
+			ordercomponent.New(),
+			permissioncomponent.New(),
+			consolecomponent.New(users.Service()),
 			ttscomponent.NewComponent(),
 			notificationcomponent.NewComponent(),
 			mq.New(),

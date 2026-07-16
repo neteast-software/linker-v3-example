@@ -1,0 +1,18 @@
+package user
+
+import (
+	"context"
+
+	"github.com/neteast-software/go-module/token"
+
+	usermodel "linker-v3-example/internal/model/user"
+)
+
+// Auth 是 user 组件对认证、会话和用户资料能力的稳定边界。
+type Auth interface {
+	AdminLogin(context.Context, string, string) (usermodel.User, string, error)
+	Current(context.Context, string, string) (usermodel.User, token.Claims, error)
+	Refresh(context.Context, string, string) (usermodel.User, token.Token, error)
+	Revoke(context.Context, string, string) error
+	ProfileByID(context.Context, uint64) (usermodel.User, error)
+}

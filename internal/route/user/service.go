@@ -7,11 +7,11 @@ import (
 	userservice "linker-v3-example/internal/service/user"
 )
 
-func service(c *http.Context) (userservice.Service, bool) {
+func service(c *http.Context) (*userservice.Service, bool) {
 	svc, err := http.Require(c, userservice.ServiceKey())
 	if err != nil {
 		response.Warning(c, "%s", err.Error())
-		return userservice.Service{}, false
+		return nil, false
 	}
 	return svc, true
 }
