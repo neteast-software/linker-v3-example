@@ -9,23 +9,23 @@ import (
 	permissionconstant "linker-v3-example/internal/constant/permission"
 )
 
-func Relation() *multilist.Multilist[map[string]any, map[string]any] {
-	roles := viewer.New[map[string]any]("角色").
+func Relation() *multilist.Multilist[role, resource] {
+	roles := viewer.New[role]("角色").
 		Identity("permission.role").
 		Columns(viewer.Col("id", "ID"), viewer.Col("name", "角色名称")).
 		Choose().
 		WithData(
-			map[string]any{"id": 1, "name": "系统管理员"},
-			map[string]any{"id": 2, "name": "只读用户"},
+			role{ID: 1, Name: "系统管理员"},
+			role{ID: 2, Name: "只读用户"},
 		)
-	resources := viewer.New[map[string]any]("权限资源").
+	resources := viewer.New[resource]("权限资源").
 		Identity("permission.resource").
 		Key("tag").
 		Columns(viewer.Col("tag", "资源"), viewer.Col("description", "说明")).
 		Select().
 		WithData(
-			map[string]any{"tag": orderconstant.List, "description": "查看订单列表"},
-			map[string]any{"tag": orderconstant.Update, "description": "维护订单"},
+			resource{Tag: orderconstant.List, Description: "查看订单列表"},
+			resource{Tag: orderconstant.Update, Description: "维护订单"},
 		)
 	target := protocol.Route("/api/v1/app2/permission/role/:id/resource")
 	relation := multilist.Relate(
