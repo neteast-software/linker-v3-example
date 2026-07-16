@@ -13,7 +13,7 @@ import (
 )
 
 func Page() *layout.Layout {
-	summary := viewer.New[map[string]any]("运行概览").
+	summary := viewer.New[metric]("运行概览").
 		Identity("dashboard.summary").
 		Resource(consoleconstant.Dashboard).
 		Columns(
@@ -21,9 +21,9 @@ func Page() *layout.Layout {
 			viewer.Col("value", "数量"),
 		).
 		WithData(
-			map[string]any{"name": "运行组件", "value": 12},
-			map[string]any{"name": "业务路由", "value": 18},
-			map[string]any{"name": "待处理通知", "value": 1},
+			metric{Name: "运行组件", Value: 12},
+			metric{Name: "业务路由", Value: 18},
+			metric{Name: "待处理通知", Value: 1},
 		)
 	trend := chart.New("请求趋势", chart.Line,
 		chart.Data(
