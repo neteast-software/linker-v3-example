@@ -45,9 +45,10 @@ go build -o ./bin/linker-v3-example .
 - `POST /api/v1/app2/notification/send`：HTTP 到 MQ mock 的 trace 贯穿示例。
 - `POST /api/v1/app2/tts/transcribe`：HTTP 到 typed gRPC client 的 trace 贯穿示例。
 - `GET /metrics`：Prometheus scrape 入口，由 `server.WithMetrics` 统一装配 HTTP/gRPC/MQ/cron/component/fault/notice 指标。
-- `GET /api/v1/app2/graph/orders`：graph/naive viewer 示例。
-- `GET /api/v1/app2/graph/orders/form`：graph/naive form 示例。
-- `GET /api/v1/app2/graph/refresh`：graph/naive behavior 示例。
+- `GET /console/entry`、`POST /console/login`：Graph Console 公开入口和登录。
+- `GET /console/menu`、`GET /console/page/:id`：经过 session 与 ACL 的菜单和动态页面。
+- `GET|PUT /api/v1/app2/order`：viewer/form 对应的真实业务查询、服务端验证和写入边界。
+- `GET|POST|DELETE /api/v1/app2/permission/role/:id/resource`：multilist 对应的权限关系增量接口。
 - `example.tts.TTS/Transcribe`：gRPC service，演示 RPC register、typed client provider、trace 传播和表资产。
 - `example/http_client_example_test.go`：出站 HTTP client 示例，演示 `http/client/linker` capability、Plan asset、credential、trace hook 和业务 typed client。
 
@@ -96,6 +97,11 @@ func init() {
 - `internal/constant/inspection`：巡检状态等稳定业务词汇，类型自己提供校验、解析、定义集和文本边界。
 - `internal/fixture/user`：只承载 example 演示数据；错误回到产生它的 service 或 route/middleware 边界，不塞进 `constant`。
 - `internal/component/user`：组件 identity、linker 组件生命周期、表资产和 service capability 挂载。
+- `internal/page/*`：Graph Console 页面对象；页面只声明布局、数据展示意图、target 和 Resource，不查询数据库。
+- `internal/adapter/console`：把 user/token/session/ACL 业务边界适配为 Console provider，不污染 Graph Console 协议。
+- `internal/component/console`：集中装配 Console Component、页面、资源和 provider，不进入 linker core。
+- `internal/route/order`、`internal/service/order`：表单 target 的业务 API 与可复用流程，服务端验证始终保留。
+- `internal/route/permission`、`internal/service/permission`：multilist 的关系读写接口，最终权限判断仍由后端 middleware 完成。
 
 record-level 权限建议放在具体业务 store 的查询入口处完成。`internal/service/inspection` 用 `TaskAccess` 把 `acl.Access`、`acl.Resource` 和 `RecordRange` 组合在一起：route 只提供当前 application 和 actor，store 在一次查询里同时应用 application scope、业务 filter 和 owner range，避免为了权限判断额外做 N+1 查询或维护 RBAC 关系表。
 - `internal/route/inspection`、`internal/model/inspection`、`internal/service/inspection`、`internal/component/inspection`：接近真实业务的列表接口结构，route 负责 HTTP 参数和输出，service/store 负责批量查询和数据范围。
@@ -206,11 +212,13 @@ Prometheus 可抓取 `GET /metrics`，最小 scrape、OTel Collector 和 Grafana
 
 - `docs/scaffold.md`：推荐项目骨架，说明 main、app、component、route、model、service、config、observability 和 example test 的边界。
 - `docs/example-policy.md`：说明 example 的定位、外部依赖、测试拆分和未来 submodule 边界。
+- `docs/graph-console.md`：Graph Console fixture、前端开发、同进程静态挂载和反向代理四种运行方式。
 - `main.go`：保持极薄，只分发 server 启动和 `--plan`。
 - `source.go`：只读取配置文件位置和 Nacos bootstrap 参数，按顺序声明 Source。
 - `internal/app/app.go`：集中装配 framework、组件和 adapter，不解析业务配置。
-- `internal/route/graph/*.go`：一个稳定 API 一个业务文件，route/resource/middleware 和 handler 放在同一个入口重心内；辅助对象按自己的语义单独成文件。
-- `example/graph_example_test.go`：验证 graph route、Plan asset 和 renderer capability。
+- `internal/page/*`：viewer、form、multilist、chart、theme 和 layout 的业务声明。
+- `internal/route/order/*.go`、`internal/route/permission/*.go`：一个稳定 API 一个业务文件，route/resource/middleware 和 handler 放在同一个入口重心内。
+- `example/graph_example_test.go`：验证 Console Component、登录/session、ACL、页面、静态挂载和业务 API。
 - `example/nacos_example_test.go`：验证 YAML seed、Nacos source、HTTP/gRPC registry adapter 和 Plan 里的依赖/capability 表达。
 - `example/nacos_provider_example_test.go`：在显式 Nacos 环境中发布独立 data id，经 Source 启动最小 App，并验证清理和关闭。
 - `example/redis_example_test.go`：在显式 Redis 环境中验证 component、capability、读写、Plan 资产和 graceful close。
