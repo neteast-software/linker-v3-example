@@ -2,6 +2,8 @@
 
 `linker-v3-example` 是 linker v3 的演示业务系统，用来验证 framework、HTTP route、ACL resource、PostgreSQL 生命周期和业务组件声明方式。
 
+当前依赖基线为 linker `v3.1.0` 和本批次已发布 module `v0.2.0`。`go.mod` 中剩余的本地 `replace` 只对应尚未发布的 source-ready 能力，不覆盖已经发布的 canonical API。
+
 ## 最短运行
 
 本地 YAML server：

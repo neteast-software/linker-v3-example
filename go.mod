@@ -3,60 +3,60 @@ module linker-v3-example
 go 1.26.5
 
 require (
-	github.com/neteast-software/go-module/acl v0.1.1
+	github.com/neteast-software/go-module/acl v0.2.0
 	github.com/neteast-software/go-module/acl/session v0.0.0
-	github.com/neteast-software/go-module/application v0.0.0
+	github.com/neteast-software/go-module/application v0.2.0
 	github.com/neteast-software/go-module/application/http/gin v0.0.0
-	github.com/neteast-software/go-module/application/linker v0.0.0
-	github.com/neteast-software/go-module/application/store/gorm v0.0.0
-	github.com/neteast-software/go-module/audit/operate v0.1.1
-	github.com/neteast-software/go-module/audit/operate/http/gin v0.1.2
-	github.com/neteast-software/go-module/audit/operate/linker v0.1.1
-	github.com/neteast-software/go-module/cache/redis v0.0.0
-	github.com/neteast-software/go-module/cache/redis/linker v0.0.0
-	github.com/neteast-software/go-module/config v0.1.1
+	github.com/neteast-software/go-module/application/linker v0.2.0
+	github.com/neteast-software/go-module/application/store/gorm v0.2.0
+	github.com/neteast-software/go-module/audit/operate v0.2.0
+	github.com/neteast-software/go-module/audit/operate/http/gin v0.2.0
+	github.com/neteast-software/go-module/audit/operate/linker v0.2.0
+	github.com/neteast-software/go-module/cache/redis v0.2.0
+	github.com/neteast-software/go-module/cache/redis/linker v0.2.0
+	github.com/neteast-software/go-module/config v0.2.0
 	github.com/neteast-software/go-module/config/env/linker v0.0.0
 	github.com/neteast-software/go-module/config/yaml/linker v0.0.0
 	github.com/neteast-software/go-module/db/gorm/query v0.0.0
-	github.com/neteast-software/go-module/db/gorm/table v0.1.1
-	github.com/neteast-software/go-module/db/postgresql v0.1.2
-	github.com/neteast-software/go-module/db/postgresql/linker v0.0.0
-	github.com/neteast-software/go-module/fault/event v0.1.1
-	github.com/neteast-software/go-module/fault/event/linker v0.1.1
-	github.com/neteast-software/go-module/fault/notice v0.1.1
-	github.com/neteast-software/go-module/fault/notice/linker v0.1.1
+	github.com/neteast-software/go-module/db/gorm/table v0.2.0
+	github.com/neteast-software/go-module/db/postgresql v0.2.0
+	github.com/neteast-software/go-module/db/postgresql/linker v0.2.0
+	github.com/neteast-software/go-module/fault/event v0.2.0
+	github.com/neteast-software/go-module/fault/event/linker v0.2.0
+	github.com/neteast-software/go-module/fault/notice v0.2.0
+	github.com/neteast-software/go-module/fault/notice/linker v0.2.0
 	github.com/neteast-software/go-module/http/client v0.0.0
 	github.com/neteast-software/go-module/http/client/linker v0.0.0
-	github.com/neteast-software/go-module/http/gin v0.1.2
-	github.com/neteast-software/go-module/linker/server v0.0.0
-	github.com/neteast-software/go-module/mq/consumer v0.0.0
-	github.com/neteast-software/go-module/mq/consumer/linker v0.0.0
-	github.com/neteast-software/go-module/mq/rocketmq v0.0.0
-	github.com/neteast-software/go-module/mq/rocketmq/linker v0.0.0
+	github.com/neteast-software/go-module/http/gin v0.2.0
+	github.com/neteast-software/go-module/linker/server v0.2.0
+	github.com/neteast-software/go-module/mq/consumer v0.2.0
+	github.com/neteast-software/go-module/mq/consumer/linker v0.2.0
+	github.com/neteast-software/go-module/mq/rocketmq v0.2.0
+	github.com/neteast-software/go-module/mq/rocketmq/linker v0.2.0
 	github.com/neteast-software/go-module/notify/feishu v0.0.0
 	github.com/neteast-software/go-module/notify/feishu/linker v0.0.0
-	github.com/neteast-software/go-module/observe/metrics v0.1.1
-	github.com/neteast-software/go-module/observe/metrics/linker v0.1.1
+	github.com/neteast-software/go-module/observe/metrics v0.2.0
+	github.com/neteast-software/go-module/observe/metrics/linker v0.2.0
 	github.com/neteast-software/go-module/observe/metrics/prometheus/linker v0.0.0
-	github.com/neteast-software/go-module/observe/metrics/rpc/grpc v0.0.0
-	github.com/neteast-software/go-module/observe/tracing v0.1.1
-	github.com/neteast-software/go-module/observe/tracing/linker v0.1.1
-	github.com/neteast-software/go-module/observe/tracing/mq/consumer v0.0.0
-	github.com/neteast-software/go-module/observe/tracing/opentelemetry v0.0.0
-	github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker v0.0.0
-	github.com/neteast-software/go-module/observe/tracing/rpc/grpc v0.0.0
-	github.com/neteast-software/go-module/outbox v0.0.0
-	github.com/neteast-software/go-module/registry/service v0.1.1
+	github.com/neteast-software/go-module/observe/metrics/rpc/grpc v0.2.0
+	github.com/neteast-software/go-module/observe/tracing v0.2.0
+	github.com/neteast-software/go-module/observe/tracing/linker v0.2.0
+	github.com/neteast-software/go-module/observe/tracing/mq/consumer v0.2.0
+	github.com/neteast-software/go-module/observe/tracing/opentelemetry v0.2.0
+	github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker v0.2.0
+	github.com/neteast-software/go-module/observe/tracing/rpc/grpc v0.2.0
+	github.com/neteast-software/go-module/outbox v0.2.0
+	github.com/neteast-software/go-module/registry/service v0.2.0
 	github.com/neteast-software/go-module/registry/service/nacos/linker v0.0.0
-	github.com/neteast-software/go-module/rpc/grpc v0.0.0
-	github.com/neteast-software/go-module/rpc/grpc/linker v0.0.0
-	github.com/neteast-software/go-module/rpc/meta v0.0.0
+	github.com/neteast-software/go-module/rpc/grpc v0.2.0
+	github.com/neteast-software/go-module/rpc/grpc/linker v0.2.0
+	github.com/neteast-software/go-module/rpc/meta v0.2.0
 	github.com/neteast-software/go-module/scheduler/cron v0.0.0
 	github.com/neteast-software/go-module/scheduler/cron/linker v0.0.0
-	github.com/neteast-software/go-module/token v0.0.0
+	github.com/neteast-software/go-module/token v0.2.0
 	github.com/neteast-software/go-module/user/account v0.0.0
-	github.com/neteast-software/grpc-discovery v0.0.0
-	github.com/neteast-software/linker/v3 v3.0.2
+	github.com/neteast-software/grpc-discovery v0.1.0
+	github.com/neteast-software/linker/v3 v3.1.0
 	google.golang.org/grpc v1.81.1
 	google.golang.org/protobuf v1.36.11
 	gorm.io/gorm v1.31.1
@@ -116,25 +116,25 @@ require (
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/nacos-group/nacos-sdk-go/v2 v2.3.5 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible // indirect
-	github.com/neteast-software/go-module/audit/operate/store/gorm v0.1.1 // indirect
+	github.com/neteast-software/go-module/audit/operate/store/gorm v0.2.0 // indirect
 	github.com/neteast-software/go-module/config/env v0.0.0 // indirect
 	github.com/neteast-software/go-module/config/yaml v0.0.0 // indirect
 	github.com/neteast-software/go-module/crypto/sm v0.0.0 // indirect
-	github.com/neteast-software/go-module/fault v0.1.1 // indirect
-	github.com/neteast-software/go-module/observe/metrics/fault/notice v0.1.1 // indirect
-	github.com/neteast-software/go-module/observe/metrics/http/gin v0.1.1 // indirect
-	github.com/neteast-software/go-module/observe/metrics/http/gin/linker v0.1.1 // indirect
-	github.com/neteast-software/go-module/observe/metrics/linker/server v0.1.1 // indirect
-	github.com/neteast-software/go-module/observe/metrics/mq/consumer v0.0.0 // indirect
+	github.com/neteast-software/go-module/fault v0.2.0 // indirect
+	github.com/neteast-software/go-module/observe/metrics/fault/notice v0.2.0 // indirect
+	github.com/neteast-software/go-module/observe/metrics/http/gin v0.2.0 // indirect
+	github.com/neteast-software/go-module/observe/metrics/http/gin/linker v0.2.0 // indirect
+	github.com/neteast-software/go-module/observe/metrics/linker/server v0.2.0 // indirect
+	github.com/neteast-software/go-module/observe/metrics/mq/consumer v0.2.0 // indirect
 	github.com/neteast-software/go-module/observe/metrics/prometheus v0.0.0 // indirect
 	github.com/neteast-software/go-module/observe/metrics/scheduler/cron v0.0.0 // indirect
 	github.com/neteast-software/go-module/observe/tracing/http/client v0.0.0 // indirect
-	github.com/neteast-software/go-module/observe/tracing/http/gin v0.1.1 // indirect
-	github.com/neteast-software/go-module/observe/tracing/http/gin/linker v0.1.1 // indirect
+	github.com/neteast-software/go-module/observe/tracing/http/gin v0.2.0 // indirect
+	github.com/neteast-software/go-module/observe/tracing/http/gin/linker v0.2.0 // indirect
 	github.com/neteast-software/go-module/observe/tracing/scheduler/cron v0.0.0 // indirect
-	github.com/neteast-software/go-module/provider v0.1.1 // indirect
-	github.com/neteast-software/go-module/redact v0.1.1 // indirect
-	github.com/neteast-software/go-module/registry/service/linker v0.1.1 // indirect
+	github.com/neteast-software/go-module/provider v0.2.0 // indirect
+	github.com/neteast-software/go-module/redact v0.2.0 // indirect
+	github.com/neteast-software/go-module/registry/service/linker v0.2.0 // indirect
 	github.com/neteast-software/go-module/registry/service/nacos v0.0.0 // indirect
 	github.com/neteast-software/go-module/scheduler/cron/store/gorm v0.0.0 // indirect
 	github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc // indirect
@@ -194,7 +194,7 @@ require (
 	github.com/neteast-software/go-module/graph/naive v0.0.0
 	github.com/neteast-software/go-module/graph/naive/http/gin v0.0.0
 	github.com/neteast-software/go-module/graph/naive/linker v0.0.0
-	github.com/neteast-software/go-module/http/gin/linker v0.1.1
+	github.com/neteast-software/go-module/http/gin/linker v0.2.0
 	github.com/neteast-software/go-module/license v0.0.0
 	github.com/neteast-software/go-module/license/http/gin v0.0.0
 	github.com/neteast-software/go-module/registry/nacos v0.0.0
@@ -213,63 +213,15 @@ require (
 	golang.org/x/text v0.38.0 // indirect
 )
 
-replace github.com/neteast-software/linker/v3 => ../linker-v3
-
-replace github.com/neteast-software/go-module/http/gin => ../modules/http/gin
-
-replace github.com/neteast-software/go-module/http/gin/linker => ../modules/http/gin/linker
-
 replace github.com/neteast-software/go-module/http/client => ../modules/http/client
 
 replace github.com/neteast-software/go-module/http/client/linker => ../modules/http/client/linker
 
-replace github.com/neteast-software/go-module/acl => ../modules/acl
-
 replace github.com/neteast-software/go-module/acl/session => ../modules/acl/session
-
-replace github.com/neteast-software/go-module/application => ../modules/application
 
 replace github.com/neteast-software/go-module/application/http/gin => ../modules/application/http/gin
 
-replace github.com/neteast-software/go-module/application/linker => ../modules/application/linker
-
-replace github.com/neteast-software/go-module/application/store/gorm => ../modules/application/store/gorm
-
-replace github.com/neteast-software/go-module/audit/operate => ../modules/audit/operate
-
-replace github.com/neteast-software/go-module/audit/operate/http/gin => ../modules/audit/operate/http/gin
-
-replace github.com/neteast-software/go-module/audit/operate/linker => ../modules/audit/operate/linker
-
-replace github.com/neteast-software/go-module/audit/operate/store/gorm => ../modules/audit/operate/store/gorm
-
-replace github.com/neteast-software/go-module/db/gorm/table => ../modules/db/gorm/table
-
 replace github.com/neteast-software/go-module/db/gorm/query => ../modules/db/gorm/query
-
-replace github.com/neteast-software/go-module/db/postgresql => ../modules/db/postgresql
-
-replace github.com/neteast-software/go-module/db/postgresql/linker => ../modules/db/postgresql/linker
-
-replace github.com/neteast-software/go-module/fault => ../modules/fault
-
-replace github.com/neteast-software/go-module/fault/event => ../modules/fault/event
-
-replace github.com/neteast-software/go-module/fault/event/linker => ../modules/fault/event/linker
-
-replace github.com/neteast-software/go-module/fault/notice => ../modules/fault/notice
-
-replace github.com/neteast-software/go-module/fault/notice/linker => ../modules/fault/notice/linker
-
-replace github.com/neteast-software/go-module/linker/server => ../modules/linker/server
-
-replace github.com/neteast-software/go-module/mq/consumer => ../modules/mq/consumer
-
-replace github.com/neteast-software/go-module/mq/consumer/linker => ../modules/mq/consumer/linker
-
-replace github.com/neteast-software/go-module/mq/rocketmq => ../modules/mq/rocketmq
-
-replace github.com/neteast-software/go-module/mq/rocketmq/linker => ../modules/mq/rocketmq/linker
 
 replace github.com/neteast-software/go-module/config/yaml/linker => ../modules/config/yaml/linker
 
@@ -277,83 +229,29 @@ replace github.com/neteast-software/go-module/config/env/linker => ../modules/co
 
 replace github.com/neteast-software/go-module/config/env => ../modules/config/env
 
-replace github.com/neteast-software/go-module/config => ../modules/config
-
 replace github.com/neteast-software/go-module/crypto/sm => ../modules/crypto/sm
 
 replace github.com/neteast-software/go-module/notify/feishu => ../modules/notify/feishu
 
 replace github.com/neteast-software/go-module/notify/feishu/linker => ../modules/notify/feishu/linker
 
-replace github.com/neteast-software/go-module/observe/metrics => ../modules/observe/metrics
-
-replace github.com/neteast-software/go-module/observe/metrics/fault/notice => ../modules/observe/metrics/fault/notice
-
-replace github.com/neteast-software/go-module/observe/metrics/http/gin => ../modules/observe/metrics/http/gin
-
-replace github.com/neteast-software/go-module/observe/metrics/http/gin/linker => ../modules/observe/metrics/http/gin/linker
-
-replace github.com/neteast-software/go-module/observe/metrics/linker => ../modules/observe/metrics/linker
-
-replace github.com/neteast-software/go-module/observe/metrics/linker/server => ../modules/observe/metrics/linker/server
-
-replace github.com/neteast-software/go-module/observe/metrics/mq/consumer => ../modules/observe/metrics/mq/consumer
-
 replace github.com/neteast-software/go-module/observe/metrics/prometheus => ../modules/observe/metrics/prometheus
 
 replace github.com/neteast-software/go-module/observe/metrics/prometheus/linker => ../modules/observe/metrics/prometheus/linker
 
-replace github.com/neteast-software/go-module/observe/metrics/rpc/grpc => ../modules/observe/metrics/rpc/grpc
-
 replace github.com/neteast-software/go-module/observe/metrics/scheduler/cron => ../modules/observe/metrics/scheduler/cron
-
-replace github.com/neteast-software/go-module/observe/tracing => ../modules/observe/tracing
 
 replace github.com/neteast-software/go-module/observe/tracing/http/client => ../modules/observe/tracing/http/client
 
-replace github.com/neteast-software/go-module/observe/tracing/http/gin => ../modules/observe/tracing/http/gin
-
-replace github.com/neteast-software/go-module/observe/tracing/http/gin/linker => ../modules/observe/tracing/http/gin/linker
-
-replace github.com/neteast-software/go-module/observe/tracing/linker => ../modules/observe/tracing/linker
-
-replace github.com/neteast-software/go-module/observe/tracing/mq/consumer => ../modules/observe/tracing/mq/consumer
-
-replace github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker => ../modules/observe/tracing/opentelemetry/linker
-
-replace github.com/neteast-software/go-module/observe/tracing/opentelemetry => ../modules/observe/tracing/opentelemetry
-
-replace github.com/neteast-software/go-module/observe/tracing/rpc/grpc => ../modules/observe/tracing/rpc/grpc
-
 replace github.com/neteast-software/go-module/observe/tracing/scheduler/cron => ../modules/observe/tracing/scheduler/cron
 
-replace github.com/neteast-software/go-module/outbox => ../modules/outbox
-
 replace github.com/neteast-software/go-module/config/yaml => ../modules/config/yaml
-
-replace github.com/neteast-software/go-module/cache/redis => ../modules/cache/redis
-
-replace github.com/neteast-software/go-module/cache/redis/linker => ../modules/cache/redis/linker
-
-replace github.com/neteast-software/go-module/provider => ../modules/provider
-
-replace github.com/neteast-software/go-module/test/integration => ../modules/test/integration
 
 replace github.com/neteast-software/go-module/scheduler/cron => ../modules/scheduler/cron
 
 replace github.com/neteast-software/go-module/scheduler/cron/linker => ../modules/scheduler/cron/linker
 
 replace github.com/neteast-software/go-module/scheduler/cron/store/gorm => ../modules/scheduler/cron/store/gorm
-
-replace github.com/neteast-software/go-module/rpc/grpc => ../modules/rpc/grpc
-
-replace github.com/neteast-software/go-module/rpc/grpc/linker => ../modules/rpc/grpc/linker
-
-replace github.com/neteast-software/go-module/rpc/meta => ../modules/rpc/meta
-
-replace github.com/neteast-software/grpc-discovery => ../modules/grpc-discovery
-
-replace github.com/neteast-software/go-module/token => ../modules/token
 
 replace github.com/neteast-software/go-module/user/account => ../modules/user/account
 
@@ -369,10 +267,6 @@ replace github.com/neteast-software/nacos-kit => ../modules/nacos-kit
 
 replace github.com/neteast-software/go-module/registry/nacos => ../modules/registry/nacos
 
-replace github.com/neteast-software/go-module/registry/service => ../modules/registry/service
-
-replace github.com/neteast-software/go-module/registry/service/linker => ../modules/registry/service/linker
-
 replace github.com/neteast-software/go-module/registry/service/nacos => ../modules/registry/service/nacos
 
 replace github.com/neteast-software/go-module/registry/service/nacos/linker => ../modules/registry/service/nacos/linker
@@ -380,5 +274,3 @@ replace github.com/neteast-software/go-module/registry/service/nacos/linker => .
 replace github.com/neteast-software/go-module/license => ../modules/license
 
 replace github.com/neteast-software/go-module/license/http/gin => ../modules/license/http/gin
-
-replace github.com/neteast-software/go-module/redact => ../modules/redact
