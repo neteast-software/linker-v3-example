@@ -7,7 +7,6 @@ import (
 	useraccount "github.com/neteast-software/go-module/user/account"
 	"gorm.io/gorm"
 
-	userconstant "linker-v3-example/internal/constant/user"
 	usermodel "linker-v3-example/internal/model/user"
 )
 
@@ -68,7 +67,7 @@ func (s Store) byAccount(ctx context.Context, provider useraccount.Provider, ide
 		Where("provider = ? AND identifier = ?", provider.String(), identifier).
 		First(&account).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return usermodel.User{}, usermodel.Account{}, userconstant.ErrLogin
+		return usermodel.User{}, usermodel.Account{}, ErrLogin
 	}
 	if err != nil {
 		return usermodel.User{}, usermodel.Account{}, err
@@ -84,7 +83,7 @@ func (s Store) first(ctx context.Context, query string, args ...any) (usermodel.
 	var user usermodel.User
 	err := s.db.WithContext(ctx).Where(query, args...).First(&user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return usermodel.User{}, userconstant.ErrLogin
+		return usermodel.User{}, ErrLogin
 	}
 	return user, err
 }

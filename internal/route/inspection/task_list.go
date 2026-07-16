@@ -6,6 +6,7 @@ import (
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	"github.com/neteast-software/go-module/http/gin/response"
 
+	inspectionconstant "linker-v3-example/internal/constant/inspection"
 	routemiddleware "linker-v3-example/internal/route/middleware"
 	inspectionservice "linker-v3-example/internal/service/inspection"
 )
@@ -37,9 +38,17 @@ func listTasks(c *http.Context) {
 	if !ok {
 		return
 	}
+	var status inspectionconstant.Status
+	if raw := c.Query("status"); raw != "" {
+		status, err = inspectionconstant.ParseStatus(raw)
+		if err != nil {
+			response.Warning(c, "%s", err.Error())
+			return
+		}
+	}
 	rows, req, err := svc.List(c.Request.Context(), app, inspectionservice.ListRequest{
 		Page:   query.NewPage(intQuery(c, "page"), intQuery(c, "pageSize")),
-		Status: c.Query("status"),
+		Status: status,
 		Access: inspectionservice.NewTaskAccess(app, actorID),
 	})
 	if err != nil {

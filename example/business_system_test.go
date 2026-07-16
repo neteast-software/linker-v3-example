@@ -38,7 +38,7 @@ import (
 	notificationcomponent "linker-v3-example/internal/component/notification"
 	ttscomponent "linker-v3-example/internal/component/tts"
 	usercomponent "linker-v3-example/internal/component/user"
-	userconstant "linker-v3-example/internal/constant/user"
+	userfixture "linker-v3-example/internal/fixture/user"
 )
 
 const testLoginPassword = "example-test-password"
@@ -59,7 +59,8 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 				"version": "v1",
 			},
 		},
-		Timeout: time.Second,
+		Timeout:  time.Second,
+		Insecure: true,
 		Metadata: map[string]string{
 			"scope": "front",
 		},
@@ -76,9 +77,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		prometheus.Namespace: prometheus.Config{
 			Enabled: true, Namespace: "linker_v3_example", ConstLabels: map[string]string{"service": "linker-v3-example"},
 		},
-		opentelemetry.Namespace: opentelemetry.Config{
-			Mode: opentelemetry.ModeMemory, Service: "linker-v3-example",
-		},
+		opentelemetry.Namespace: opentelemetry.InMemory("linker-v3-example"),
 	}))
 	plan := preparedPlan(t, app)
 	if !planHasComponent(plan, postgresql.ID) ||
@@ -187,7 +186,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	}
 
 	front := postJSON(t, baseURL+"/user/login", map[string]string{
-		"phone":    userconstant.ExamplePhone,
+		"phone":    userfixture.Phone,
 		"password": testLoginPassword,
 	}, "")
 	frontData := responseData(t, front)
@@ -199,7 +198,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	profile := getJSON(t, baseURL+"/api/profile", token)
 	profileData := responseData(t, profile)
 	if profileData["username"] != "example_user" ||
-		profileData["phone"] != userconstant.ExamplePhone ||
+		profileData["phone"] != userfixture.Phone ||
 		profileData["email"] != "example.user@neteast.cn" ||
 		profileData["avatar"] == "" {
 		t.Fatalf("unexpected profile: %#v", profileData)
@@ -212,7 +211,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	app2Profile := getJSON(t, fmt.Sprintf("%s/api/v1/app2/user/%d/profile", baseURL, int(userID)), "")
 	app2ProfileData := responseData(t, app2Profile)
 	if app2ProfileData["username"] != "example_user" ||
-		app2ProfileData["phone"] != userconstant.ExamplePhone ||
+		app2ProfileData["phone"] != userfixture.Phone ||
 		app2ProfileData["application"] != "app2" {
 		t.Fatalf("unexpected app2 profile: %#v", app2ProfileData)
 	}

@@ -173,9 +173,7 @@ func TestLinkerV3PrometheusMetricsExample(t *testing.T) {
 	metricComponent := prometheus.New(prometheus.WithConfig(prometheus.Config{
 		Enabled: true, Namespace: "linker_v3_example", ConstLabels: map[string]string{"service": "linker-v3-example"},
 	}))
-	traceComponent := opentelemetry.New(opentelemetry.WithConfig(opentelemetry.Config{
-		Mode: opentelemetry.ModeMemory, Service: "linker-v3-example",
-	}))
+	traceComponent := opentelemetry.New(opentelemetry.WithConfig(opentelemetry.InMemory("linker-v3-example")))
 	httpConfig := http.DefaultConfig()
 	httpConfig.Addr = "127.0.0.1:0"
 	app := server.New(

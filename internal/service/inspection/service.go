@@ -6,6 +6,7 @@ import (
 	"github.com/neteast-software/go-module/application"
 	postgresql "github.com/neteast-software/go-module/db/postgresql"
 
+	inspectionconstant "linker-v3-example/internal/constant/inspection"
 	inspectionmodel "linker-v3-example/internal/model/inspection"
 )
 
@@ -25,9 +26,9 @@ func (p Service) List(ctx context.Context, app application.Application, req List
 
 func Seed(ctx context.Context, store Store) error {
 	return store.SaveDefaults(ctx,
-		inspectionmodel.Task{Head: head(1), ApplicationScope: "app2", Title: "应用二巡检任务", Status: "open", OwnerID: 2},
-		inspectionmodel.Task{Head: head(2), ApplicationScope: "console", Title: "后台巡检任务", Status: "open", OwnerID: 1},
-		inspectionmodel.Task{Head: head(3), ApplicationScope: "app2", Title: "应用二已完成任务", Status: "done", OwnerID: 1},
+		inspectionmodel.Task{Head: head(1), ApplicationScope: "app2", Title: "应用二巡检任务", Status: inspectionconstant.Open, OwnerID: 2},
+		inspectionmodel.Task{Head: head(2), ApplicationScope: "console", Title: "后台巡检任务", Status: inspectionconstant.Open, OwnerID: 1},
+		inspectionmodel.Task{Head: head(3), ApplicationScope: "app2", Title: "应用二已完成任务", Status: inspectionconstant.Done, OwnerID: 1},
 	)
 }
 

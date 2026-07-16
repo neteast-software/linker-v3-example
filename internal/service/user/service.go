@@ -7,7 +7,6 @@ import (
 
 	session "github.com/neteast-software/go-module/acl/session"
 	"github.com/neteast-software/go-module/token"
-	userconstant "linker-v3-example/internal/constant/user"
 	usermodel "linker-v3-example/internal/model/user"
 )
 
@@ -40,21 +39,21 @@ func (s Service) UserLogin(ctx context.Context, phone string, password string) (
 func (s Service) Profile(ctx context.Context, raw string, scope string) (usermodel.User, error) {
 	claims, err := s.signer.Verify(raw)
 	if err != nil {
-		return usermodel.User{}, userconstant.ErrLogin
+		return usermodel.User{}, ErrLogin
 	}
 	if claims.Scope != scope {
-		return usermodel.User{}, userconstant.ErrLogin
+		return usermodel.User{}, ErrLogin
 	}
 	alive, err := s.sessions.Alive(ctx, claims)
 	if err != nil {
 		return usermodel.User{}, err
 	}
 	if !alive {
-		return usermodel.User{}, userconstant.ErrLogin
+		return usermodel.User{}, ErrLogin
 	}
 	userID, err := strconv.ParseUint(claims.Subject, 10, 64)
 	if err != nil {
-		return usermodel.User{}, userconstant.ErrLogin
+		return usermodel.User{}, ErrLogin
 	}
 	return s.store.ByID(ctx, userID)
 }
@@ -69,7 +68,7 @@ func (s Service) login(ctx context.Context, user usermodel.User, account usermod
 		return usermodel.User{}, "", err
 	}
 	if !ok {
-		return usermodel.User{}, "", userconstant.ErrLogin
+		return usermodel.User{}, "", ErrLogin
 	}
 	issued, err := s.signer.Issue(strconv.FormatUint(user.ID, 10), time.Hour,
 		token.WithScope(scope),

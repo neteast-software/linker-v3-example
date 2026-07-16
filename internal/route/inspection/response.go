@@ -1,13 +1,16 @@
 package inspection
 
-import inspectionmodel "linker-v3-example/internal/model/inspection"
+import (
+	inspectionconstant "linker-v3-example/internal/constant/inspection"
+	inspectionmodel "linker-v3-example/internal/model/inspection"
+)
 
 type taskItem struct {
-	ID               uint64 `json:"id"`
-	ApplicationScope string `json:"application_scope"`
-	Title            string `json:"title"`
-	Status           string `json:"status"`
-	OwnerID          uint64 `json:"owner_id"`
+	ID               uint64                    `json:"id"`
+	ApplicationScope string                    `json:"application_scope"`
+	Title            string                    `json:"title"`
+	Status           inspectionconstant.Status `json:"status"`
+	OwnerID          uint64                    `json:"owner_id"`
 }
 
 func taskItems(rows []inspectionmodel.Task) []taskItem {

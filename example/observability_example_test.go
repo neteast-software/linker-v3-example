@@ -35,9 +35,7 @@ func TestFrameworkObservabilityExample(t *testing.T) {
 	metricComponent := prometheus.New(prometheus.WithConfig(prometheus.Config{
 		Enabled: true, Namespace: "linker_v3_example", ConstLabels: map[string]string{"service": "observability-example"},
 	}))
-	traceComponent := opentelemetry.New(opentelemetry.WithConfig(opentelemetry.Config{
-		Mode: opentelemetry.ModeMemory, Service: "linker-v3-example",
-	}))
+	traceComponent := opentelemetry.New(opentelemetry.WithConfig(opentelemetry.InMemory("linker-v3-example")))
 	mqTrace := make(chan tracing.Trace, 1)
 	item := consumer.New("trace", consumer.HandlerFunc(func(ctx context.Context, _ consumer.Message) error {
 		trace, _ := tracing.FromContext(ctx)

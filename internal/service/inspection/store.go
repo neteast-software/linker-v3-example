@@ -20,7 +20,7 @@ type Store struct {
 
 type ListRequest struct {
 	Page   query.Page
-	Status string
+	Status inspectionconstant.Status
 	Access TaskAccess
 }
 
@@ -32,6 +32,11 @@ func (p Store) SaveDefaults(ctx context.Context, tasks ...inspectionmodel.Task) 
 	if len(tasks) == 0 {
 		return nil
 	}
+	for _, task := range tasks {
+		if err := task.Validate(); err != nil {
+			return err
+		}
+	}
 	records := append([]inspectionmodel.Task(nil), tasks...)
 	return p.db.WithContext(ctx).
 		Clauses(clause.OnConflict{UpdateAll: true}).
@@ -41,14 +46,14 @@ func (p Store) SaveDefaults(ctx context.Context, tasks ...inspectionmodel.Task) 
 
 func (p Store) List(ctx context.Context, app application.Application, req ListRequest) ([]inspectionmodel.Task, query.Page, error) {
 	if !req.Access.Can(acl.Read) {
-		return nil, query.Page{}, inspectionconstant.ErrForbidden
+		return nil, query.Page{}, ErrForbidden
 	}
 	spec := query.Spec{
 		Page:   req.Page,
 		Orders: []query.Order{query.Desc("id")},
 	}
 	if req.Status != "" {
-		spec.Filters = append(spec.Filters, query.Where("status", req.Status))
+		spec.Filters = append(spec.Filters, query.Where("status", req.Status.String()))
 	}
 	spec.Filters = append(spec.Filters, req.Access.Range.Filters()...)
 	db, spec, err := query.Apply(

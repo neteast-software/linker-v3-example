@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 
-	userconstant "linker-v3-example/internal/constant/user"
+	userfixture "linker-v3-example/internal/fixture/user"
 	usermodel "linker-v3-example/internal/model/user"
 )
 
@@ -34,11 +34,11 @@ func Seed(ctx context.Context, store Store, password string) error {
 				Username: "example_user",
 				Avatar:   "https://static.neteast.cn/avatar/user.png",
 				Email:    "example.user@neteast.cn",
-				Phone:    userconstant.ExamplePhone,
+				Phone:    userfixture.Phone,
 				Role:     "user",
 			},
 			Accounts: []usermodel.Account{
-				{Provider: "phone", Identifier: userconstant.ExamplePhone, SecretHash: userHash, Salt: userSalt},
+				{Provider: "phone", Identifier: userfixture.Phone, SecretHash: userHash, Salt: userSalt},
 			},
 		},
 	)

@@ -91,7 +91,8 @@ func init() {
 - `internal/route/user`：HTTP 入口和 route 声明。
 - `internal/model/user`：数据表模型，包含 `user` 主体表和 `account` 凭据表；业务名直接成为 model/table 节点，不增加项目 prefix。
 - `internal/service/user`：登录、资料读取、token/session 和存储流程；service capability key 由 service 自己声明。
-- `internal/constant/user`：业务错误和明确的 example fixture。
+- `internal/constant/inspection`：巡检状态等稳定业务词汇，类型自己提供校验、解析、定义集和文本边界。
+- `internal/fixture/user`：只承载 example 演示数据；错误回到产生它的 service 或 route/middleware 边界，不塞进 `constant`。
 - `internal/component/user`：组件 identity、linker 组件生命周期、表资产和 service capability 挂载。
 
 record-level 权限建议放在具体业务 store 的查询入口处完成。`internal/service/inspection` 用 `TaskAccess` 把 `acl.Access`、`acl.Resource` 和 `RecordRange` 组合在一起：route 只提供当前 application 和 actor，store 在一次查询里同时应用 application scope、业务 filter 和 owner range，避免为了权限判断额外做 N+1 查询或维护 RBAC 关系表。

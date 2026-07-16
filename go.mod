@@ -10,7 +10,7 @@ require (
 	github.com/neteast-software/go-module/application/linker v0.0.0
 	github.com/neteast-software/go-module/application/store/gorm v0.0.0
 	github.com/neteast-software/go-module/audit/operate v0.1.1
-	github.com/neteast-software/go-module/audit/operate/http/gin v0.1.1
+	github.com/neteast-software/go-module/audit/operate/http/gin v0.1.2
 	github.com/neteast-software/go-module/audit/operate/linker v0.1.1
 	github.com/neteast-software/go-module/cache/redis v0.0.0
 	github.com/neteast-software/go-module/cache/redis/linker v0.0.0
@@ -19,7 +19,7 @@ require (
 	github.com/neteast-software/go-module/config/yaml/linker v0.0.0
 	github.com/neteast-software/go-module/db/gorm/query v0.0.0
 	github.com/neteast-software/go-module/db/gorm/table v0.1.1
-	github.com/neteast-software/go-module/db/postgresql v0.1.1
+	github.com/neteast-software/go-module/db/postgresql v0.1.2
 	github.com/neteast-software/go-module/db/postgresql/linker v0.0.0
 	github.com/neteast-software/go-module/fault/event v0.1.1
 	github.com/neteast-software/go-module/fault/event/linker v0.1.1
@@ -27,7 +27,7 @@ require (
 	github.com/neteast-software/go-module/fault/notice/linker v0.1.1
 	github.com/neteast-software/go-module/http/client v0.0.0
 	github.com/neteast-software/go-module/http/client/linker v0.0.0
-	github.com/neteast-software/go-module/http/gin v0.1.1
+	github.com/neteast-software/go-module/http/gin v0.1.2
 	github.com/neteast-software/go-module/linker/server v0.0.0
 	github.com/neteast-software/go-module/mq/consumer v0.0.0
 	github.com/neteast-software/go-module/mq/consumer/linker v0.0.0
