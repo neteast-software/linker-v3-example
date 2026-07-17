@@ -51,6 +51,7 @@ go build -o ./bin/linker-v3-example .
 - `GET|POST|DELETE /api/v1/app2/permission/role/:id/resource`：multilist 对应的权限关系增量接口。
 - `example.tts.TTS/Transcribe`：gRPC service，演示 RPC register、typed client provider、trace 传播和表资产。
 - `example/http_client_example_test.go`：出站 HTTP client 示例，演示 `http/client/linker` capability、Plan asset、credential、trace hook 和业务 typed client。
+- `example/oauth_example_test.go`：可选 OAuth 示例，演示 JWT provider、issuer/audience/scope 校验、Gin Bearer middleware 以及与 ACL 的组合；不进入 Linker 默认组件。
 
 登录链路使用 modules 的边界：
 
@@ -181,6 +182,12 @@ go run .
 ## Example
 
 测试文件集中在 `example/` 目录。真实 PostgreSQL example 只在设置 `LINKER_V3_EXAMPLE_PG_PASSWORD` 后运行，host 默认使用 `127.0.0.1` 且可通过同前缀测试变量覆盖；当前环境不可用时会明确 skip。真实 Redis、Nacos 和 RocketMQ 样板分别由 `LINKER_V3_EXAMPLE_REDIS_ADDR`、`LINKER_V3_EXAMPLE_NACOS_HOST`、`LINKER_V3_EXAMPLE_ROCKETMQ_ENDPOINT` 显式开启；凭据只从同前缀环境变量读取。RocketMQ 的 topic/group 是部署资产，测试只引用预建名称并用唯一 message key 识别本次消息。`signal_example_test.go` 会启动真实 server 子进程，分别在 startup 和 running 阶段发送 SIGTERM，验证反向关闭和退出码，不依赖外部 provider。`production_http_example_test.go` 展示 body limit、trusted proxy、health endpoint 和负载中 graceful stop；`docs/Caddyfile` 是部署层终止 TLS 的最小样板。
+
+可选 OAuth 不需要 Linker component，直接在 route 影响面挂 middleware：
+
+```bash
+go test ./example -run TestOAuthJWTMiddlewareExample -count=1
+```
 
 RocketMQ 5.5 Proxy 测试前先在部署主机预建专用资产；仓库辅助工具只创建不存在的普通 topic/group，不覆盖已有配置：
 

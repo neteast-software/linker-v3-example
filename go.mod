@@ -100,6 +100,7 @@ require (
 	github.com/gin-gonic/gin v1.11.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
@@ -197,6 +198,9 @@ require (
 	github.com/neteast-software/go-module/license/http/gin v0.0.0
 	github.com/neteast-software/go-module/registry/nacos v0.0.0
 	github.com/neteast-software/go-module/registry/nacos/linker v0.0.0
+	github.com/neteast-software/go-module/security/oauth v0.0.0
+	github.com/neteast-software/go-module/security/oauth/http/gin v0.0.0
+	github.com/neteast-software/go-module/security/oauth/jwt v0.0.0
 	github.com/neteast-software/nacos-kit v0.1.0
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
@@ -268,3 +272,9 @@ replace github.com/neteast-software/go-module/license => ../modules/license
 replace github.com/neteast-software/go-module/license/http/gin => ../modules/license/http/gin
 
 replace github.com/neteast-software/go-module/graph/console => ../modules/graph/console
+
+replace github.com/neteast-software/go-module/security/oauth => ../modules/security/oauth
+
+replace github.com/neteast-software/go-module/security/oauth/http/gin => ../modules/security/oauth/http/gin
+
+replace github.com/neteast-software/go-module/security/oauth/jwt => ../modules/security/oauth/jwt
