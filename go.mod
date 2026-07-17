@@ -15,8 +15,8 @@ require (
 	github.com/neteast-software/go-module/cache/redis v0.2.0
 	github.com/neteast-software/go-module/cache/redis/linker v0.2.0
 	github.com/neteast-software/go-module/config v0.2.0
-	github.com/neteast-software/go-module/config/env/linker v0.0.0
-	github.com/neteast-software/go-module/config/yaml/linker v0.0.0
+	github.com/neteast-software/go-module/config/env/linker v0.2.0
+	github.com/neteast-software/go-module/config/yaml/linker v0.2.0
 	github.com/neteast-software/go-module/db/gorm/query v0.0.0
 	github.com/neteast-software/go-module/db/gorm/table v0.2.0
 	github.com/neteast-software/go-module/db/postgresql v0.2.0
@@ -118,8 +118,8 @@ require (
 	github.com/nacos-group/nacos-sdk-go/v2 v2.3.5 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible // indirect
 	github.com/neteast-software/go-module/audit/operate/store/gorm v0.2.0 // indirect
-	github.com/neteast-software/go-module/config/env v0.0.0 // indirect
-	github.com/neteast-software/go-module/config/yaml v0.0.0 // indirect
+	github.com/neteast-software/go-module/config/env v0.2.0 // indirect
+	github.com/neteast-software/go-module/config/yaml v0.2.0 // indirect
 	github.com/neteast-software/go-module/crypto/sm v0.0.0 // indirect
 	github.com/neteast-software/go-module/fault v0.2.0 // indirect
 	github.com/neteast-software/go-module/observe/metrics/fault/notice v0.2.0 // indirect
@@ -198,9 +198,9 @@ require (
 	github.com/neteast-software/go-module/license/http/gin v0.0.0
 	github.com/neteast-software/go-module/registry/nacos v0.0.0
 	github.com/neteast-software/go-module/registry/nacos/linker v0.0.0
-	github.com/neteast-software/go-module/security/oauth v0.0.0
-	github.com/neteast-software/go-module/security/oauth/http/gin v0.0.0
-	github.com/neteast-software/go-module/security/oauth/jwt v0.0.0
+	github.com/neteast-software/go-module/security/oauth v0.1.0
+	github.com/neteast-software/go-module/security/oauth/http/gin v0.1.0
+	github.com/neteast-software/go-module/security/oauth/jwt v0.1.0
 	github.com/neteast-software/nacos-kit v0.1.0
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
@@ -225,12 +225,6 @@ replace github.com/neteast-software/go-module/application/http/gin => ../modules
 
 replace github.com/neteast-software/go-module/db/gorm/query => ../modules/db/gorm/query
 
-replace github.com/neteast-software/go-module/config/yaml/linker => ../modules/config/yaml/linker
-
-replace github.com/neteast-software/go-module/config/env/linker => ../modules/config/env/linker
-
-replace github.com/neteast-software/go-module/config/env => ../modules/config/env
-
 replace github.com/neteast-software/go-module/crypto/sm => ../modules/crypto/sm
 
 replace github.com/neteast-software/go-module/notify/feishu => ../modules/notify/feishu
@@ -246,8 +240,6 @@ replace github.com/neteast-software/go-module/observe/metrics/scheduler/cron => 
 replace github.com/neteast-software/go-module/observe/tracing/http/client => ../modules/observe/tracing/http/client
 
 replace github.com/neteast-software/go-module/observe/tracing/scheduler/cron => ../modules/observe/tracing/scheduler/cron
-
-replace github.com/neteast-software/go-module/config/yaml => ../modules/config/yaml
 
 replace github.com/neteast-software/go-module/scheduler/cron => ../modules/scheduler/cron
 
@@ -272,11 +264,5 @@ replace github.com/neteast-software/go-module/license => ../modules/license
 replace github.com/neteast-software/go-module/license/http/gin => ../modules/license/http/gin
 
 replace github.com/neteast-software/go-module/graph/console => ../modules/graph/console
-
-replace github.com/neteast-software/go-module/security/oauth => ../modules/security/oauth
-
-replace github.com/neteast-software/go-module/security/oauth/http/gin => ../modules/security/oauth/http/gin
-
-replace github.com/neteast-software/go-module/security/oauth/jwt => ../modules/security/oauth/jwt
 
 replace github.com/neteast-software/linker/v3 => ../linker-v3

@@ -310,6 +310,14 @@ github.com/neteast-software/go-module/cache/redis/linker v0.2.0 h1:u/cE/gnE5TYO9
 github.com/neteast-software/go-module/cache/redis/linker v0.2.0/go.mod h1:LKWlunmNpNgnZNw2Bg/W6SwwjYKccucm4qV9h2L7lWs=
 github.com/neteast-software/go-module/config v0.2.0 h1:TuCTrGVU8mSknee934Q+HhR9/FgXUKqoNtRUiy14dz8=
 github.com/neteast-software/go-module/config v0.2.0/go.mod h1:QioNukoZvzwEqvmUqLrc5yIBvnT56lUk4JdY5rq5Ajs=
+github.com/neteast-software/go-module/config/env v0.2.0 h1:pG++QCet7zFhlqglUbSKumw3HT4QAOWW+JljDUfBg/k=
+github.com/neteast-software/go-module/config/env v0.2.0/go.mod h1:6Koa4RdQsPBCpMhU/vrVh5QFoHbfVYoaf8AmYJuWaBw=
+github.com/neteast-software/go-module/config/env/linker v0.2.0 h1:7ERSm286qAeAWm4GV0R6o1eYZWyivwdARjRkPVlpZeQ=
+github.com/neteast-software/go-module/config/env/linker v0.2.0/go.mod h1:LB+O4ijKeUhaBKB/2lCmL/FQZwMznNd0NiNlBQXcm54=
+github.com/neteast-software/go-module/config/yaml v0.2.0 h1:VUvf6/lWAo558+lXYEjBo6svpVW0f7rw91xmWi7EHCc=
+github.com/neteast-software/go-module/config/yaml v0.2.0/go.mod h1:H2QSefu1lRe0ksYnDvBlxSnRV+L9JJ5mh92ZoTeDYtM=
+github.com/neteast-software/go-module/config/yaml/linker v0.2.0 h1:sxW0Ls+CFJkRiWw/H861NnW2bAJ1Kt9Qv32swgv/wFg=
+github.com/neteast-software/go-module/config/yaml/linker v0.2.0/go.mod h1:NUHfeqQcodmFJLz5jwOOcxrUwCKOrksWi3Ghdo3QaLE=
 github.com/neteast-software/go-module/db/gorm/table v0.2.0 h1:1/ruhUBxCS+LPf9lssehi8FRQAk4CExTVmekFvXltwU=
 github.com/neteast-software/go-module/db/gorm/table v0.2.0/go.mod h1:ayMxSIs5KrtW0cPm9zSQuydAQAxz0mNd5RuLxMhdCes=
 github.com/neteast-software/go-module/db/postgresql v0.2.0 h1:t9/7FNUp4432dGf1P0KkttEjz2RfVQM0HNp7tiJdTrM=
@@ -388,6 +396,12 @@ github.com/neteast-software/go-module/rpc/grpc/linker v0.2.0 h1:2DRNhBXhspADEsKk
 github.com/neteast-software/go-module/rpc/grpc/linker v0.2.0/go.mod h1:HCYTsxGx9crFZtQWcxt+8gsg3vO5ii2wukQvv5jnMBQ=
 github.com/neteast-software/go-module/rpc/meta v0.2.0 h1:S8e4KYO1nTDXDDBdOLjDPjQhnwiQtPwe1G9ZykU0+ic=
 github.com/neteast-software/go-module/rpc/meta v0.2.0/go.mod h1:d6myms/w7bt3PTooXsqr3X5obW0PpOQZn7e1Cu2KKdQ=
+github.com/neteast-software/go-module/security/oauth v0.1.0 h1:D3X/O95VFpRiizJyo181LYXksRhq8mEi977dw4eytD0=
+github.com/neteast-software/go-module/security/oauth v0.1.0/go.mod h1:F27cx2H50mW8iZLEuuXK6iJWwtSJYZl/LMb5FxbPVL8=
+github.com/neteast-software/go-module/security/oauth/http/gin v0.1.0 h1:/xoWiONF+U2xwzZ35ij03iZds/5xECvJUbjvRHhqXgA=
+github.com/neteast-software/go-module/security/oauth/http/gin v0.1.0/go.mod h1:vdTJ0qK3JiuU6u/f9t7P3ASuLIyA8nWJ9n7ru3rJ90c=
+github.com/neteast-software/go-module/security/oauth/jwt v0.1.0 h1:0n99sAounLTHcX/pj0BodIoHy1/PhSRph4isJSY03Ic=
+github.com/neteast-software/go-module/security/oauth/jwt v0.1.0/go.mod h1:maRSdtv7PKNJFbkzce6o5/keev+xF9EK2eZbcWCwUtA=
 github.com/neteast-software/go-module/test/integration v0.2.0 h1:5hdTcfHXdTzzNIDBQ5yOYdwhzth62ZK4EyxUAf+VxVY=
 github.com/neteast-software/go-module/test/integration v0.2.0/go.mod h1:nWwZIJsfD+zcy4yZDAHH4lGOZLbAVKozuZYMFxZO3sU=
 github.com/neteast-software/go-module/token v0.2.0 h1:JijgE9RInhuR9BruMpJedLzK/geGPXDF6z2JN84i+Xo=
