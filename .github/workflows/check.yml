@@ -17,12 +17,16 @@ jobs:
           repository: neteast-software/linker
           ref: 3.0.0
           path: linker-v3
+          ssh-key: ${{ secrets.LINKER_DEPLOY_KEY }}
       - uses: actions/checkout@v4
         with:
           repository: neteast-software/go-module
           ref: main
           path: modules
-          submodules: recursive
+          submodules: false
+      - name: Checkout required module submodule
+        working-directory: modules
+        run: git submodule update --init nacos-kit
       - uses: actions/setup-go@v5
         with:
           go-version: 1.26.5
