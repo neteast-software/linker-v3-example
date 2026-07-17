@@ -109,7 +109,7 @@ record-level 权限建议放在具体业务 store 的查询入口处完成。`in
 - `internal/model/inspection/archive.go`：外部维护表资产示例，只改业务 model 和 component asset，使用 `postgresql.External()` 避免启动期迁移。
 - `internal/component/notification`、`internal/service/notification`、`internal/route/notification`：MQ consumer、cron job、SSE route 和 provider mock 的长生命周期组合；观测 wrapper 由 MQ/cron adapter 统一装配。
 - `observe/metrics/prometheus/linker`、`observe/tracing/opentelemetry/linker`：标准 metrics/tracing 组件；example 不维护平行 recorder capability 或手写 interceptor chain。
-- `license/http/gin`：示例只在需要保护的入口显式挂 `licensehttp.Gate(gate)`；license 不进入 core，也不默认挂到 server framework。
+- `license/http/gin`：示例只在需要保护的入口显式挂 `license.Gate(gate)`；license 不进入 core，也不默认挂到 server framework。
 - `internal/rpc/tts`、`internal/client/tts`、`internal/component/tts`：gRPC server/client 的声明、注册、trace/metrics interceptor 和 capability provider。
 - `internal/client/directory`：出站 HTTP typed client 示例，第三方用户目录 API 的业务语义在这里承载，通用 HTTP 执行者来自 `http/client` capability。
 

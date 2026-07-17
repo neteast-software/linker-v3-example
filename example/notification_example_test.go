@@ -17,8 +17,8 @@ import (
 	consumer "github.com/neteast-software/go-module/mq/consumer"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
 	prometheus "github.com/neteast-software/go-module/observe/metrics/prometheus/linker"
-	"github.com/neteast-software/go-module/observe/tracing"
-	traceconsumer "github.com/neteast-software/go-module/observe/tracing/mq/consumer"
+	trace "github.com/neteast-software/go-module/observe/tracing"
+	"github.com/neteast-software/go-module/observe/tracing/mq/consumer"
 	opentelemetry "github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker"
 	cron "github.com/neteast-software/go-module/scheduler/cron"
 	schedule "github.com/neteast-software/go-module/scheduler/cron/linker"
@@ -84,8 +84,8 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	if err != nil {
 		t.Fatalf("consumer capability: %v", err)
 	}
-	mqCtx, _ := tracing.Ensure(context.Background(), tracing.WithTraceID(exampleTraceID), tracing.WithSpanID(exampleSpanID))
-	message := traceconsumer.InjectMessage(mqCtx, consumer.Message{
+	mqCtx, _ := trace.Ensure(context.Background(), trace.WithTraceID(exampleTraceID), trace.WithSpanID(exampleSpanID))
+	message := tracing.InjectMessage(mqCtx, consumer.Message{
 		Topic: "notification.message",
 		Key:   "n1",
 		Body:  []byte("hello notification"),
@@ -117,8 +117,8 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		t.Fatalf("new send request: %v", err)
 	}
 	sendReq.Header.Set("Content-Type", "application/json")
-	sendReq.Header.Set(tracing.HeaderTraceID, httpMQTraceID)
-	sendReq.Header.Set(tracing.HeaderSpanID, httpMQSpanID)
+	sendReq.Header.Set(trace.HeaderTraceID, httpMQTraceID)
+	sendReq.Header.Set(trace.HeaderSpanID, httpMQSpanID)
 	sendResp, err := stdhttp.DefaultClient.Do(sendReq)
 	if err != nil {
 		t.Fatalf("post notification send: %v", err)
@@ -129,7 +129,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		t.Fatalf("read send response: %v", err)
 	}
 	if sendResp.StatusCode != stdhttp.StatusOK ||
-		sendResp.Header.Get(tracing.HeaderTraceID) != httpMQTraceID ||
+		sendResp.Header.Get(trace.HeaderTraceID) != httpMQTraceID ||
 		!strings.Contains(string(sendPayload), "queued") {
 		t.Fatalf("unexpected send response: status=%d header=%#v body=%q", sendResp.StatusCode, sendResp.Header, sendPayload)
 	}
@@ -149,8 +149,8 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	if err != nil {
 		t.Fatalf("new sse request: %v", err)
 	}
-	sseReq.Header.Set(tracing.HeaderTraceID, sseTraceID)
-	sseReq.Header.Set(tracing.HeaderSpanID, sseSpanID)
+	sseReq.Header.Set(trace.HeaderTraceID, sseTraceID)
+	sseReq.Header.Set(trace.HeaderSpanID, sseSpanID)
 	resp, err := stdhttp.DefaultClient.Do(sseReq)
 	if err != nil {
 		t.Fatalf("get sse: %v", err)
@@ -162,7 +162,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	}
 	if resp.StatusCode != stdhttp.StatusOK ||
 		!strings.Contains(resp.Header.Get("Content-Type"), "text/event-stream") ||
-		resp.Header.Get(tracing.HeaderTraceID) != sseTraceID ||
+		resp.Header.Get(trace.HeaderTraceID) != sseTraceID ||
 		!strings.Contains(string(body), "ready") {
 		t.Fatalf("unexpected sse response: status=%d content-type=%q body=%q", resp.StatusCode, resp.Header.Get("Content-Type"), body)
 	}

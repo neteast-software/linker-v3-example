@@ -13,8 +13,8 @@ import (
 	consumer "github.com/neteast-software/go-module/mq/consumer"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
 	prometheus "github.com/neteast-software/go-module/observe/metrics/prometheus/linker"
-	"github.com/neteast-software/go-module/observe/tracing"
-	traceconsumer "github.com/neteast-software/go-module/observe/tracing/mq/consumer"
+	trace "github.com/neteast-software/go-module/observe/tracing"
+	"github.com/neteast-software/go-module/observe/tracing/mq/consumer"
 	opentelemetry "github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker"
 	rpccore "github.com/neteast-software/go-module/rpc/grpc"
 	rpc "github.com/neteast-software/go-module/rpc/grpc/linker"
@@ -36,17 +36,17 @@ func TestFrameworkObservabilityExample(t *testing.T) {
 		Enabled: true, Namespace: "linker_v3_example", ConstLabels: map[string]string{"service": "observability-example"},
 	}))
 	traceComponent := opentelemetry.New(opentelemetry.WithConfig(opentelemetry.InMemory("linker-v3-example")))
-	mqTrace := make(chan tracing.Trace, 1)
+	mqTrace := make(chan trace.Trace, 1)
 	item := consumer.New("trace", consumer.HandlerFunc(func(ctx context.Context, _ consumer.Message) error {
-		trace, _ := tracing.FromContext(ctx)
-		mqTrace <- trace
+		current, _ := trace.FromContext(ctx)
+		mqTrace <- current
 		return nil
 	}), consumer.WithTopic("trace.message"))
-	cronTrace := make(chan tracing.Trace, 1)
+	cronTrace := make(chan trace.Trace, 1)
 	job := cron.NewJob("trace.job", "@every 10ms", cron.HandlerFunc(func(ctx context.Context) error {
-		trace, _ := tracing.FromContext(ctx)
+		current, _ := trace.FromContext(ctx)
 		select {
-		case cronTrace <- trace:
+		case cronTrace <- current:
 		default:
 		}
 		return nil
@@ -93,13 +93,13 @@ func TestFrameworkObservabilityExample(t *testing.T) {
 	baseURL := "http://" + httpServer.Addr()
 
 	grpcResponse := traceRequest(t, baseURL+"/trace/grpc", exampleTraceID, exampleSpanID)
-	if grpcResponse.Header.Get(tracing.HeaderTraceID) != exampleTraceID {
-		t.Fatalf("gRPC response trace = %q", grpcResponse.Header.Get(tracing.HeaderTraceID))
+	if grpcResponse.Header.Get(trace.HeaderTraceID) != exampleTraceID {
+		t.Fatalf("gRPC response trace = %q", grpcResponse.Header.Get(trace.HeaderTraceID))
 	}
 	_ = grpcResponse.Body.Close()
 	mqResponse := traceRequest(t, baseURL+"/trace/mq", httpMQTraceID, httpMQSpanID)
-	if mqResponse.Header.Get(tracing.HeaderTraceID) != httpMQTraceID {
-		t.Fatalf("MQ response trace = %q", mqResponse.Header.Get(tracing.HeaderTraceID))
+	if mqResponse.Header.Get(trace.HeaderTraceID) != httpMQTraceID {
+		t.Fatalf("MQ response trace = %q", mqResponse.Header.Get(trace.HeaderTraceID))
 	}
 	_ = mqResponse.Body.Close()
 
@@ -111,7 +111,7 @@ func TestFrameworkObservabilityExample(t *testing.T) {
 	case <-time.After(2 * time.Second):
 		t.Fatal("等待 MQ trace 超时")
 	}
-	var scheduled tracing.Trace
+	var scheduled trace.Trace
 	select {
 	case scheduled = <-cronTrace:
 	case <-time.After(2 * time.Second):
@@ -176,7 +176,7 @@ func traceMQ(c *http.Context) {
 		c.Status(stdhttp.StatusServiceUnavailable)
 		return
 	}
-	message := traceconsumer.InjectMessage(c.Request.Context(), consumer.Message{Topic: "trace.message", Body: []byte("trace")})
+	message := tracing.InjectMessage(c.Request.Context(), consumer.Message{Topic: "trace.message", Body: []byte("trace")})
 	if err = executor.Submit(c.Request.Context(), message); err != nil {
 		c.Status(stdhttp.StatusServiceUnavailable)
 		return
@@ -190,8 +190,8 @@ func traceRequest(t *testing.T, url string, traceID string, spanID string) *stdh
 	if err != nil {
 		t.Fatalf("request: %v", err)
 	}
-	req.Header.Set(tracing.HeaderTraceID, traceID)
-	req.Header.Set(tracing.HeaderSpanID, spanID)
+	req.Header.Set(trace.HeaderTraceID, traceID)
+	req.Header.Set(trace.HeaderSpanID, spanID)
 	resp, err := stdhttp.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatalf("do request: %v", err)

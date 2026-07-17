@@ -14,8 +14,8 @@ import (
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	"github.com/neteast-software/go-module/http/gin/param"
 	"github.com/neteast-software/go-module/http/gin/response"
-	"github.com/neteast-software/go-module/license"
-	licensehttp "github.com/neteast-software/go-module/license/http/gin"
+	licensecore "github.com/neteast-software/go-module/license"
+	"github.com/neteast-software/go-module/license/http/gin"
 	server "github.com/neteast-software/go-module/linker/server"
 	metricscomponent "github.com/neteast-software/go-module/observe/metrics/linker"
 	prometheus "github.com/neteast-software/go-module/observe/metrics/prometheus/linker"
@@ -30,9 +30,9 @@ func TestLinkerV3HTTPGinExample(t *testing.T) {
 	httpConfig := http.DefaultConfig()
 	httpConfig.Addr = "127.0.0.1:0"
 	now := time.Date(2026, 7, 8, 0, 0, 0, 0, time.Local)
-	gate := license.NewGate(license.New(
-		license.WithExpireAt(now.Add(-time.Second)),
-		license.WithClock(func() time.Time { return now }),
+	gate := licensecore.NewGate(licensecore.New(
+		licensecore.WithExpireAt(now.Add(-time.Second)),
+		licensecore.WithClock(func() time.Time { return now }),
 	))
 	app := server.New(
 		server.WithShutdownTimeout(3*time.Second),
@@ -57,7 +57,7 @@ func TestLinkerV3HTTPGinExample(t *testing.T) {
 			}),
 			http.GET("licensed", func(c *http.Context) {
 				response.Success(c)
-			}).With(licensehttp.Gate(gate)),
+			}).With(license.Gate(gate)),
 		),
 	)
 

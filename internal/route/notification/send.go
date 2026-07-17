@@ -6,7 +6,7 @@ import (
 	"github.com/neteast-software/go-module/http/gin/response"
 	consumer "github.com/neteast-software/go-module/mq/consumer"
 	mq "github.com/neteast-software/go-module/mq/consumer/linker"
-	traceconsumer "github.com/neteast-software/go-module/observe/tracing/mq/consumer"
+	"github.com/neteast-software/go-module/observe/tracing/mq/consumer"
 )
 
 type sendRequest struct {
@@ -36,7 +36,7 @@ func send(c *http.Context) {
 		response.Warning(c, "%s", err.Error())
 		return
 	}
-	message := traceconsumer.InjectMessage(c.Request.Context(), consumer.Message{
+	message := tracing.InjectMessage(c.Request.Context(), consumer.Message{
 		Topic: "notification.message",
 		Key:   req.Key,
 		Body:  []byte(req.Body),

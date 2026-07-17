@@ -223,6 +223,10 @@ replace github.com/neteast-software/go-module/acl/session => ../modules/acl/sess
 
 replace github.com/neteast-software/go-module/application/http/gin => ../modules/application/http/gin
 
+replace github.com/neteast-software/go-module/audit/operate/http/gin => ../modules/audit/operate/http/gin
+
+replace github.com/neteast-software/go-module/audit/operate/rpc/grpc => ../modules/audit/operate/rpc/grpc
+
 replace github.com/neteast-software/go-module/db/gorm/query => ../modules/db/gorm/query
 
 replace github.com/neteast-software/go-module/crypto/sm => ../modules/crypto/sm
@@ -235,11 +239,25 @@ replace github.com/neteast-software/go-module/observe/metrics/prometheus => ../m
 
 replace github.com/neteast-software/go-module/observe/metrics/prometheus/linker => ../modules/observe/metrics/prometheus/linker
 
+replace github.com/neteast-software/go-module/observe/metrics/fault/notice => ../modules/observe/metrics/fault/notice
+
+replace github.com/neteast-software/go-module/observe/metrics/linker/server => ../modules/observe/metrics/linker/server
+
+replace github.com/neteast-software/go-module/observe/metrics/mq/consumer => ../modules/observe/metrics/mq/consumer
+
+replace github.com/neteast-software/go-module/observe/metrics/rpc/grpc => ../modules/observe/metrics/rpc/grpc
+
 replace github.com/neteast-software/go-module/observe/metrics/scheduler/cron => ../modules/observe/metrics/scheduler/cron
 
 replace github.com/neteast-software/go-module/observe/tracing/http/client => ../modules/observe/tracing/http/client
 
+replace github.com/neteast-software/go-module/observe/tracing/mq/consumer => ../modules/observe/tracing/mq/consumer
+
+replace github.com/neteast-software/go-module/observe/tracing/rpc/grpc => ../modules/observe/tracing/rpc/grpc
+
 replace github.com/neteast-software/go-module/observe/tracing/scheduler/cron => ../modules/observe/tracing/scheduler/cron
+
+replace github.com/neteast-software/go-module/observe/tracing/task => ../modules/observe/tracing/task
 
 replace github.com/neteast-software/go-module/scheduler/cron => ../modules/scheduler/cron
 
@@ -264,5 +282,7 @@ replace github.com/neteast-software/go-module/license => ../modules/license
 replace github.com/neteast-software/go-module/license/http/gin => ../modules/license/http/gin
 
 replace github.com/neteast-software/go-module/graph/console => ../modules/graph/console
+
+replace github.com/neteast-software/go-module/linker/server => ../modules/linker/server
 
 replace github.com/neteast-software/linker/v3 => ../linker-v3

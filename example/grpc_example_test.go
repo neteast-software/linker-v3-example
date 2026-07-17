@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/neteast-software/go-module/observe/metrics"
-	metricgrpc "github.com/neteast-software/go-module/observe/metrics/rpc/grpc"
-	"github.com/neteast-software/go-module/observe/tracing"
-	tracegrpc "github.com/neteast-software/go-module/observe/tracing/rpc/grpc"
+	metricscore "github.com/neteast-software/go-module/observe/metrics"
+	"github.com/neteast-software/go-module/observe/metrics/rpc/grpc"
+	tracingcore "github.com/neteast-software/go-module/observe/tracing"
+	"github.com/neteast-software/go-module/observe/tracing/rpc/grpc"
 	rpcgrpc "github.com/neteast-software/go-module/rpc/grpc"
 	rpcmeta "github.com/neteast-software/go-module/rpc/meta"
 	stdgrpc "google.golang.org/grpc"
@@ -22,24 +22,24 @@ type exampleMetaServer interface {
 type exampleMetaService struct {
 	scope string
 	user  rpcmeta.User
-	trace tracing.Trace
+	trace tracingcore.Trace
 }
 
 func (p *exampleMetaService) Ping(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
 	p.scope, _ = rpcmeta.Scope(ctx)
 	p.user, _ = rpcmeta.UserFrom(ctx)
-	p.trace, _ = tracing.FromContext(ctx)
+	p.trace, _ = tracingcore.FromContext(ctx)
 	return &emptypb.Empty{}, nil
 }
 
 func TestGRPCMetadataExample(t *testing.T) {
 	service := &exampleMetaService{}
-	recorder := metrics.Memory()
+	recorder := metricscore.Memory()
 	server := rpcgrpc.NewServerWithOptions(
 		rpcgrpc.ServerConfig{Addr: "127.0.0.1:0"},
 		[]stdgrpc.ServerOption{stdgrpc.ChainUnaryInterceptor(
-			tracegrpc.UnaryServer(),
-			metricgrpc.UnaryServer(recorder, metricgrpc.WithConstLabels(metrics.Label("service", "example"))),
+			tracing.UnaryServer(),
+			metrics.UnaryServer(recorder, metrics.WithConstLabels(metricscore.Label("service", "example"))),
 			rpcgrpc.UnaryServerMeta(),
 		)},
 		func(server *stdgrpc.Server) {
@@ -58,8 +58,8 @@ func TestGRPCMetadataExample(t *testing.T) {
 		rpcgrpc.ClientConfig{Target: server.Addr()},
 		stdgrpc.WithTransportCredentials(insecure.NewCredentials()),
 		stdgrpc.WithChainUnaryInterceptor(
-			tracegrpc.UnaryClient(),
-			metricgrpc.UnaryClient(recorder, metricgrpc.WithConstLabels(metrics.Label("service", "example"))),
+			tracing.UnaryClient(),
+			metrics.UnaryClient(recorder, metrics.WithConstLabels(metricscore.Label("service", "example"))),
 			rpcgrpc.UnaryClientMeta(rpcmeta.System("front")),
 		),
 	)
@@ -70,7 +70,7 @@ func TestGRPCMetadataExample(t *testing.T) {
 		_ = conn.Close()
 	})
 
-	ctx, _ := tracing.Ensure(context.Background(), tracing.WithTraceID("trace-grpc-example"), tracing.WithRequestID("request-grpc-example"))
+	ctx, _ := tracingcore.Ensure(context.Background(), tracingcore.WithTraceID("trace-grpc-example"), tracingcore.WithRequestID("request-grpc-example"))
 	if err = conn.Invoke(ctx, "/example.Meta/Ping", &emptypb.Empty{}, &emptypb.Empty{}); err != nil {
 		t.Fatalf("invoke: %v", err)
 	}
@@ -96,7 +96,7 @@ func registerExampleMeta(server *stdgrpc.Server, service exampleMetaServer) {
 	}, service)
 }
 
-func assertMetricLabel(t *testing.T, recorder *metrics.MemoryRecorder, name string, label string, value string) {
+func assertMetricLabel(t *testing.T, recorder *metricscore.MemoryRecorder, name string, label string, value string) {
 	t.Helper()
 	sample, ok := recorder.Last(name)
 	if !ok {
