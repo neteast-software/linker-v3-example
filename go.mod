@@ -56,7 +56,7 @@ require (
 	github.com/neteast-software/go-module/token v0.2.0
 	github.com/neteast-software/go-module/user/account v0.0.0
 	github.com/neteast-software/grpc-discovery v0.1.0
-	github.com/neteast-software/linker/v3 v3.1.0
+	github.com/neteast-software/linker/v3 v3.2.0
 	google.golang.org/grpc v1.81.1
 	google.golang.org/protobuf v1.36.11
 	gorm.io/gorm v1.31.1
@@ -284,5 +284,3 @@ replace github.com/neteast-software/go-module/license/http/gin => ../modules/lic
 replace github.com/neteast-software/go-module/graph/console => ../modules/graph/console
 
 replace github.com/neteast-software/go-module/linker/server => ../modules/linker/server
-
-replace github.com/neteast-software/linker/v3 => ../linker-v3
