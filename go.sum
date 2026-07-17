@@ -394,8 +394,6 @@ github.com/neteast-software/go-module/token v0.2.0 h1:JijgE9RInhuR9BruMpJedLzK/g
 github.com/neteast-software/go-module/token v0.2.0/go.mod h1:ud/chVvz52kFQxpmqOw8jpCZ5DMBw2b0kOF85dhFhvw=
 github.com/neteast-software/grpc-discovery v0.1.0 h1:WBukoc/5spiQ0I5GIw2nQAEJFQQ+7rTwcsUNO7HH3us=
 github.com/neteast-software/grpc-discovery v0.1.0/go.mod h1:TZ6JCiEYGXzg+1rlzbUpNv7N7fdtfky3d68BzYhXdzM=
-github.com/neteast-software/linker/v3 v3.1.0 h1:F8v5zwMnF8+x/yurCdSoDVaNxndRr/XHG6HLMV56Kx0=
-github.com/neteast-software/linker/v3 v3.1.0/go.mod h1:WuVU+LFQfaZFsibv/BpUhMkkao29yJ1pvgIRsU/2Xpw=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
 github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc h1:Ak86L+yDSOzKFa7WM5bf5itSOo1e3Xh8bm5YCMUXIjQ=
 github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=

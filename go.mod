@@ -278,3 +278,5 @@ replace github.com/neteast-software/go-module/security/oauth => ../modules/secur
 replace github.com/neteast-software/go-module/security/oauth/http/gin => ../modules/security/oauth/http/gin
 
 replace github.com/neteast-software/go-module/security/oauth/jwt => ../modules/security/oauth/jwt
+
+replace github.com/neteast-software/linker/v3 => ../linker-v3
