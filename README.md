@@ -2,7 +2,7 @@
 
 `linker-v3-example` 是 linker v3 的演示业务系统，用来验证 framework、HTTP route、ACL resource、PostgreSQL 生命周期和业务组件声明方式。
 
-当前工具链基线为 Go `1.26.5`，framework 基线为 linker `v3.3.0`；各自治 module 按自身版本发布，精确依赖以 `go.mod` 为准。现代 Go 能力和采用边界从 linker [`GO.md`](https://github.com/neteast-software/linker/blob/v3/GO.md) 进入。`go.mod` 中剩余的本地 `replace` 只对应尚未发布的 source-ready 能力，不覆盖已经发布的 canonical API。
+当前工具链基线为 Go `1.26.5`，framework 基线为 linker `v3.3.1`；各自治 module 按自身版本发布，精确依赖以 `go.mod` 为准。现代 Go 能力和采用边界从 linker [`GO.md`](https://github.com/neteast-software/linker/blob/v3/GO.md) 进入。`go.mod` 中剩余的本地 `replace` 只对应尚未发布的 source-ready 能力，不覆盖已经发布的 canonical API。
 
 当前阶段新建 server 的关系型数据库推荐 PostgreSQL，并通过 `db/postgresql` 与可选 linker adapter 接入；这是脚手架默认选型，不让 Linker core 依赖数据库，也不削弱其他自治数据库 module。
 
@@ -55,6 +55,7 @@ go build -o ./bin/linker-v3-example .
 - `example/http_client_example_test.go`：出站 HTTP client 示例，演示 `http/client/linker` capability、Plan asset、credential、trace hook 和业务 typed client。
 - `example/oauth_example_test.go`：可选 OAuth 示例，演示 JWT provider、issuer/audience/scope 校验、Gin Bearer middleware 以及与 ACL 的组合；不进入 Linker 默认组件。
 - `example/postgresql_brownfield_example_test.go`：历史项目迁移示例，演示既有表 `External` 策略、旧 sqlc 查询层的共池共事务兼容和集中 transition Asset；新项目仍统一推荐 GORM。
+- `example/periodic_worker_example_test.go`：受管周期 Worker 示例，演示自治 Worker、Linker adapter、Plan Asset、capability 与 graceful stop。
 - `example/grpc_example_test.go`：进阶 provider 示例，演示官方 interceptor 与 metrics/tracing 组合；普通业务优先使用 typed client 和 Linker register asset。
 
 主程序和业务目录只使用能力地图 `call` 主路径。测试为了取得随机 listener 地址、发送真实请求或验证 provider 边界，可以使用明确的 `advanced_call`；棕地测试只验证 `compatibility_call`，两者都不作为新业务脚手架。
@@ -114,6 +115,7 @@ record-level 权限建议放在具体业务 store 的查询入口处完成。`in
 - `internal/route/inspection`、`internal/model/inspection`、`internal/service/inspection`、`internal/component/inspection`：接近真实业务的列表接口结构，route 负责 HTTP 参数和输出，service/store 负责批量查询和数据范围。
 - `internal/model/inspection/archive.go`：外部维护表资产示例，只改业务 model 和 component asset，使用 `postgresql.External()` 避免启动期迁移。
 - `internal/component/notification`、`internal/service/notification`、`internal/route/notification`：MQ consumer、cron job、SSE route 和 provider mock 的长生命周期组合；观测 wrapper 由 MQ/cron adapter 统一装配。
+- `worker/periodic` 与 `worker/periodic/linker`：稳定固定周期后台循环及其 framework 生命周期装配；日历表达、持久化调度仍由 `scheduler/cron` 承担。
 - `observe/metrics/prometheus/linker`、`observe/tracing/opentelemetry/linker`：标准 metrics/tracing 组件；example 不维护平行 recorder capability 或手写 interceptor chain。
 - `license/http/gin`：示例只在需要保护的入口显式挂 `license.Gate(gate)`；license 不进入 core，也不默认挂到 server framework。
 - `internal/rpc/tts`、`internal/client/tts`、`internal/component/tts`：gRPC server/client 的声明、注册、trace/metrics interceptor 和 capability provider。

@@ -20,7 +20,7 @@ require (
 	github.com/neteast-software/go-module/db/gorm/query v0.0.0
 	github.com/neteast-software/go-module/db/gorm/table v0.3.0
 	github.com/neteast-software/go-module/db/postgresql v0.3.0
-	github.com/neteast-software/go-module/db/postgresql/linker v0.2.0
+	github.com/neteast-software/go-module/db/postgresql/linker v0.3.0
 	github.com/neteast-software/go-module/fault/event v0.3.0
 	github.com/neteast-software/go-module/fault/event/linker v0.2.0
 	github.com/neteast-software/go-module/fault/notice v0.2.0
@@ -55,8 +55,10 @@ require (
 	github.com/neteast-software/go-module/scheduler/cron/linker v0.0.0
 	github.com/neteast-software/go-module/token v0.2.0
 	github.com/neteast-software/go-module/user/account v0.0.0
+	github.com/neteast-software/go-module/worker/periodic v0.1.0
+	github.com/neteast-software/go-module/worker/periodic/linker v0.1.0
 	github.com/neteast-software/grpc-discovery v0.1.0
-	github.com/neteast-software/linker/v3 v3.3.0
+	github.com/neteast-software/linker/v3 v3.3.1
 	google.golang.org/grpc v1.81.1
 	google.golang.org/protobuf v1.36.11
 	gorm.io/gorm v1.31.1

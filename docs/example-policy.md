@@ -17,7 +17,7 @@
 每个对业务开发者可见的新能力，都先判断是否需要 example：
 
 - 只影响纯工具函数，且 README 和单测已经足够时，可以不进 example。
-- 影响 component lifecycle、route、config、observability、DB、RPC、MQ、cron、SSE、ACL、license、outbox 或 graph 这类框架使用体验时，应补一个最小示例。
+- 影响 component lifecycle、route、config、observability、DB、RPC、MQ、cron、周期 Worker、SSE、ACL、license、outbox 或 graph 这类框架使用体验时，应补一个最小示例。
 - 示例只覆盖最小闭环，不追求真实业务完整度。
 - 示例必须能解释 Plan、请求路径、失败反馈或资源边界中的至少一个。
 
@@ -51,6 +51,7 @@
 - `production_http_example_test.go`：HTTP body/proxy/负载中 graceful 边界。
 - `Caddyfile`：部署层 TLS 终止样板，linker 不管理证书。
 - `nacos_example_test.go`：YAML seed、Nacos source 和 registry adapter。
+- `periodic_worker_example_test.go`：固定周期 Worker 的自治声明、Plan Asset、capability 与 graceful stop。
 
 如果单个测试文件开始承载多个不相干流程，优先按场景拆分，不把所有能力塞回一个大测试。
 

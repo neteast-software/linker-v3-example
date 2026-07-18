@@ -45,6 +45,8 @@ internal/component/<domain>/component.go
 - 组件硬依赖写 `linker.RequireComponent(postgresql.ID)`；软性的启动让位在组件自己的 `Dependencies()` 内写 core 的 `linker.StartAfter(...)`，业务装配层不改写组件依赖。
 - `server.WithComponents(...)` 的默认心智模型是声明顺序启动；遇到依赖未就绪的组件会先让位，framework 会回扫并生成最终启动顺序。
 
+稳定固定周期后台循环优先由自治 `worker/periodic.Worker` 承载，再通过 `worker/periodic/linker` 进入 framework 生命周期。需要日历表达、任务持久化或人工补跑时使用 `scheduler/cron`；单次并行处理使用 `worker/parallel`，不为每一种后台任务重复手写 goroutine、ticker 和 shutdown channel。
+
 反例：
 
 ```text
