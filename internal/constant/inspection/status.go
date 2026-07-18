@@ -3,6 +3,7 @@ package inspection
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 )
 
@@ -65,7 +66,7 @@ func Statuses() []Status {
 }
 
 func Definitions() []Definition {
-	return append([]Definition(nil), definitions...)
+	return slices.Clone(definitions)
 }
 
 func (p Status) MarshalText() ([]byte, error) {

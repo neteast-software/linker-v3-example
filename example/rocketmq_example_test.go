@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"testing"
@@ -129,10 +130,5 @@ func rocketMQTLS(t *testing.T) bool {
 }
 
 func containsRocketMQKey(keys []string, target string) bool {
-	for _, key := range keys {
-		if key == target {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(keys, target)
 }

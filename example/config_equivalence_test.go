@@ -28,7 +28,7 @@ type effectiveConfig struct {
 }
 
 func TestLocalAndNacosRootYAMLProduceEquivalentSetting(t *testing.T) {
-	content := []byte(fmt.Sprintf(`
+	content := fmt.Appendf(nil, `
 http:
   addr: 127.0.0.1:8080
   read_timeout: 2s
@@ -48,7 +48,7 @@ rpc/grpc:
   addr: 127.0.0.1:9900
 example/user:
   token_key: %s
-`, strings.Repeat("a", 32)))
+`, strings.Repeat("a", 32))
 	path := filepath.Join(t.TempDir(), "app.yaml")
 	if err := os.WriteFile(path, content, 0o600); err != nil {
 		t.Fatalf("write yaml: %v", err)

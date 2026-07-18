@@ -1,6 +1,7 @@
 package permission
 
 import (
+	"maps"
 	"slices"
 	"sync"
 )
@@ -50,10 +51,5 @@ func (p *Service) Remove(role string, resources ...string) {
 }
 
 func sorted(values map[string]struct{}) []string {
-	ret := make([]string, 0, len(values))
-	for value := range values {
-		ret = append(ret, value)
-	}
-	slices.Sort(ret)
-	return ret
+	return slices.Sorted(maps.Keys(values))
 }

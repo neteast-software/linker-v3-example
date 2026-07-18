@@ -2,6 +2,7 @@ package inspection
 
 import (
 	"context"
+	"slices"
 
 	"github.com/neteast-software/go-module/acl"
 	"github.com/neteast-software/go-module/application"
@@ -37,7 +38,7 @@ func (p Store) SaveDefaults(ctx context.Context, tasks ...inspectionmodel.Task) 
 			return err
 		}
 	}
-	records := append([]inspectionmodel.Task(nil), tasks...)
+	records := slices.Clone(tasks)
 	return p.db.WithContext(ctx).
 		Clauses(clause.OnConflict{UpdateAll: true}).
 		Create(&records).

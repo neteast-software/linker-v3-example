@@ -1,6 +1,8 @@
 package console
 
 import (
+	"slices"
+
 	"github.com/neteast-software/go-module/acl"
 	graphconsole "github.com/neteast-software/go-module/graph/console"
 	"github.com/neteast-software/go-module/graph/console/protocol"
@@ -48,5 +50,5 @@ func New(user userservice.Auth, options ...graphconsole.Option) *graphconsole.Co
 		graphconsole.WithAccess(provider),
 		graphconsole.WithNotice(provider),
 	}
-	return graphconsole.New(append(defaults, options...)...)
+	return graphconsole.New(slices.Concat(defaults, options)...)
 }

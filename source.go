@@ -61,9 +61,8 @@ func nacosSource() (linker.Source, error) {
 }
 
 func splitValues(value string) []string {
-	parts := strings.Split(value, ",")
-	ret := make([]string, 0, len(parts))
-	for _, part := range parts {
+	ret := make([]string, 0, strings.Count(value, ",")+1)
+	for part := range strings.SplitSeq(value, ",") {
 		if part = strings.TrimSpace(part); part != "" {
 			ret = append(ret, part)
 		}

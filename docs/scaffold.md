@@ -96,6 +96,8 @@ route 不做的事：
 
 model 默认表示可持久化资源映射，大多数时候就是 DB model：
 
+当前阶段新建 server 的关系型数据库默认采用 PostgreSQL；业务从 `db/postgresql` 进入，只有需要统一生命周期时才装配其 linker adapter。数据库选型不进入 Linker core。
+
 ```text
 internal/model/<domain>/<object>.go
 ```
