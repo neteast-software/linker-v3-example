@@ -3,7 +3,7 @@ module linker-v3-example
 go 1.26.5
 
 require (
-	github.com/neteast-software/go-module/acl v0.2.0
+	github.com/neteast-software/go-module/acl v0.3.0
 	github.com/neteast-software/go-module/acl/session v0.0.0
 	github.com/neteast-software/go-module/application v0.2.0
 	github.com/neteast-software/go-module/application/http/gin v0.0.0
@@ -12,51 +12,51 @@ require (
 	github.com/neteast-software/go-module/audit/operate v0.2.0
 	github.com/neteast-software/go-module/audit/operate/http/gin v0.2.0
 	github.com/neteast-software/go-module/audit/operate/linker v0.2.0
-	github.com/neteast-software/go-module/cache/redis v0.2.0
+	github.com/neteast-software/go-module/cache/redis v0.3.0
 	github.com/neteast-software/go-module/cache/redis/linker v0.2.0
-	github.com/neteast-software/go-module/config v0.2.0
+	github.com/neteast-software/go-module/config v0.3.0
 	github.com/neteast-software/go-module/config/env/linker v0.2.0
 	github.com/neteast-software/go-module/config/yaml/linker v0.2.0
 	github.com/neteast-software/go-module/db/gorm/query v0.0.0
-	github.com/neteast-software/go-module/db/gorm/table v0.2.0
-	github.com/neteast-software/go-module/db/postgresql v0.2.0
+	github.com/neteast-software/go-module/db/gorm/table v0.3.0
+	github.com/neteast-software/go-module/db/postgresql v0.3.0
 	github.com/neteast-software/go-module/db/postgresql/linker v0.2.0
-	github.com/neteast-software/go-module/fault/event v0.2.0
+	github.com/neteast-software/go-module/fault/event v0.3.0
 	github.com/neteast-software/go-module/fault/event/linker v0.2.0
 	github.com/neteast-software/go-module/fault/notice v0.2.0
 	github.com/neteast-software/go-module/fault/notice/linker v0.2.0
 	github.com/neteast-software/go-module/http/client v0.0.0
 	github.com/neteast-software/go-module/http/client/linker v0.0.0
-	github.com/neteast-software/go-module/http/gin v0.2.0
+	github.com/neteast-software/go-module/http/gin v0.3.0
 	github.com/neteast-software/go-module/linker/server v0.2.0
 	github.com/neteast-software/go-module/mq/consumer v0.2.0
 	github.com/neteast-software/go-module/mq/consumer/linker v0.2.0
 	github.com/neteast-software/go-module/mq/rocketmq v0.2.0
 	github.com/neteast-software/go-module/mq/rocketmq/linker v0.2.0
-	github.com/neteast-software/go-module/notify/feishu v0.0.0
+	github.com/neteast-software/go-module/notify/feishu v0.1.0
 	github.com/neteast-software/go-module/notify/feishu/linker v0.0.0
-	github.com/neteast-software/go-module/observe/metrics v0.2.0
-	github.com/neteast-software/go-module/observe/metrics/linker v0.2.0
+	github.com/neteast-software/go-module/observe/metrics v0.3.0
+	github.com/neteast-software/go-module/observe/metrics/linker v0.3.0
 	github.com/neteast-software/go-module/observe/metrics/prometheus/linker v0.0.0
 	github.com/neteast-software/go-module/observe/metrics/rpc/grpc v0.2.0
-	github.com/neteast-software/go-module/observe/tracing v0.2.0
-	github.com/neteast-software/go-module/observe/tracing/linker v0.2.0
+	github.com/neteast-software/go-module/observe/tracing v0.3.0
+	github.com/neteast-software/go-module/observe/tracing/linker v0.3.0
 	github.com/neteast-software/go-module/observe/tracing/mq/consumer v0.2.0
 	github.com/neteast-software/go-module/observe/tracing/opentelemetry v0.2.0
 	github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker v0.2.0
 	github.com/neteast-software/go-module/observe/tracing/rpc/grpc v0.2.0
 	github.com/neteast-software/go-module/outbox v0.2.0
-	github.com/neteast-software/go-module/registry/service v0.2.0
+	github.com/neteast-software/go-module/registry/service v0.3.0
 	github.com/neteast-software/go-module/registry/service/nacos/linker v0.0.0
 	github.com/neteast-software/go-module/rpc/grpc v0.2.0
 	github.com/neteast-software/go-module/rpc/grpc/linker v0.2.0
 	github.com/neteast-software/go-module/rpc/meta v0.2.0
-	github.com/neteast-software/go-module/scheduler/cron v0.0.0
+	github.com/neteast-software/go-module/scheduler/cron v0.1.0
 	github.com/neteast-software/go-module/scheduler/cron/linker v0.0.0
 	github.com/neteast-software/go-module/token v0.2.0
 	github.com/neteast-software/go-module/user/account v0.0.0
 	github.com/neteast-software/grpc-discovery v0.1.0
-	github.com/neteast-software/linker/v3 v3.2.0
+	github.com/neteast-software/linker/v3 v3.3.0
 	google.golang.org/grpc v1.81.1
 	google.golang.org/protobuf v1.36.11
 	gorm.io/gorm v1.31.1
@@ -121,23 +121,23 @@ require (
 	github.com/neteast-software/go-module/config/env v0.2.0 // indirect
 	github.com/neteast-software/go-module/config/yaml v0.2.0 // indirect
 	github.com/neteast-software/go-module/crypto/sm v0.0.0 // indirect
-	github.com/neteast-software/go-module/fault v0.2.0 // indirect
+	github.com/neteast-software/go-module/fault v0.3.0 // indirect
 	github.com/neteast-software/go-module/observe/metrics/fault/notice v0.2.0 // indirect
 	github.com/neteast-software/go-module/observe/metrics/http/gin v0.2.0 // indirect
 	github.com/neteast-software/go-module/observe/metrics/http/gin/linker v0.2.0 // indirect
 	github.com/neteast-software/go-module/observe/metrics/linker/server v0.2.0 // indirect
 	github.com/neteast-software/go-module/observe/metrics/mq/consumer v0.2.0 // indirect
-	github.com/neteast-software/go-module/observe/metrics/prometheus v0.0.0 // indirect
-	github.com/neteast-software/go-module/observe/metrics/scheduler/cron v0.0.0 // indirect
+	github.com/neteast-software/go-module/observe/metrics/prometheus v0.1.0 // indirect
+	github.com/neteast-software/go-module/observe/metrics/scheduler/cron v0.1.0 // indirect
 	github.com/neteast-software/go-module/observe/tracing/http/client v0.0.0 // indirect
 	github.com/neteast-software/go-module/observe/tracing/http/gin v0.2.0 // indirect
 	github.com/neteast-software/go-module/observe/tracing/http/gin/linker v0.2.0 // indirect
-	github.com/neteast-software/go-module/observe/tracing/scheduler/cron v0.0.0 // indirect
-	github.com/neteast-software/go-module/provider v0.2.0 // indirect
-	github.com/neteast-software/go-module/redact v0.2.0 // indirect
-	github.com/neteast-software/go-module/registry/service/linker v0.2.0 // indirect
+	github.com/neteast-software/go-module/observe/tracing/scheduler/cron v0.1.0 // indirect
+	github.com/neteast-software/go-module/provider v0.3.0 // indirect
+	github.com/neteast-software/go-module/redact v0.3.0 // indirect
+	github.com/neteast-software/go-module/registry/service/linker v0.3.0 // indirect
 	github.com/neteast-software/go-module/registry/service/nacos v0.0.0 // indirect
-	github.com/neteast-software/go-module/scheduler/cron/store/gorm v0.0.0 // indirect
+	github.com/neteast-software/go-module/scheduler/cron/store/gorm v0.1.0 // indirect
 	github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -196,7 +196,7 @@ require (
 	github.com/neteast-software/go-module/http/gin/linker v0.2.0
 	github.com/neteast-software/go-module/license v0.0.0
 	github.com/neteast-software/go-module/license/http/gin v0.0.0
-	github.com/neteast-software/go-module/registry/nacos v0.0.0
+	github.com/neteast-software/go-module/registry/nacos v0.1.0
 	github.com/neteast-software/go-module/registry/nacos/linker v0.0.0
 	github.com/neteast-software/go-module/security/oauth v0.1.0
 	github.com/neteast-software/go-module/security/oauth/http/gin v0.1.0
