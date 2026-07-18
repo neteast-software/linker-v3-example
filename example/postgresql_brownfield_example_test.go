@@ -46,7 +46,7 @@ func (p accountSchema) Assets(context.Context, linker.Runtime) ([]linker.Asset, 
 	}, nil
 }
 
-// sqlcDBTX 对应 sqlc 生成代码常见的小接口；postgresql.Executor 和 *sql.DB 都能满足它。
+// sqlcDBTX 模拟历史 sqlc 生成代码常见的小接口；新项目不以此作为推荐访问方案。
 type sqlcDBTX interface {
 	PrepareContext(context.Context, string) (*sql.Stmt, error)
 	ExecContext(context.Context, string, ...any) (sql.Result, error)
@@ -67,7 +67,7 @@ func (p *accountQueries) Enable(ctx context.Context, id uint64) error {
 	return err
 }
 
-// updateAccount 演示业务代码保留 sqlc 查询层，并与 GORM 使用同一个事务。
+// updateAccount 演示棕地项目保留历史 sqlc 查询层，并与 GORM 使用同一个事务。
 func updateAccount(ctx context.Context, runtime linker.Runtime, account legacyAccount) error {
 	db, err := postgresql.Require(runtime)
 	if err != nil {
@@ -81,7 +81,7 @@ func updateAccount(ctx context.Context, runtime linker.Runtime, account legacyAc
 	})
 }
 
-// readAccounts 演示普通 sqlc 查询直接借用 component 拥有的同一个连接池。
+// readAccounts 演示历史 sqlc 查询直接借用 component 拥有的同一个连接池。
 func readAccounts(runtime linker.Runtime) (*accountQueries, error) {
 	db, err := postgresql.RequireSQL(runtime)
 	if err != nil {
