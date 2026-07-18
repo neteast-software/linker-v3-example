@@ -26,6 +26,8 @@ dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
+github.com/DATA-DOG/go-sqlmock v1.5.2 h1:OcvFkGmslmlZibjAjaHm3L//6LiuBgolP7OputlJIzU=
+github.com/DATA-DOG/go-sqlmock v1.5.2/go.mod h1:88MAG/4G7SMwSE3CeA0ZKzrT5CiOU3OJ+JlNzwDqpNU=
 github.com/alibabacloud-go/alibabacloud-gateway-pop v0.0.6 h1:eIf+iGJxdU4U9ypaUfbtOWCsZSbTb8AUHvyPrxu6mAA=
 github.com/alibabacloud-go/alibabacloud-gateway-pop v0.0.6/go.mod h1:4EUIoxs/do24zMOGGqYVWgw0s9NtiylnJglOeEB5UJo=
 github.com/alibabacloud-go/alibabacloud-gateway-spi v0.0.4/go.mod h1:sCavSAvdzOjul4cEqeVtvlSaSScfNsTQ+46HwlTL1hc=
@@ -318,10 +320,6 @@ github.com/neteast-software/go-module/config/yaml/linker v0.2.0 h1:sxW0Ls+CFJkRi
 github.com/neteast-software/go-module/config/yaml/linker v0.2.0/go.mod h1:NUHfeqQcodmFJLz5jwOOcxrUwCKOrksWi3Ghdo3QaLE=
 github.com/neteast-software/go-module/db/gorm/table v0.2.0 h1:1/ruhUBxCS+LPf9lssehi8FRQAk4CExTVmekFvXltwU=
 github.com/neteast-software/go-module/db/gorm/table v0.2.0/go.mod h1:ayMxSIs5KrtW0cPm9zSQuydAQAxz0mNd5RuLxMhdCes=
-github.com/neteast-software/go-module/db/postgresql v0.2.0 h1:t9/7FNUp4432dGf1P0KkttEjz2RfVQM0HNp7tiJdTrM=
-github.com/neteast-software/go-module/db/postgresql v0.2.0/go.mod h1:cnIyqUDqBippPRN5/o0doeSa8oGoCsvb7tCrdyu0JT0=
-github.com/neteast-software/go-module/db/postgresql/linker v0.2.0 h1:QTrurpv74zhH+NBzFHiUBd6WUxKb2bBejcHC0Aom2Bg=
-github.com/neteast-software/go-module/db/postgresql/linker v0.2.0/go.mod h1:jWfpZsVFDimFKDuRCLvwSN7C3VZfamqrC3QXqvrFDas=
 github.com/neteast-software/go-module/fault v0.2.0 h1:peGaV5xtsc6G53tCGcYV2BpIIjYm9b5cZgvygo/VWsw=
 github.com/neteast-software/go-module/fault v0.2.0/go.mod h1:aGeZTKoGLJQBuFsC0l0GnxItvZQ9WBUZwPY5mbi1oU4=
 github.com/neteast-software/go-module/fault/event v0.2.0 h1:8dWC3IIQMxaxhuPhW5iBGWlooyiqXLoAjgYVYEEUFJU=

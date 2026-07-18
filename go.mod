@@ -229,6 +229,10 @@ replace github.com/neteast-software/go-module/audit/operate/rpc/grpc => ../modul
 
 replace github.com/neteast-software/go-module/db/gorm/query => ../modules/db/gorm/query
 
+replace github.com/neteast-software/go-module/db/postgresql => ../modules/db/postgresql
+
+replace github.com/neteast-software/go-module/db/postgresql/linker => ../modules/db/postgresql/linker
+
 replace github.com/neteast-software/go-module/crypto/sm => ../modules/crypto/sm
 
 replace github.com/neteast-software/go-module/notify/feishu => ../modules/notify/feishu
