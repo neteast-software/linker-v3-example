@@ -54,7 +54,7 @@ go build -o ./bin/linker-v3-example .
 - `example.tts.TTS/Transcribe`：gRPC service，演示 RPC register、typed client provider、trace 传播和表资产。
 - `example/http_client_example_test.go`：出站 HTTP client 示例，演示 `http/client/linker` capability、Plan asset、credential、trace hook 和业务 typed client。
 - `example/oauth_example_test.go`：可选 OAuth 示例，演示 JWT provider、issuer/audience/scope 校验、Gin Bearer middleware 以及与 ACL 的组合；不进入 Linker 默认组件。
-- `example/postgresql_brownfield_example_test.go`：历史项目迁移示例，演示既有表 `External` 策略、旧 sqlc 查询层的共池共事务兼容和集中 transition Asset；新项目仍统一推荐 GORM。
+- `example/postgresql_brownfield_example_test.go`：历史项目迁移示例，演示有 model 的既有表、无 model 的 SQL-only 命名表、旧 sqlc 查询层的共池共事务兼容和集中 transition Asset；新项目仍统一推荐 GORM。
 - `example/periodic_worker_example_test.go`：受管周期 Worker 示例，演示自治 Worker、Linker adapter、Plan Asset、capability 与 graceful stop。
 - `example/grpc_example_test.go`：进阶 provider 示例，演示官方 interceptor 与 metrics/tracing 组合；普通业务优先使用 typed client 和 Linker register asset。
 

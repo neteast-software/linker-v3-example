@@ -18,9 +18,9 @@ require (
 	github.com/neteast-software/go-module/config/env/linker v0.2.0
 	github.com/neteast-software/go-module/config/yaml/linker v0.2.0
 	github.com/neteast-software/go-module/db/gorm/query v0.0.0
-	github.com/neteast-software/go-module/db/gorm/table v0.3.0
+	github.com/neteast-software/go-module/db/gorm/table v0.3.1
 	github.com/neteast-software/go-module/db/postgresql v0.3.0
-	github.com/neteast-software/go-module/db/postgresql/linker v0.3.0
+	github.com/neteast-software/go-module/db/postgresql/linker v0.3.1
 	github.com/neteast-software/go-module/fault/event v0.3.0
 	github.com/neteast-software/go-module/fault/event/linker v0.2.0
 	github.com/neteast-software/go-module/fault/notice v0.2.0
@@ -230,10 +230,6 @@ replace github.com/neteast-software/go-module/audit/operate/http/gin => ../modul
 replace github.com/neteast-software/go-module/audit/operate/rpc/grpc => ../modules/audit/operate/rpc/grpc
 
 replace github.com/neteast-software/go-module/db/gorm/query => ../modules/db/gorm/query
-
-replace github.com/neteast-software/go-module/db/postgresql => ../modules/db/postgresql
-
-replace github.com/neteast-software/go-module/db/postgresql/linker => ../modules/db/postgresql/linker
 
 replace github.com/neteast-software/go-module/crypto/sm => ../modules/crypto/sm
 

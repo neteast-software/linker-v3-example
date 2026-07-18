@@ -112,6 +112,7 @@ internal/model/<domain>/<object>.go
 - 默认有 `id`，优先复用约定好的 DB head。
 - model 可以承载表名、基础格式化、转换、映射、批处理等资源自身能力。
 - 数据库约束尽量保持 GORM 兼容，不优先依赖数据库自定义函数、触发器或外键。
+- 棕地 SQL-only 表没有真实 GORM model 时，使用 PostgreSQL adapter 的 `ExternalTable` 或 `ReadOnlyTable` 按稳定表名声明；不要为资产门禁制造空 model，也不要把这种兼容入口当成新项目主路径。
 
 不推荐：
 

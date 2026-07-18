@@ -318,8 +318,12 @@ github.com/neteast-software/go-module/config/yaml v0.2.0 h1:VUvf6/lWAo558+lXYEjB
 github.com/neteast-software/go-module/config/yaml v0.2.0/go.mod h1:H2QSefu1lRe0ksYnDvBlxSnRV+L9JJ5mh92ZoTeDYtM=
 github.com/neteast-software/go-module/config/yaml/linker v0.2.0 h1:sxW0Ls+CFJkRiWw/H861NnW2bAJ1Kt9Qv32swgv/wFg=
 github.com/neteast-software/go-module/config/yaml/linker v0.2.0/go.mod h1:NUHfeqQcodmFJLz5jwOOcxrUwCKOrksWi3Ghdo3QaLE=
-github.com/neteast-software/go-module/db/gorm/table v0.3.0 h1:Nq8bMSaByXNIjHBTmZBewNa/YaD+IrD9uUlDrG/6Tms=
-github.com/neteast-software/go-module/db/gorm/table v0.3.0/go.mod h1:ayMxSIs5KrtW0cPm9zSQuydAQAxz0mNd5RuLxMhdCes=
+github.com/neteast-software/go-module/db/gorm/table v0.3.1 h1:qnSHas6ow1OpGIvdzmMrSNFJsEhx8dLNWjlczl9BD30=
+github.com/neteast-software/go-module/db/gorm/table v0.3.1/go.mod h1:ayMxSIs5KrtW0cPm9zSQuydAQAxz0mNd5RuLxMhdCes=
+github.com/neteast-software/go-module/db/postgresql v0.3.0 h1:A2J191gPkU7DPJ+FCJU6UqQnk2kAL/T7tRc7H8HsI/g=
+github.com/neteast-software/go-module/db/postgresql v0.3.0/go.mod h1:vj7+YsdOpYVuVVkqOSAJ/d1L8O4TGptszZRi29QzvPU=
+github.com/neteast-software/go-module/db/postgresql/linker v0.3.1 h1:h9DeKDDoEldD++5ac7cDnFPCalA2WDulcQ3aNHSBvx4=
+github.com/neteast-software/go-module/db/postgresql/linker v0.3.1/go.mod h1:yK+oImE42h60nxtyKavOhYoOHYwjRB6gz6cfRohYhC0=
 github.com/neteast-software/go-module/fault v0.3.0 h1:KIFNPbUlcJPICoNMG3MqFmzO0MTYdAAIYvIwTyuSK+M=
 github.com/neteast-software/go-module/fault v0.3.0/go.mod h1:aGeZTKoGLJQBuFsC0l0GnxItvZQ9WBUZwPY5mbi1oU4=
 github.com/neteast-software/go-module/fault/event v0.3.0 h1:i99pbWSIKSSakgJDEcz134cNaf32ybKTrHUEcv2lP2o=

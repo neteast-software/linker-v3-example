@@ -20,14 +20,6 @@ func (p legacyAccount) TableName() string {
 	return "legacy_account"
 }
 
-type legacyAudit struct {
-	ID uint64
-}
-
-func (p legacyAudit) TableName() string {
-	return "legacy_audit"
-}
-
 type accountSchema struct{}
 
 func (p accountSchema) Identity() linker.ID {
@@ -38,7 +30,8 @@ func (p accountSchema) Identity() linker.ID {
 func (p accountSchema) Assets(context.Context, linker.Runtime) ([]linker.Asset, error) {
 	return []linker.Asset{
 		postgresql.Table(&legacyAccount{}, postgresql.External(), postgresql.Comment("既有账号表")),
-		postgresql.Table(&legacyAudit{}, postgresql.ReadOnly(), postgresql.Comment("只读审计表")),
+		postgresql.ExternalTable("legacy_audit", postgresql.Comment("外部迁移维护的审计表")),
+		postgresql.ReadOnlyTable("public.schema_migrations", postgresql.Comment("外部迁移账本")),
 		postgresql.Transition(transition.BeforeSQL(
 			"account-status-backfill",
 			`UPDATE legacy_account SET status = 'enabled' WHERE status IS NULL`,
@@ -92,18 +85,24 @@ func readAccounts(runtime linker.Runtime) (*accountQueries, error) {
 
 func TestBrownfieldPostgreSQLDeclarations(t *testing.T) {
 	assets, err := (accountSchema{}).Assets(context.Background(), nil)
-	if err != nil || len(assets) != 3 {
+	if err != nil || len(assets) != 4 {
 		t.Fatalf("brownfield assets = %#v, %v", assets, err)
 	}
 	tableAsset, ok := assets[0].Value.(table.Table)
 	if !ok || tableAsset.Strategy.Normalize() != table.StrategyExternal {
 		t.Fatalf("既有表未声明 External: %#v", assets[0].Value)
 	}
-	readOnly, ok := assets[1].Value.(table.Table)
-	if !ok || readOnly.Strategy.Normalize() != table.StrategyReadOnly {
-		t.Fatalf("只读表未声明 ReadOnly: %#v", assets[1].Value)
+	external, ok := assets[1].Value.(table.Table)
+	if !ok || external.Name != "legacy_audit" || external.Model != nil ||
+		external.Strategy.Normalize() != table.StrategyExternal {
+		t.Fatalf("SQL-only 表未声明 External: %#v", assets[1].Value)
 	}
-	descriptions := assets[2].Descriptions()
+	readOnly, ok := assets[2].Value.(table.Table)
+	if !ok || readOnly.Name != "public.schema_migrations" || readOnly.Model != nil ||
+		readOnly.Strategy.Normalize() != table.StrategyReadOnly {
+		t.Fatalf("迁移账本未声明 ReadOnly: %#v", assets[2].Value)
+	}
+	descriptions := assets[3].Descriptions()
 	if len(descriptions) != 1 || descriptions[0].Name != "account-status-backfill" ||
 		descriptions[0].Detail["checksum"] == "" {
 		t.Fatalf("transition Plan 投影不完整: %#v", descriptions)
