@@ -53,6 +53,9 @@ go build -o ./bin/linker-v3-example .
 - `example/http_client_example_test.go`：出站 HTTP client 示例，演示 `http/client/linker` capability、Plan asset、credential、trace hook 和业务 typed client。
 - `example/oauth_example_test.go`：可选 OAuth 示例，演示 JWT provider、issuer/audience/scope 校验、Gin Bearer middleware 以及与 ACL 的组合；不进入 Linker 默认组件。
 - `example/postgresql_brownfield_example_test.go`：历史项目迁移示例，演示既有表 `External` 策略、旧 sqlc 查询层的共池共事务兼容和集中 transition Asset；新项目仍统一推荐 GORM。
+- `example/grpc_example_test.go`：进阶 provider 示例，演示官方 interceptor 与 metrics/tracing 组合；普通业务优先使用 typed client 和 Linker register asset。
+
+主程序和业务目录只使用能力地图 `call` 主路径。测试为了取得随机 listener 地址、发送真实请求或验证 provider 边界，可以使用明确的 `advanced_call`；棕地测试只验证 `compatibility_call`，两者都不作为新业务脚手架。
 
 登录链路使用 modules 的边界：
 
