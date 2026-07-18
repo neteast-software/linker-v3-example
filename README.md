@@ -216,6 +216,7 @@ RocketMQ PushConsumer 停止时会等待 SDK 当前 receive request、long poll 
 Apache RocketMQ Go SDK 5.1.4 在真实 PushConsumer 的 settings/metrics 并发路径存在上游 race detector 报告。`go test -race` 可用于复现和跟踪该边界，但当前不能作为这条真实 provider 示例的通过门禁；项目不复制私有 SDK fork，也不通过全局关闭 race detector 隐藏证据。未启用真实 RocketMQ 环境时，example 自身仍完整执行普通 `-race` 门禁。
 
 ```bash
+ruby scripts/check-go-baseline.rb
 go test ./...
 ```
 
