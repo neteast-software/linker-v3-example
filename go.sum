@@ -398,8 +398,8 @@ github.com/neteast-software/go-module/token v0.2.0 h1:JijgE9RInhuR9BruMpJedLzK/g
 github.com/neteast-software/go-module/token v0.2.0/go.mod h1:ud/chVvz52kFQxpmqOw8jpCZ5DMBw2b0kOF85dhFhvw=
 github.com/neteast-software/go-module/worker/periodic v0.1.0 h1:qLWTVknLXyjIZyhqtXEtuKduA0cBekl2smedAIxWs9A=
 github.com/neteast-software/go-module/worker/periodic v0.1.0/go.mod h1:kAbtkb8J8yPeCqvWXbUXFC1vE7Hw7xAc7hT6rhHkICA=
-github.com/neteast-software/go-module/worker/periodic/linker v0.1.0 h1:ZQ5QKMg7F4w/if4kfB8Te7dCPwnsz00HCTfITIMCvno=
-github.com/neteast-software/go-module/worker/periodic/linker v0.1.0/go.mod h1:teXUEElWylBypjfVU98tmgwI7LQ3SdeTrZBtJleVemY=
+github.com/neteast-software/go-module/worker/periodic/linker v0.1.1 h1:3EwaiyV4s6osKEYLDznY4TQG1wfv+9U5qFjLAxb8i8o=
+github.com/neteast-software/go-module/worker/periodic/linker v0.1.1/go.mod h1:teXUEElWylBypjfVU98tmgwI7LQ3SdeTrZBtJleVemY=
 github.com/neteast-software/grpc-discovery v0.1.0 h1:WBukoc/5spiQ0I5GIw2nQAEJFQQ+7rTwcsUNO7HH3us=
 github.com/neteast-software/grpc-discovery v0.1.0/go.mod h1:TZ6JCiEYGXzg+1rlzbUpNv7N7fdtfky3d68BzYhXdzM=
 github.com/neteast-software/linker/v3 v3.3.3 h1:4B7+hh/meVLumVZ6iNG2RTr7nLXe9iPWGFwXGhoRqHE=

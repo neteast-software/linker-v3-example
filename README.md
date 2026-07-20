@@ -115,7 +115,7 @@ record-level 权限建议放在具体业务 store 的查询入口处完成。`in
 - `internal/route/inspection`、`internal/model/inspection`、`internal/service/inspection`、`internal/component/inspection`：接近真实业务的列表接口结构，route 负责 HTTP 参数和输出，service/store 负责批量查询和数据范围。
 - `internal/model/inspection/archive.go`：外部维护表资产示例，只改业务 model 和 component asset，使用 `postgresql.External()` 避免启动期迁移。
 - `internal/component/notification`、`internal/service/notification`、`internal/route/notification`：MQ consumer、cron job、SSE route 和 provider mock 的长生命周期组合；观测 wrapper 由 MQ/cron adapter 统一装配。
-- `worker/periodic` 与 `worker/periodic/linker`：稳定固定周期后台循环及其 framework 生命周期装配；日历表达、持久化调度仍由 `scheduler/cron` 承担。
+- `worker/periodic` 与 `worker/periodic/linker`：稳定固定周期后台循环及其 framework 生命周期装配；`UnhealthyAfter(0)` 可声明只观测、不影响主服务健康的可选任务，日历表达和持久化调度仍由 `scheduler/cron` 承担。
 - `observe/metrics/prometheus/linker`、`observe/tracing/opentelemetry/linker`：标准 metrics/tracing 组件；example 不维护平行 recorder capability 或手写 interceptor chain。
 - `license/http/gin`：示例只在需要保护的入口显式挂 `license.Gate(gate)`；license 不进入 core，也不默认挂到 server framework。
 - `internal/rpc/tts`、`internal/client/tts`、`internal/component/tts`：gRPC server/client 的声明、注册、trace/metrics interceptor 和 capability provider。
