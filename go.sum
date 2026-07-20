@@ -300,6 +300,8 @@ github.com/neteast-software/go-module/application/store/gorm v0.2.0 h1:YgxQ2Pn+v
 github.com/neteast-software/go-module/application/store/gorm v0.2.0/go.mod h1:IXxzM7jjC1hSnwI6EzSXeGjUKN+m4e0QOax0QtCAhy8=
 github.com/neteast-software/go-module/audit/operate v0.2.0 h1:mdsbVV7MxJIAV3Y71k7+SyxXmkqDJxmZ5XocUxKEpr0=
 github.com/neteast-software/go-module/audit/operate v0.2.0/go.mod h1:+yKTAXm5EJBQzcy4B0lFtsS2a0B7bcQdeYs1wdxt+tg=
+github.com/neteast-software/go-module/audit/operate/http/gin v0.3.0 h1:MN0pTDxng5SlGGxu4mGBds4h8Raof6PcFS4+bifvciE=
+github.com/neteast-software/go-module/audit/operate/http/gin v0.3.0/go.mod h1:9rpELCZ01xZWZWsyqZ2ukKnz1oxRhYUTFi9GJu/aiRA=
 github.com/neteast-software/go-module/audit/operate/linker v0.2.0 h1:w1O+M3foH90cWqfbs0Fg114HHdUbpAaz4amngT311jU=
 github.com/neteast-software/go-module/audit/operate/linker v0.2.0/go.mod h1:4pxtlQbmysulNTLZq0mlO5LswlEEE/9BnNewtRufYDs=
 github.com/neteast-software/go-module/audit/operate/store/gorm v0.2.0 h1:Lgz/rxW71rukayh+LSf+W+v1HNEggzW8EI2H/M2RM+U=
@@ -334,10 +336,12 @@ github.com/neteast-software/go-module/fault/notice v0.2.0 h1:zcMFaCsbEeLaLyeaU7D
 github.com/neteast-software/go-module/fault/notice v0.2.0/go.mod h1:4cVOoV3h+IGx5yQUx2H/xZgsMqgSOHLqDUsh9KNLs9c=
 github.com/neteast-software/go-module/fault/notice/linker v0.2.0 h1:7Ty+P3djzUf9duPD27uvvOaPPqGdGonMSINHRG/Pthc=
 github.com/neteast-software/go-module/fault/notice/linker v0.2.0/go.mod h1:wrdLxp8JpzGsRDM5aQE2xrRTGjdeNV7n7rc3Fgstz3c=
-github.com/neteast-software/go-module/http/gin v0.3.0 h1:cEQcr2QZkx1afNXbgKRicBP/YJjTFR1IxTl1+xPDxD0=
-github.com/neteast-software/go-module/http/gin v0.3.0/go.mod h1:KWHc7DVAcfdS6ULc+FR2TxkSQE3e12C8BRte5L5LDac=
-github.com/neteast-software/go-module/http/gin/linker v0.2.0 h1:AuiarE0EYP4izUX5LT3CLqsa8Pf8ZNj3lSZPK+a3vbA=
-github.com/neteast-software/go-module/http/gin/linker v0.2.0/go.mod h1:rMg9SFbSd+42K4QpXRD1xZ1esXReLhtyZHkJoksEvKM=
+github.com/neteast-software/go-module/http/gin v0.3.1 h1:FHg/Nclt3i4kPMmK/2GdR5hjHq72/8mfNW7LsU9YZ5M=
+github.com/neteast-software/go-module/http/gin v0.3.1/go.mod h1:tE5N3PFHKgwJagAv7a2YTRTN3+35moVxoZRiiqWckgY=
+github.com/neteast-software/go-module/http/gin/linker v0.3.1 h1:cXbAu53qi+5viHnQldp1pOy58KXgA3Cq7Ju72ILVfLo=
+github.com/neteast-software/go-module/http/gin/linker v0.3.1/go.mod h1:gUpQaonhC9FbOxX+eCRbGpCPjZsXOXMb9VcgI1sIDzc=
+github.com/neteast-software/go-module/linker/server v0.2.2 h1:VYwY44/3uUrb43ijeDBwX81WH7GuTegO6/sRRFV5D9Y=
+github.com/neteast-software/go-module/linker/server v0.2.2/go.mod h1:7nukHsB0PT/WfITrOvXv5ZS8f21jhQkXxatkqu4BUWE=
 github.com/neteast-software/go-module/mq/consumer v0.2.0 h1:Tv0cjGDR19bvXwaY+kiyxQs7ScbjCMyIQloHzCSoFoM=
 github.com/neteast-software/go-module/mq/consumer v0.2.0/go.mod h1:BWnjle16lDXOC23o40ZXNvkEgjLhat3KgiZ7U5RcctQ=
 github.com/neteast-software/go-module/mq/consumer/linker v0.2.0 h1:1YT+qZ01bl9SD+9AvGAAe66y6ao0rjitQIlEgeazZKk=
@@ -398,8 +402,8 @@ github.com/neteast-software/go-module/worker/periodic/linker v0.1.0 h1:ZQ5QKMg7F
 github.com/neteast-software/go-module/worker/periodic/linker v0.1.0/go.mod h1:teXUEElWylBypjfVU98tmgwI7LQ3SdeTrZBtJleVemY=
 github.com/neteast-software/grpc-discovery v0.1.0 h1:WBukoc/5spiQ0I5GIw2nQAEJFQQ+7rTwcsUNO7HH3us=
 github.com/neteast-software/grpc-discovery v0.1.0/go.mod h1:TZ6JCiEYGXzg+1rlzbUpNv7N7fdtfky3d68BzYhXdzM=
-github.com/neteast-software/linker/v3 v3.3.1 h1:ph/gNgv8Qgjrwh7+RtHK5uEkqmg+QwIti/vPsI9iuq4=
-github.com/neteast-software/linker/v3 v3.3.1/go.mod h1:WuVU+LFQfaZFsibv/BpUhMkkao29yJ1pvgIRsU/2Xpw=
+github.com/neteast-software/linker/v3 v3.3.3 h1:4B7+hh/meVLumVZ6iNG2RTr7nLXe9iPWGFwXGhoRqHE=
+github.com/neteast-software/linker/v3 v3.3.3/go.mod h1:WuVU+LFQfaZFsibv/BpUhMkkao29yJ1pvgIRsU/2Xpw=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
 github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc h1:Ak86L+yDSOzKFa7WM5bf5itSOo1e3Xh8bm5YCMUXIjQ=
 github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=

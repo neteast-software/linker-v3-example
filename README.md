@@ -2,7 +2,7 @@
 
 `linker-v3-example` 是 linker v3 的演示业务系统，用来验证 framework、HTTP route、ACL resource、PostgreSQL 生命周期和业务组件声明方式。
 
-当前工具链基线为 Go `1.26.5`，framework 基线为 linker `v3.3.1`；各自治 module 按自身版本发布，精确依赖以 `go.mod` 为准。现代 Go 能力和采用边界从 linker [`GO.md`](https://github.com/neteast-software/linker/blob/v3/GO.md) 进入。`go.mod` 中剩余的本地 `replace` 只对应尚未发布的 source-ready 能力，不覆盖已经发布的 canonical API。
+当前工具链基线为 Go `1.26.5`，framework 基线为 linker `v3.3.3`；各自治 module 按自身版本发布，精确依赖以 `go.mod` 为准。现代 Go 能力和采用边界从 linker [`GO.md`](https://github.com/neteast-software/linker/blob/v3/GO.md) 进入。`go.mod` 中剩余的本地 `replace` 只对应尚未发布的 source-ready 能力，不覆盖已经发布的 canonical API。
 
 当前阶段新建 server 的关系型数据库推荐 PostgreSQL，并通过 `db/postgresql` 与可选 linker adapter 接入；这是脚手架默认选型，不让 Linker core 依赖数据库，也不削弱其他自治数据库 module。
 

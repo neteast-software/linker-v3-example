@@ -10,7 +10,7 @@ require (
 	github.com/neteast-software/go-module/application/linker v0.2.0
 	github.com/neteast-software/go-module/application/store/gorm v0.2.0
 	github.com/neteast-software/go-module/audit/operate v0.2.0
-	github.com/neteast-software/go-module/audit/operate/http/gin v0.2.0
+	github.com/neteast-software/go-module/audit/operate/http/gin v0.3.0
 	github.com/neteast-software/go-module/audit/operate/linker v0.2.0
 	github.com/neteast-software/go-module/cache/redis v0.3.0
 	github.com/neteast-software/go-module/cache/redis/linker v0.2.0
@@ -27,8 +27,8 @@ require (
 	github.com/neteast-software/go-module/fault/notice/linker v0.2.0
 	github.com/neteast-software/go-module/http/client v0.0.0
 	github.com/neteast-software/go-module/http/client/linker v0.0.0
-	github.com/neteast-software/go-module/http/gin v0.3.0
-	github.com/neteast-software/go-module/linker/server v0.2.0
+	github.com/neteast-software/go-module/http/gin v0.3.1
+	github.com/neteast-software/go-module/linker/server v0.2.2
 	github.com/neteast-software/go-module/mq/consumer v0.2.0
 	github.com/neteast-software/go-module/mq/consumer/linker v0.2.0
 	github.com/neteast-software/go-module/mq/rocketmq v0.2.0
@@ -58,7 +58,7 @@ require (
 	github.com/neteast-software/go-module/worker/periodic v0.1.0
 	github.com/neteast-software/go-module/worker/periodic/linker v0.1.0
 	github.com/neteast-software/grpc-discovery v0.1.0
-	github.com/neteast-software/linker/v3 v3.3.1
+	github.com/neteast-software/linker/v3 v3.3.3
 	google.golang.org/grpc v1.81.1
 	google.golang.org/protobuf v1.36.11
 	gorm.io/gorm v1.31.1
@@ -195,7 +195,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
 	github.com/neteast-software/go-module/graph/console v0.0.0
-	github.com/neteast-software/go-module/http/gin/linker v0.2.0
+	github.com/neteast-software/go-module/http/gin/linker v0.3.1
 	github.com/neteast-software/go-module/license v0.0.0
 	github.com/neteast-software/go-module/license/http/gin v0.0.0
 	github.com/neteast-software/go-module/registry/nacos v0.1.0
@@ -224,8 +224,6 @@ replace github.com/neteast-software/go-module/http/client/linker => ../modules/h
 replace github.com/neteast-software/go-module/acl/session => ../modules/acl/session
 
 replace github.com/neteast-software/go-module/application/http/gin => ../modules/application/http/gin
-
-replace github.com/neteast-software/go-module/audit/operate/http/gin => ../modules/audit/operate/http/gin
 
 replace github.com/neteast-software/go-module/audit/operate/rpc/grpc => ../modules/audit/operate/rpc/grpc
 
@@ -284,9 +282,3 @@ replace github.com/neteast-software/go-module/license => ../modules/license
 replace github.com/neteast-software/go-module/license/http/gin => ../modules/license/http/gin
 
 replace github.com/neteast-software/go-module/graph/console => ../modules/graph/console
-
-replace github.com/neteast-software/go-module/http/gin => ../modules/http/gin
-
-replace github.com/neteast-software/go-module/http/gin/linker => ../modules/http/gin/linker
-
-replace github.com/neteast-software/go-module/linker/server => ../modules/linker/server
