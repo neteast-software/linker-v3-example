@@ -25,13 +25,19 @@ func TestServerHTTPProductionBoundaryExample(t *testing.T) {
 	app := server.New(
 		server.WithShutdownTimeout(2*time.Second),
 		server.WithHTTP(config),
+		server.WithHTTPRoot(func(next stdhttp.Handler) stdhttp.Handler {
+			return stdhttp.HandlerFunc(func(w stdhttp.ResponseWriter, r *stdhttp.Request) {
+				w.Header().Set("X-HTTP-Root", "active")
+				next.ServeHTTP(w, r)
+			})
+		}),
 		server.WithHTTPRoutes(
 			http.GET("client-ip", func(c *http.Context) {
 				c.String(stdhttp.StatusOK, c.ClientIP())
 			}),
 			http.POST("upload", func(c *http.Context) {
 				c.Status(stdhttp.StatusNoContent)
-			}),
+			}).ReadBodyWithin(time.Minute),
 			http.GET("slow", func(c *http.Context) {
 				close(entered)
 				<-release
@@ -59,6 +65,9 @@ func TestServerHTTPProductionBoundaryExample(t *testing.T) {
 		_ = response.Body.Close()
 		if response.StatusCode != stdhttp.StatusOK {
 			t.Fatalf("GET %s status = %d", path, response.StatusCode)
+		}
+		if response.Header.Get("X-HTTP-Root") != "active" {
+			t.Fatalf("GET %s 未经过 HTTP root", path)
 		}
 	}
 

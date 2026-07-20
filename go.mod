@@ -285,4 +285,8 @@ replace github.com/neteast-software/go-module/license/http/gin => ../modules/lic
 
 replace github.com/neteast-software/go-module/graph/console => ../modules/graph/console
 
+replace github.com/neteast-software/go-module/http/gin => ../modules/http/gin
+
+replace github.com/neteast-software/go-module/http/gin/linker => ../modules/http/gin/linker
+
 replace github.com/neteast-software/go-module/linker/server => ../modules/linker/server
