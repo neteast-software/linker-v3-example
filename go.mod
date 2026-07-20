@@ -17,6 +17,7 @@ require (
 	github.com/neteast-software/go-module/config v0.3.0
 	github.com/neteast-software/go-module/config/env/linker v0.2.0
 	github.com/neteast-software/go-module/config/yaml/linker v0.2.0
+	github.com/neteast-software/go-module/db/gorm/model v0.0.0
 	github.com/neteast-software/go-module/db/gorm/query v0.0.0
 	github.com/neteast-software/go-module/db/gorm/table v0.3.1
 	github.com/neteast-software/go-module/db/postgresql v0.3.0
@@ -90,7 +91,7 @@ require (
 	github.com/apache/rocketmq-clients/golang/v5 v5.1.4 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bsm/redislock v0.9.4 // indirect
-	github.com/buger/jsonparser v1.1.1 // indirect
+	github.com/buger/jsonparser v1.1.2 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
@@ -228,6 +229,8 @@ replace github.com/neteast-software/go-module/application/http/gin => ../modules
 replace github.com/neteast-software/go-module/audit/operate/rpc/grpc => ../modules/audit/operate/rpc/grpc
 
 replace github.com/neteast-software/go-module/db/gorm/query => ../modules/db/gorm/query
+
+replace github.com/neteast-software/go-module/db/gorm/model => ../modules/db/gorm/model
 
 replace github.com/neteast-software/go-module/crypto/sm => ../modules/crypto/sm
 

@@ -4,7 +4,7 @@
 
 当前工具链基线为 Go `1.26.5`，framework 基线为 linker `v3.3.3`；各自治 module 按自身版本发布，精确依赖以 `go.mod` 为准。现代 Go 能力和采用边界从 linker [`GO.md`](https://github.com/neteast-software/linker/blob/v3/GO.md) 进入。`go.mod` 中剩余的本地 `replace` 只对应尚未发布的 source-ready 能力，不覆盖已经发布的 canonical API。
 
-当前阶段新建 server 的关系型数据库推荐 PostgreSQL，并通过 `db/postgresql` 与可选 linker adapter 接入；这是脚手架默认选型，不让 Linker core 依赖数据库，也不削弱其他自治数据库 module。
+当前阶段新建 server 的关系型数据库推荐 PostgreSQL，并通过 `db/postgresql` 与可选 linker adapter 接入；普通业务模型嵌入 `db/gorm/model` 的 `model.Head` 接管自增 ID。这是脚手架默认选型，不让 Linker core 依赖数据库，也不削弱其他自治数据库 module。
 
 ## 最短运行
 
@@ -100,7 +100,7 @@ func init() {
 业务代码按职责域 package 组织：
 
 - `internal/route/user`：HTTP 入口和 route 声明。
-- `internal/model/user`：数据表模型，包含 `user` 主体表和 `account` 凭据表；业务名直接成为 model/table 节点，不增加项目 prefix。
+- `internal/model/user`：数据表模型，包含 `user` 主体表和 `account` 凭据表；业务名直接成为 model/table 节点，不增加项目 prefix，并统一嵌入 `model.Head`。
 - `internal/service/user`：登录、资料读取、token/session 和存储流程；service capability key 由 service 自己声明。
 - `internal/constant/inspection`：巡检状态等稳定业务词汇，类型自己提供校验、解析、定义集和文本边界。
 - `internal/fixture/user`：只承载 example 演示数据；错误回到产生它的 service 或 route/middleware 边界，不塞进 `constant`。

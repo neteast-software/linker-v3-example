@@ -100,6 +100,8 @@ model 默认表示可持久化资源映射，大多数时候就是 DB model：
 
 当前阶段新建 server 的关系型数据库默认采用 PostgreSQL；业务从 `db/postgresql` 进入，只有需要统一生命周期时才装配其 linker adapter。数据库选型不进入 Linker core。
 
+普通业务资产从 `db/gorm/model` 嵌入 `model.Head`，由数据库和 GORM 接管 `uint64` 自增 ID、创建时间和更新时间。UUID 不作为默认主键；没有独立身份和生命周期的纯关系记录才省略 Head，使用参与方 ID 的复合主键或唯一复合索引。
+
 ```text
 internal/model/<domain>/<object>.go
 ```

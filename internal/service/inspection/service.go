@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/neteast-software/go-module/application"
-	postgresql "github.com/neteast-software/go-module/db/postgresql"
+	"github.com/neteast-software/go-module/db/gorm/model"
 
 	inspectionconstant "linker-v3-example/internal/constant/inspection"
 	inspectionmodel "linker-v3-example/internal/model/inspection"
@@ -32,6 +32,6 @@ func Seed(ctx context.Context, store Store) error {
 	)
 }
 
-func head(id uint64) postgresql.Head {
-	return postgresql.Head{ID: id}
+func head(id uint64) model.Head {
+	return model.Head{ID: id}
 }

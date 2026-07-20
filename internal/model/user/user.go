@@ -1,9 +1,9 @@
 package user
 
-import postgresql "github.com/neteast-software/go-module/db/postgresql"
+import "github.com/neteast-software/go-module/db/gorm/model"
 
 type User struct {
-	postgresql.Head
+	model.Head
 	Username string `gorm:"type:varchar(64);uniqueIndex;not null" json:"username"`
 	Avatar   string `gorm:"type:varchar(256)" json:"avatar"`
 	Email    string `gorm:"type:varchar(128);index" json:"email"`
