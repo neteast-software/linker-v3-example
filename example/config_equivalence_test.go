@@ -17,14 +17,14 @@ import (
 	rpc "github.com/neteast-software/go-module/rpc/grpc"
 	linker "github.com/neteast-software/linker/v3"
 
-	usercomponent "linker-v3-example/internal/component/user"
+	user "linker-v3-example/internal/user/linker"
 )
 
 type effectiveConfig struct {
 	http       http.Config
 	postgresql postgresql.Config
 	rpc        rpc.ServerConfig
-	user       usercomponent.Config
+	user       user.Config
 }
 
 func TestLocalAndNacosRootYAMLProduceEquivalentSetting(t *testing.T) {
@@ -92,7 +92,7 @@ func projectEffectiveConfig(t *testing.T, setting linker.Setting) effectiveConfi
 	decodeNamespace(t, setting, "http", &ret.http)
 	decodeNamespace(t, setting, "db/postgresql", &ret.postgresql)
 	decodeNamespace(t, setting, "rpc/grpc", &ret.rpc)
-	decodeNamespace(t, setting, usercomponent.Namespace, &ret.user)
+	decodeNamespace(t, setting, user.Namespace, &ret.user)
 	ret.http = ret.http.Normalize()
 	ret.postgresql = ret.postgresql.Normalize()
 	ret.rpc = ret.rpc.Normalize()

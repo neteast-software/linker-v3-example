@@ -8,13 +8,13 @@ import (
 
 	"github.com/neteast-software/go-module/outbox"
 
-	notificationservice "linker-v3-example/internal/service/notification"
+	notification "linker-v3-example/internal/notification"
 )
 
 func TestOutboxDeliveryExample(t *testing.T) {
 	ctx := context.Background()
 	store := outbox.NewMemoryStore()
-	provider := notificationservice.NewProvider()
+	provider := notification.NewProvider()
 
 	message, err := store.Enqueue(ctx, outbox.New(
 		"notification.send",

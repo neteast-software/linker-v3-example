@@ -19,35 +19,34 @@ import (
 	"github.com/neteast-software/go-module/token"
 	linker "github.com/neteast-software/linker/v3"
 
-	consolecomponent "linker-v3-example/internal/component/console"
-	ordercomponent "linker-v3-example/internal/component/order"
-	permissioncomponent "linker-v3-example/internal/component/permission"
-	usercomponent "linker-v3-example/internal/component/user"
-	usermodel "linker-v3-example/internal/model/user"
-	userservice "linker-v3-example/internal/service/user"
+	console "linker-v3-example/internal/console/linker"
+	order "linker-v3-example/internal/order/linker"
+	permission "linker-v3-example/internal/permission/linker"
+	userdata "linker-v3-example/internal/user"
+	user "linker-v3-example/internal/user/linker"
 )
 
 type graphUser struct {
-	user usermodel.User
+	user userdata.User
 }
 
-func (p *graphUser) AdminLogin(_ context.Context, username string, password string) (usermodel.User, string, error) {
+func (p *graphUser) AdminLogin(_ context.Context, username string, password string) (userdata.User, string, error) {
 	if username != "admin" || password != "demo-password" {
-		return usermodel.User{}, "", context.Canceled
+		return userdata.User{}, "", context.Canceled
 	}
 	return p.user, "graph-token", nil
 }
 
-func (p *graphUser) Current(_ context.Context, raw string, scope string) (usermodel.User, token.Claims, error) {
+func (p *graphUser) Current(_ context.Context, raw string, scope string) (userdata.User, token.Claims, error) {
 	if raw != "graph-token" || scope != "console" {
-		return usermodel.User{}, token.Claims{}, context.Canceled
+		return userdata.User{}, token.Claims{}, context.Canceled
 	}
 	return p.user, graphClaims(p.user.ID), nil
 }
 
-func (p *graphUser) Refresh(_ context.Context, raw string, scope string) (usermodel.User, token.Token, error) {
+func (p *graphUser) Refresh(_ context.Context, raw string, scope string) (userdata.User, token.Token, error) {
 	if raw != "graph-token" || scope != "console" {
-		return usermodel.User{}, token.Token{}, context.Canceled
+		return userdata.User{}, token.Token{}, context.Canceled
 	}
 	return p.user, token.Token{Raw: raw, Claims: graphClaims(p.user.ID)}, nil
 }
@@ -59,9 +58,9 @@ func (p *graphUser) Revoke(_ context.Context, raw string, scope string) error {
 	return nil
 }
 
-func (p *graphUser) ProfileByID(_ context.Context, id uint64) (usermodel.User, error) {
+func (p *graphUser) ProfileByID(_ context.Context, id uint64) (userdata.User, error) {
 	if id != p.user.ID {
-		return usermodel.User{}, context.Canceled
+		return userdata.User{}, context.Canceled
 	}
 	return p.user, nil
 }
@@ -71,24 +70,24 @@ type graphUserComponent struct {
 }
 
 func (p graphUserComponent) Identity() linker.ID {
-	return usercomponent.ID
+	return user.ID
 }
 
 func (p graphUserComponent) OnMounted(_ context.Context, runtime linker.Runtime) error {
-	return linker.Provide(runtime, userservice.AuthKey(), userservice.Auth(p.user))
+	return linker.Provide(runtime, userdata.AuthKey(), userdata.Auth(p.user))
 }
 
 func TestGraphConsoleExample(t *testing.T) {
 	httpConfig := http.DefaultConfig()
 	httpConfig.Addr = "127.0.0.1:0"
-	user := &graphUser{user: usermodel.User{
+	current := &graphUser{user: userdata.User{
 		Username: "admin",
 		Avatar:   "https://static.neteast.cn/avatar/admin.png",
 		Email:    "admin@neteast.cn",
 		Phone:    "18558755877",
 		Role:     "admin",
 	}}
-	user.user.ID = 1
+	current.user.ID = 1
 	app := server.New(
 		server.WithShutdownTimeout(3*time.Second),
 		server.WithHTTP(httpConfig),
@@ -99,10 +98,10 @@ func TestGraphConsoleExample(t *testing.T) {
 					ID: "app2", Scope: "app2", Name: "应用二", Status: applicationcore.StatusEnabled,
 				}),
 			),
-			graphUserComponent{user: user},
-			ordercomponent.New(),
-			permissioncomponent.New(),
-			consolecomponent.New(user, graphconsole.WithStatic(fstest.MapFS{
+			graphUserComponent{user: current},
+			order.New(),
+			permission.New(),
+			console.New(current, graphconsole.WithStatic(fstest.MapFS{
 				"index.html":    {Data: []byte("<!doctype html><title>Graph Console</title>")},
 				"assets/app.js": {Data: []byte("console.log('graph-console')")},
 			})),
@@ -112,9 +111,9 @@ func TestGraphConsoleExample(t *testing.T) {
 	plan := preparedPlan(t, app)
 	for _, id := range []linker.ID{
 		graphconsole.ID,
-		ordercomponent.ID,
-		permissioncomponent.ID,
-		usercomponent.ID,
+		order.ID,
+		permission.ID,
+		user.ID,
 	} {
 		if !planHasComponent(plan, id) {
 			t.Fatalf("plan missing component %s: %#v", id, plan.Components)

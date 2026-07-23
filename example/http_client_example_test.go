@@ -12,7 +12,7 @@ import (
 	clientcomponent "github.com/neteast-software/go-module/http/client/linker"
 	linker "github.com/neteast-software/linker/v3"
 
-	"linker-v3-example/internal/client/directory"
+	"linker-v3-example/internal/directory"
 )
 
 func TestHTTPClientExample(t *testing.T) {

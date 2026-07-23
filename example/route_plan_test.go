@@ -6,7 +6,7 @@ import (
 
 	http "github.com/neteast-software/go-module/http/gin/linker"
 
-	_ "linker-v3-example/internal/route/user"
+	_ "linker-v3-example/internal/user/http"
 )
 
 func TestStaticRoutePlanShowsApp2ResourceAndMiddleware(t *testing.T) {

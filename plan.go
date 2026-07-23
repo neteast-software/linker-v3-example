@@ -10,7 +10,7 @@ import (
 	linker "github.com/neteast-software/linker/v3"
 
 	"linker-v3-example/internal/app"
-	usercomponent "linker-v3-example/internal/component/user"
+	user "linker-v3-example/internal/user/linker"
 )
 
 func printPlan(output io.Writer) error {
@@ -36,14 +36,14 @@ func planSecretSource() (linker.Source, error) {
 	if _, err := rand.Read(value); err != nil {
 		return nil, err
 	}
-	content, err := json.Marshal(usercomponent.Config{TokenKey: hex.EncodeToString(value)})
+	content, err := json.Marshal(user.Config{TokenKey: hex.EncodeToString(value)})
 	if err != nil {
 		return nil, err
 	}
 	return linker.MapSource{
 		Label: "config/plan-secret",
 		Setting: linker.NewSetting(map[linker.Namespace][]byte{
-			usercomponent.Namespace: content,
+			user.Namespace: content,
 		}),
 	}, nil
 }

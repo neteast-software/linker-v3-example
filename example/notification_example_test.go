@@ -24,15 +24,15 @@ import (
 	schedule "github.com/neteast-software/go-module/scheduler/cron/linker"
 	linker "github.com/neteast-software/linker/v3"
 
-	notificationcomponent "linker-v3-example/internal/component/notification"
-	notificationservice "linker-v3-example/internal/service/notification"
+	notificationdata "linker-v3-example/internal/notification"
+	notification "linker-v3-example/internal/notification/linker"
 )
 
 func TestNotificationLifecycleExample(t *testing.T) {
 	eventRecorder := eventcore.NewMemoryRecorder()
 	auditRecorder := auditcore.NewMemoryRecorder()
-	notification := notificationcomponent.NewComponent(
-		notificationcomponent.WithCronSpec("@every 1s"),
+	notifier := notification.NewComponent(
+		notification.WithCronSpec("@every 1s"),
 	)
 	metricComponent := prometheus.New(prometheus.WithConfig(prometheus.Config{
 		Enabled: true, Namespace: "linker_v3_example", ConstLabels: map[string]string{"service": "example"},
@@ -49,7 +49,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		server.WithMetrics(metricComponent),
 		server.WithComponents(
 			traceComponent,
-			notification,
+			notifier,
 			mq.New(),
 			schedule.New(
 				schedule.WithStore(cron.NewMemoryStore()),
@@ -94,8 +94,8 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		t.Fatalf("submit: %v", err)
 	}
 	waitFor(t, 2*time.Second, func() bool {
-		return hasProviderMessage(notification.Provider().Messages(), "mq") &&
-			hasProviderTrace(notification.Provider().Messages(), "mq", exampleTraceID) &&
+		return hasProviderMessage(notifier.Provider().Messages(), "mq") &&
+			hasProviderTrace(notifier.Provider().Messages(), "mq", exampleTraceID) &&
 			len(auditRecorder.Records()) > 0 &&
 			len(eventRecorder.Events()) > 0
 	})
@@ -134,7 +134,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		t.Fatalf("unexpected send response: status=%d header=%#v body=%q", sendResp.StatusCode, sendResp.Header, sendPayload)
 	}
 	waitFor(t, 2*time.Second, func() bool {
-		return hasProviderTrace(notification.Provider().Messages(), "mq", httpMQTraceID)
+		return hasProviderTrace(notifier.Provider().Messages(), "mq", httpMQTraceID)
 	})
 	waitFor(t, time.Second, func() bool {
 		return hasAuditRecord(
@@ -168,8 +168,8 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	}
 
 	waitFor(t, 2500*time.Millisecond, func() bool {
-		return hasProviderMessage(notification.Provider().Messages(), "cron") &&
-			hasProviderNonEmptyTrace(notification.Provider().Messages(), "cron")
+		return hasProviderMessage(notifier.Provider().Messages(), "cron") &&
+			hasProviderNonEmptyTrace(notifier.Provider().Messages(), "cron")
 	})
 	metricsText := getRaw(t, "http://"+httpServer.Addr()+"/metrics")
 	assertMetricText(t, metricsText, "linker_v3_example_mq_consumer_messages_total", "status", "handled")
@@ -204,7 +204,7 @@ func planHasRouteAsset(plan linker.Plan, method string, path string, resource st
 	return false
 }
 
-func hasProviderMessage(messages []notificationservice.Message, source string) bool {
+func hasProviderMessage(messages []notificationdata.Message, source string) bool {
 	for _, message := range messages {
 		if message.Source == source {
 			return true
@@ -213,7 +213,7 @@ func hasProviderMessage(messages []notificationservice.Message, source string) b
 	return false
 }
 
-func hasProviderTrace(messages []notificationservice.Message, source string, traceID string) bool {
+func hasProviderTrace(messages []notificationdata.Message, source string, traceID string) bool {
 	for _, message := range messages {
 		if message.Source == source && message.TraceID == traceID {
 			return true
@@ -222,7 +222,7 @@ func hasProviderTrace(messages []notificationservice.Message, source string, tra
 	return false
 }
 
-func hasProviderNonEmptyTrace(messages []notificationservice.Message, source string) bool {
+func hasProviderNonEmptyTrace(messages []notificationdata.Message, source string) bool {
 	for _, message := range messages {
 		if message.Source == source && message.TraceID != "" {
 			return true

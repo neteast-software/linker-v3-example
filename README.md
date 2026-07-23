@@ -97,39 +97,43 @@ func init() {
 }
 ```
 
-业务代码按职责域 package 组织：
+业务代码按能力 package 组织，不再按技术职责横向切开：
 
-- `internal/route/user`：HTTP 入口和 route 声明。
-- `internal/model/user`：数据表模型，包含 `user` 主体表和 `account` 凭据表；业务名直接成为 model/table 节点，不增加项目 prefix，并统一嵌入 `model.Head`。
-- `internal/service/user`：登录、资料读取、token/session 和存储流程；service capability key 由 service 自己声明。
-- `internal/constant/inspection`：巡检状态等稳定业务词汇，类型自己提供校验、解析、定义集和文本边界。
-- `internal/fixture/user`：只承载 example 演示数据；错误回到产生它的 service 或 route/middleware 边界，不塞进 `constant`。
-- `internal/component/user`：组件 identity、linker 组件生命周期、表资产和 service capability 挂载。
-- `internal/page/*`：Graph Console 页面对象；页面只声明布局、数据展示意图、target 和 Resource，不查询数据库。
-- `internal/adapter/console`：把 user/token/session/ACL 业务边界适配为 Console provider，不污染 Graph Console 协议。
-- `internal/component/console`：集中装配 Console Component、页面、资源和 provider，不进入 linker core。
-- `internal/route/order`、`internal/service/order`：表单 target 的业务 API 与可复用流程，服务端验证始终保留。
-- `internal/route/permission`、`internal/service/permission`：multilist 的关系读写接口，最终权限判断仍由后端 middleware 完成。
+```text
+internal/
+├── app/                  # 只装配 framework 与能力适配层
+├── access/               # 跨 HTTP 入口复用的访问策略
+├── user/
+│   ├── user.go           # 可持久化业务对象
+│   ├── auth.go           # 可复用业务能力
+│   ├── store.go
+│   ├── http/             # 用户能力的 HTTP 适配
+│   └── linker/           # 用户能力的生命周期适配
+├── inspection/
+├── notification/
+├── order/
+├── permission/
+├── console/
+└── tts/
+```
 
-record-level 权限建议放在具体业务 store 的查询入口处完成。`internal/service/inspection` 用 `TaskAccess` 把 `acl.Access`、`acl.Resource` 和 `RecordRange` 组合在一起：route 只提供当前 application 和 actor，store 在一次查询里同时应用 application scope、业务 filter 和 owner range，避免为了权限判断额外做 N+1 查询或维护 RBAC 关系表。
-- `internal/route/inspection`、`internal/model/inspection`、`internal/service/inspection`、`internal/component/inspection`：接近真实业务的列表接口结构，route 负责 HTTP 参数和输出，service/store 负责批量查询和数据范围。
-- `internal/model/inspection/archive.go`：外部维护表资产示例，只改业务 model 和 component asset，使用 `postgresql.External()` 避免启动期迁移。
-- `internal/component/notification`、`internal/service/notification`、`internal/route/notification`：MQ consumer、cron job、SSE route 和 provider mock 的长生命周期组合；观测 wrapper 由 MQ/cron adapter 统一装配。
-- `worker/periodic` 与 `worker/periodic/linker`：稳定固定周期后台循环及其 framework 生命周期装配；`UnhealthyAfter(0)` 可声明只观测、不影响主服务健康的可选任务，日历表达和持久化调度仍由 `scheduler/cron` 承担。
-- `observe/metrics/prometheus/linker`、`observe/tracing/opentelemetry/linker`：标准 metrics/tracing 组件；example 不维护平行 recorder capability 或手写 interceptor chain。
-- `license/http/gin`：示例只在需要保护的入口显式挂 `license.Gate(gate)`；license 不进入 core，也不默认挂到 server framework。
-- `internal/rpc/tts`、`internal/client/tts`、`internal/component/tts`：gRPC server/client 的声明、注册、trace/metrics interceptor 和 capability provider。
-- `internal/client/directory`：出站 HTTP typed client 示例，第三方用户目录 API 的业务语义在这里承载，通用 HTTP 执行者来自 `http/client` capability。
+- `internal/user`：用户、账号、认证、session 和存储闭环；`user.User`、`user.NewStore`、`user.ServiceKey` 直接打开业务语义。
+- `internal/user/http`：一个 API 一个文件，通过 `init()` 自注册；payload、param 和 response 留在入口附近。
+- `internal/user/linker`：组件 identity、类型化配置、表 Asset 和 capability 挂载；不承载 HTTP handler。
+- `internal/inspection`：任务对象、状态、查询、数据范围和 store；`TaskAccess` 把 application、actor、resource 与 record range 合并进一次查询。
+- `internal/inspection/http`：只补充 HTTP 参数、actor 和响应投影。
+- `internal/inspection/linker`：声明普通迁移表与 `postgresql.External()` 外部维护表。
+- `internal/notification`：provider 业务闭环；其 `http` 和 `linker` 子目录分别适配 SSE/发送入口与 MQ/cron 生命周期。
+- `internal/order`、`internal/permission`：业务对象与可复用流程；各自的 `http` 目录承载 Graph Console target 对应的真实服务端校验。
+- `internal/console`：Graph Console provider、菜单、页面、ACL 投影和布局声明；`console/linker` 只完成 framework 装配。
+- `internal/tts`：RPC 协议、转写对象与服务；`tts/client`、`tts/http`、`tts/linker` 分别承担 typed client、HTTP bridge 和生命周期适配。
+- `internal/directory`：出站 HTTP typed client，业务调用表达为 `directory.New(api).Badge(ctx, userID)`。
 
-组件 identity 必须由组件 package 自己声明，例如 `component/user.ID`。需要依赖该组件时引用这个符号，不把组件 ID 放到 `constant` 或其他公共包里代管。
+依赖方向固定为 `app -> capability/linker -> capability`，HTTP 适配只依赖能力根 package。能力根不反向依赖 `app`、`http` 或 `linker`。`http`、`linker` 是技术路径，因此其中的 package 仍叫 `user`、`order` 等业务能力名。
 
-推荐边界：
+组件 identity 必须由组件自己声明，例如 `user.ID` 来自 `internal/user/linker`。依赖方引用该符号，不把 ID 放进公共常量包。带 HTTP 入口的组件 blank import 自己的 `http` 子目录，使未挂载的组件不会进入编译；route 通过 `http.Require(c, user.ServiceKey())` 获取能力，不反向依赖组件适配层。
 
-- `component/user` 不作为 HTTP controller，不出现成片的 `http.Context` handler、`response.*` 和 route tree 聚合。
-- `component/user` 不聚合所有 HTTP handler，也不替 route 维护完整 API 树。
-- `component/user` 通过 blank import 纳入 `route/user`，表示启用该组件时才编译这些 route。
-- service capability key 由 `service/user` 声明，route 通过 `http.Require(c, user.ServiceKey())` 获取能力，避免 route 反向依赖 component。
-- 跨 route middleware 应集中在明确位置；单个 API 只声明 middleware 影响面。
+跨 route 的访问策略集中在 `internal/access`，单个 API 只声明影响面。稳定固定周期后台循环由自治 `worker/periodic` 承载，再通过 `worker/periodic/linker` 进入 framework；标准 metrics/tracing 使用 `observe/metrics/prometheus/linker` 和 `observe/tracing/opentelemetry/linker`。License 仅在需要保护的入口挂载 `license/http/gin` middleware，不进入 core 或默认 server。
 
 仅在显式注入 `APP_EXAMPLE_USER__SEED_PASSWORD` 时创建本地演示数据：
 
@@ -226,14 +230,14 @@ Prometheus 可抓取 `GET /metrics`，最小 scrape、OTel Collector 和 Grafana
 
 推荐先看：
 
-- `docs/scaffold.md`：推荐项目骨架，说明 main、app、component、route、model、service、config、observability 和 example test 的边界。
+- `docs/scaffold.md`：推荐项目骨架，说明 main、app、能力根 package、HTTP/Linker 适配、持久化对象、配置、观测和测试边界。
 - `docs/example-policy.md`：说明 example 的定位、外部依赖、测试拆分和未来 submodule 边界。
 - `docs/graph-console.md`：Graph Console fixture、前端开发、同进程静态挂载和反向代理四种运行方式。
 - `main.go`：保持极薄，只分发 server 启动和 `--plan`。
 - `source.go`：只读取配置文件位置和 Nacos bootstrap 参数，按顺序声明 Source。
-- `internal/app/app.go`：集中装配 framework、组件和 adapter，不解析业务配置。
-- `internal/page/*`：viewer、form、multilist、chart、theme 和 layout 的业务声明。
-- `internal/route/order/*.go`、`internal/route/permission/*.go`：一个稳定 API 一个业务文件，route/resource/middleware 和 handler 放在同一个入口重心内。
+- `internal/app/app.go`：集中装配 framework 与能力适配层，不解析业务配置、不直连能力实现。
+- `internal/console/*`：viewer、form、multilist、chart、theme 和 layout 的业务声明。
+- `internal/order/http/*.go`、`internal/permission/http/*.go`：一个稳定 API 一个业务文件，route/resource/middleware 影响面和 handler 放在同一个入口重心内。
 - `example/graph_example_test.go`：验证 Console Component、登录/session、ACL、页面、静态挂载和业务 API。
 - `example/nacos_example_test.go`：验证 YAML seed、Nacos source、HTTP/gRPC registry adapter 和 Plan 里的依赖/capability 表达。
 - `example/nacos_provider_example_test.go`：在显式 Nacos 环境中发布独立 data id，经 Source 启动最小 App，并验证清理和关闭。

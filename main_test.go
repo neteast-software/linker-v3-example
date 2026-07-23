@@ -10,7 +10,7 @@ import (
 	postgresql "github.com/neteast-software/go-module/db/postgresql/linker"
 	linker "github.com/neteast-software/linker/v3"
 
-	usercomponent "linker-v3-example/internal/component/user"
+	user "linker-v3-example/internal/user/linker"
 )
 
 func TestPlanCommand(t *testing.T) {
@@ -56,8 +56,8 @@ func TestExampleConfigDoesNotCarryCredentials(t *testing.T) {
 		t.Fatalf("load config: %v", err)
 	}
 	for namespace, fields := range map[linker.Namespace][]string{
-		postgresql.Namespace:    {"password"},
-		usercomponent.Namespace: {"token_key", "seed_password"},
+		postgresql.Namespace: {"password"},
+		user.Namespace:       {"token_key", "seed_password"},
 	} {
 		content, ok := setting.Lookup(namespace)
 		if !ok {

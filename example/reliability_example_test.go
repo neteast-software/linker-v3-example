@@ -9,7 +9,7 @@ import (
 	server "github.com/neteast-software/go-module/linker/server"
 	linker "github.com/neteast-software/linker/v3"
 
-	inspectioncomponent "linker-v3-example/internal/component/inspection"
+	inspection "linker-v3-example/internal/inspection/linker"
 )
 
 type slowStopComponent struct{}
@@ -28,7 +28,7 @@ func (slowStopComponent) Stop(ctx context.Context) error {
 }
 
 func TestDBBackedComponentReportsMissingStoreDependency(t *testing.T) {
-	component := inspectioncomponent.NewComponent()
+	component := inspection.NewComponent()
 	runtime := linker.New(linker.WithMode(linker.Bin))
 
 	err := component.Init(context.Background(), runtime)

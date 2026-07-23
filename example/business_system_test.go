@@ -32,13 +32,13 @@ import (
 	grpcdiscovery "github.com/neteast-software/grpc-discovery"
 	linker "github.com/neteast-software/linker/v3"
 
-	exampleapp "linker-v3-example/internal/app"
-	ttsclient "linker-v3-example/internal/client/tts"
-	inspectioncomponent "linker-v3-example/internal/component/inspection"
-	notificationcomponent "linker-v3-example/internal/component/notification"
-	ttscomponent "linker-v3-example/internal/component/tts"
-	usercomponent "linker-v3-example/internal/component/user"
-	userfixture "linker-v3-example/internal/fixture/user"
+	app "linker-v3-example/internal/app"
+	inspection "linker-v3-example/internal/inspection/linker"
+	notification "linker-v3-example/internal/notification/linker"
+	ttsclient "linker-v3-example/internal/tts/client"
+	tts "linker-v3-example/internal/tts/linker"
+	userdata "linker-v3-example/internal/user"
+	user "linker-v3-example/internal/user/linker"
 )
 
 const testLoginPassword = "example-test-password"
@@ -65,12 +65,12 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 			"scope": "front",
 		},
 	}
-	app := exampleapp.New(businessConfigSource(t, map[linker.Namespace]any{
+	app := app.New(businessConfigSource(t, map[linker.Namespace]any{
 		http.Namespace:                 httpConfig,
 		rpc.Namespace:                  grpcConfig,
 		linker.Namespace(ttsclient.ID): ttsConfig,
 		postgresql.Namespace:           postgresqlConfig,
-		usercomponent.Namespace: usercomponent.Config{
+		user.Namespace: user.Config{
 			TokenKey:     strings.Repeat("a", 64),
 			SeedPassword: testLoginPassword,
 		},
@@ -83,12 +83,12 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	if !planHasComponent(plan, postgresql.ID) ||
 		!planHasComponent(plan, applicationcomponent.ID) ||
 		!planHasComponent(plan, audit.ID) ||
-		!planHasComponent(plan, inspectioncomponent.ID) ||
-		!planHasComponent(plan, notificationcomponent.ID) ||
+		!planHasComponent(plan, inspection.ID) ||
+		!planHasComponent(plan, notification.ID) ||
 		!planHasComponent(plan, metricscomponent.ID) ||
 		!planHasComponent(plan, tracingcomponent.ID) ||
-		!planHasComponent(plan, usercomponent.ID) ||
-		!planHasComponent(plan, ttscomponent.ID) ||
+		!planHasComponent(plan, user.ID) ||
+		!planHasComponent(plan, tts.ID) ||
 		!planHasComponent(plan, mq.ID) ||
 		!planHasComponent(plan, schedule.ID) ||
 		!planHasComponent(plan, rpc.ID) ||
@@ -126,10 +126,10 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	postgresqlOrder := planOrder(plan, postgresql.ID)
 	applicationOrder := planOrder(plan, applicationcomponent.ID)
 	auditOrder := planOrder(plan, audit.ID)
-	inspectionOrder := planOrder(plan, inspectioncomponent.ID)
-	notificationOrder := planOrder(plan, notificationcomponent.ID)
-	userOrder := planOrder(plan, usercomponent.ID)
-	ttsOrder := planOrder(plan, ttscomponent.ID)
+	inspectionOrder := planOrder(plan, inspection.ID)
+	notificationOrder := planOrder(plan, notification.ID)
+	userOrder := planOrder(plan, user.ID)
+	ttsOrder := planOrder(plan, tts.ID)
 	mqOrder := planOrder(plan, mq.ID)
 	cronOrder := planOrder(plan, schedule.ID)
 	rpcOrder := planOrder(plan, rpc.ID)
@@ -186,7 +186,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	}
 
 	front := postJSON(t, baseURL+"/user/login", map[string]string{
-		"phone":    userfixture.Phone,
+		"phone":    userdata.SeedPhone,
 		"password": testLoginPassword,
 	}, "")
 	frontData := responseData(t, front)
@@ -198,7 +198,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	profile := getJSON(t, baseURL+"/api/profile", token)
 	profileData := responseData(t, profile)
 	if profileData["username"] != "example_user" ||
-		profileData["phone"] != userfixture.Phone ||
+		profileData["phone"] != userdata.SeedPhone ||
 		profileData["email"] != "example.user@neteast.cn" ||
 		profileData["avatar"] == "" {
 		t.Fatalf("unexpected profile: %#v", profileData)
@@ -211,7 +211,7 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	app2Profile := getJSON(t, fmt.Sprintf("%s/api/v1/app2/user/%d/profile", baseURL, int(userID)), "")
 	app2ProfileData := responseData(t, app2Profile)
 	if app2ProfileData["username"] != "example_user" ||
-		app2ProfileData["phone"] != userfixture.Phone ||
+		app2ProfileData["phone"] != userdata.SeedPhone ||
 		app2ProfileData["application"] != "app2" {
 		t.Fatalf("unexpected app2 profile: %#v", app2ProfileData)
 	}

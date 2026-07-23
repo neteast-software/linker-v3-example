@@ -35,7 +35,7 @@ pnpm dev
 ## 3. 同进程静态挂载
 
 生产构建得到 `graph-console/dist` 后，把静态目录转换为 `fs.FS`，再作为
-`graphconsole.WithStatic(files)` 传给 `component/console.New`。Component 使用 HTTP
+`graphconsole.WithStatic(files)` 传给 `internal/console/linker` 的 `console.New`。Component 使用 HTTP
 公共 route 挂载 `/assets` 和 SPA 入口，API 继续位于 `/console`。
 
 `example/graph_example_test.go` 使用 `fstest.MapFS` 验证了相同边界。真实项目可以用

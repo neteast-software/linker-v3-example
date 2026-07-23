@@ -4,7 +4,6 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -12,35 +11,75 @@ import (
 	"testing"
 )
 
-func TestScaffoldStructureKeepsRouteOwnershipLocal(t *testing.T) {
-	assertFileNotContains(t, "../internal/app/app.go", "internal/route/")
-
-	componentFiles, err := filepath.Glob("../internal/component/*/component.go")
-	if err != nil {
-		t.Fatalf("scan component files: %v", err)
+func TestScaffoldUsesCapabilityRoots(t *testing.T) {
+	for _, name := range []string{
+		"adapter",
+		"client",
+		"component",
+		"config",
+		"constant",
+		"model",
+		"page",
+		"route",
+		"rpc",
+		"service",
+	} {
+		path := filepath.Join("../internal", name)
+		if _, err := os.Stat(path); !os.IsNotExist(err) {
+			t.Fatalf("不应恢复全局技术分层 %s: %v", path, err)
+		}
 	}
-	if len(componentFiles) == 0 {
-		t.Fatalf("missing component files")
-	}
-	for _, file := range componentFiles {
-		assertFileNotContains(t, file, "http.Context")
-		assertFileNotContains(t, file, "response.")
-		assertFileNotContains(t, file, "http.RegisterIn")
-		assertFileNotContains(t, file, "http.Routes(")
+}
 
-		domain := filepath.Base(filepath.Dir(file))
-		routeDir := filepath.Join("../internal/route", domain)
-		if _, err := os.Stat(routeDir); err == nil {
-			want := "linker-v3-example/internal/route/" + domain
-			if !hasBlankImport(t, file, want) {
-				t.Fatalf("%s should blank import %q so route declarations follow the component compile boundary", file, want)
+func TestScaffoldAdaptersKeepCapabilityPackageName(t *testing.T) {
+	for _, adapter := range []string{"client", "http", "linker"} {
+		for _, file := range adapterFiles(t, adapter) {
+			parsed, err := parser.ParseFile(token.NewFileSet(), file, nil, parser.PackageClauseOnly)
+			if err != nil {
+				t.Fatalf("解析 %s: %v", file, err)
+			}
+			capability := filepath.Base(filepath.Dir(filepath.Dir(file)))
+			if parsed.Name.Name != capability {
+				t.Fatalf("%s 是 %s 的适配层，package 应为 %q，实际为 %q", file, capability, capability, parsed.Name.Name)
 			}
 		}
 	}
 }
 
-func TestScaffoldRouteFilesSelfRegister(t *testing.T) {
-	files := goFilesUnder(t, "../internal/route")
+func TestScaffoldLinkerAdaptersOwnCompileBoundary(t *testing.T) {
+	componentFiles, err := filepath.Glob("../internal/*/linker/component.go")
+	if err != nil {
+		t.Fatalf("扫描 Linker 适配层: %v", err)
+	}
+	if len(componentFiles) == 0 {
+		t.Fatal("没有找到 Linker 组件适配层")
+	}
+	for _, file := range componentFiles {
+		for _, forbidden := range []string{"http.Context", "response.", "http.RegisterIn", "http.Routes("} {
+			assertFileNotContains(t, file, forbidden)
+		}
+
+		capability := filepath.Base(filepath.Dir(filepath.Dir(file)))
+		httpDir := filepath.Join("../internal", capability, "http")
+		if _, err := os.Stat(httpDir); err == nil {
+			want := "linker-v3-example/internal/" + capability + "/http"
+			if !hasBlankImport(t, file, want) {
+				t.Fatalf("%s 应 blank import %q，使 HTTP 声明服从组件编译边界", file, want)
+			}
+		}
+
+		content := readFile(t, file)
+		if strings.Contains(content, "type Component struct") {
+			if !strings.Contains(content, "const ID linker.ID") ||
+				!strings.Contains(content, "func (p *Component) Identity() linker.ID") {
+				t.Fatalf("%s 的组件必须自治声明 ID 和 Identity", file)
+			}
+		}
+	}
+}
+
+func TestScaffoldHTTPFilesSelfRegister(t *testing.T) {
+	files := adapterFiles(t, "http")
 	routeFiles := 0
 	for _, file := range files {
 		parsed, err := parser.ParseFile(token.NewFileSet(), file, nil, 0)
@@ -88,35 +127,57 @@ func TestScaffoldRouteFilesSelfRegister(t *testing.T) {
 		}
 	}
 	if routeFiles == 0 {
-		t.Fatal("missing self-registering route files")
+		t.Fatal("没有找到自注册 HTTP route")
 	}
 }
 
-func TestScaffoldModelNamesStayBusinessFacing(t *testing.T) {
-	for _, file := range goFilesUnder(t, "../internal/model") {
-		content := readFile(t, file)
-		for _, forbidden := range []string{"linker_v3_example_", "Model struct", "Entity struct", "DTO struct", "VO struct"} {
-			if strings.Contains(content, forbidden) {
-				t.Fatalf("model 应使用业务节点和相对语义，不应包含 %q: %s", forbidden, file)
+func TestScaffoldCapabilityRootsStayBusinessFacing(t *testing.T) {
+	entries, err := os.ReadDir("../internal")
+	if err != nil {
+		t.Fatalf("读取 internal: %v", err)
+	}
+	for _, entry := range entries {
+		if !entry.IsDir() || entry.Name() == "app" {
+			continue
+		}
+		files, err := filepath.Glob(filepath.Join("../internal", entry.Name(), "*.go"))
+		if err != nil {
+			t.Fatalf("扫描 %s: %v", entry.Name(), err)
+		}
+		for _, file := range files {
+			content := readFile(t, file)
+			for _, forbidden := range []string{"linker_v3_example_", "Model struct", "Entity struct", "DTO struct", "VO struct"} {
+				if strings.Contains(content, forbidden) {
+					t.Fatalf("能力根 package 应使用业务节点和相对语义，不应包含 %q: %s", forbidden, file)
+				}
+			}
+			for _, imported := range localImports(t, file) {
+				if imported == "linker-v3-example/internal/app" ||
+					strings.Contains(imported, "/linker") ||
+					strings.Contains(imported, "/http") {
+					t.Fatalf("能力根 package 不应反向依赖装配层或适配层 %q: %s", imported, file)
+				}
 			}
 		}
 	}
 }
 
 func TestScaffoldCentralizesMiddlewareImplementation(t *testing.T) {
-	files := goFilesUnder(t, "../internal/route")
-	for _, file := range files {
-		if filepath.Base(filepath.Dir(file)) == "middleware" {
-			continue
-		}
+	for _, file := range adapterFiles(t, "http") {
 		if strings.Contains(readFile(t, file), ".Next()") {
-			t.Fatalf("middleware 实现必须集中在 internal/route/middleware: %s", file)
+			t.Fatalf("HTTP 入口不应内嵌 middleware 实现，统一由 internal/access 承担: %s", file)
 		}
 	}
 }
 
 func TestScaffoldKeepsFrameworkAssemblySemantic(t *testing.T) {
 	app := readFile(t, "../internal/app/app.go")
+	for _, imported := range localImports(t, "../internal/app/app.go") {
+		parts := strings.Split(strings.TrimPrefix(imported, "linker-v3-example/internal/"), "/")
+		if len(parts) < 2 || parts[1] != "linker" && parts[1] != "client" {
+			t.Fatalf("internal/app 只应装配能力适配层，不应直连业务实现 %q", imported)
+		}
+	}
 	for _, forbidden := range []string{
 		"WithLifecycleObserver",
 		"WithConfigObserver",
@@ -137,16 +198,16 @@ func TestScaffoldKeepsFrameworkAssemblySemantic(t *testing.T) {
 	if !strings.Contains(app, "server.WithMetrics(prometheus.New())") {
 		t.Fatal("internal/app 应通过 framework 语义入口装配观测能力")
 	}
-	for _, file := range goFilesUnder(t, "../internal/component") {
+	for _, file := range adapterFiles(t, "linker") {
 		if strings.Contains(readFile(t, file), "NewCapabilityKey") {
-			t.Fatalf("业务 component 应使用能力归属 package 的语义入口: %s", file)
+			t.Fatalf("Linker 适配层应使用能力根 package 自己声明的能力入口: %s", file)
 		}
 	}
 }
 
 func TestScaffoldKeepsOneConfigurationPath(t *testing.T) {
 	if _, err := os.Stat("../internal/config"); !os.IsNotExist(err) {
-		t.Fatalf("global internal/config should not exist: %v", err)
+		t.Fatalf("不应建立全局 internal/config: %v", err)
 	}
 	app := readFile(t, "../internal/app/app.go")
 	for _, forbidden := range []string{
@@ -156,15 +217,15 @@ func TestScaffoldKeepsOneConfigurationPath(t *testing.T) {
 		"internal/config",
 	} {
 		if strings.Contains(app, forbidden) {
-			t.Fatalf("internal/app should not contain %q", forbidden)
+			t.Fatalf("internal/app 不应包含 %q", forbidden)
 		}
 	}
 	if !strings.Contains(app, "server.Config(sources...)") {
-		t.Fatal("internal/app should forward the single ordered Source chain")
+		t.Fatal("internal/app 应只转交一条有序 Source 配置链")
 	}
-	user := readFile(t, "../internal/component/user/component.go")
+	user := readFile(t, "../internal/user/linker/component.go")
 	if !strings.Contains(user, "func (p *Component) Bootstrap(") || !strings.Contains(user, "func (p *Component) Configs()") {
-		t.Fatal("business component should own typed config bootstrap and lifecycle mode")
+		t.Fatal("业务组件应自治声明类型化配置引导和生命周期模式")
 	}
 }
 
@@ -197,6 +258,41 @@ func hasBlankImport(t *testing.T, file string, importPath string) bool {
 	return false
 }
 
+func localImports(t *testing.T, file string) []string {
+	t.Helper()
+	parsed, err := parser.ParseFile(token.NewFileSet(), file, nil, parser.ImportsOnly)
+	if err != nil {
+		t.Fatalf("解析 %s 的 imports: %v", file, err)
+	}
+	var imports []string
+	for _, spec := range parsed.Imports {
+		path, err := strconv.Unquote(spec.Path.Value)
+		if err != nil {
+			t.Fatalf("解析 import %s: %v", spec.Path.Value, err)
+		}
+		if strings.HasPrefix(path, "linker-v3-example/internal/") {
+			imports = append(imports, path)
+		}
+	}
+	return imports
+}
+
+func adapterFiles(t *testing.T, adapter string) []string {
+	t.Helper()
+	pattern := filepath.Join("../internal", "*", adapter, "*.go")
+	files, err := filepath.Glob(pattern)
+	if err != nil {
+		t.Fatalf("扫描 %s 适配层: %v", adapter, err)
+	}
+	ret := files[:0]
+	for _, file := range files {
+		if !strings.HasSuffix(file, "_test.go") {
+			ret = append(ret, file)
+		}
+	}
+	return ret
+}
+
 func readFile(t *testing.T, file string) string {
 	t.Helper()
 	data, err := os.ReadFile(file)
@@ -204,22 +300,4 @@ func readFile(t *testing.T, file string) string {
 		t.Fatalf("read %s: %v", file, err)
 	}
 	return string(data)
-}
-
-func goFilesUnder(t *testing.T, root string) []string {
-	t.Helper()
-	var files []string
-	err := filepath.WalkDir(root, func(path string, entry fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if !entry.IsDir() && strings.HasSuffix(path, ".go") && !strings.HasSuffix(path, "_test.go") {
-			files = append(files, path)
-		}
-		return nil
-	})
-	if err != nil {
-		t.Fatalf("scan %s: %v", root, err)
-	}
-	return files
 }

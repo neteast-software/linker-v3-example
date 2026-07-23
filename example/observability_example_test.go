@@ -24,8 +24,8 @@ import (
 	stdgrpc "google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	ttsclient "linker-v3-example/internal/client/tts"
-	ttsrpc "linker-v3-example/internal/rpc/tts"
+	tts "linker-v3-example/internal/tts"
+	ttsclient "linker-v3-example/internal/tts/client"
 )
 
 func TestFrameworkObservabilityExample(t *testing.T) {
@@ -77,7 +77,7 @@ func TestFrameworkObservabilityExample(t *testing.T) {
 				schedule.WithJobs(job),
 			),
 			rpc.New(
-				rpc.WithRegisters(func(server *stdgrpc.Server) { ttsrpc.Register(server, traceTTS{}) }),
+				rpc.WithRegisters(func(server *stdgrpc.Server) { tts.Register(server, traceTTS{}) }),
 			),
 			ttsclient.Provider(),
 		),
@@ -125,8 +125,8 @@ func TestFrameworkObservabilityExample(t *testing.T) {
 	waitFor(t, time.Second, func() bool { return len(provider.Memory().Spans()) >= 6 })
 	spans := provider.Memory().Spans()
 	httpGRPC := requireTraceSpan(t, spans, "HTTP POST /trace/grpc", exampleTraceID, exampleSpanID)
-	grpcClient := requireTraceSpan(t, spans, "gRPC "+ttsrpc.FullMethodTranscribe, exampleTraceID, httpGRPC.SpanID)
-	_ = requireTraceSpan(t, spans, "gRPC "+ttsrpc.FullMethodTranscribe, exampleTraceID, grpcClient.SpanID)
+	grpcClient := requireTraceSpan(t, spans, "gRPC "+tts.FullMethodTranscribe, exampleTraceID, httpGRPC.SpanID)
+	_ = requireTraceSpan(t, spans, "gRPC "+tts.FullMethodTranscribe, exampleTraceID, grpcClient.SpanID)
 	httpMQ := requireTraceSpan(t, spans, "HTTP POST /trace/mq", httpMQTraceID, httpMQSpanID)
 	_ = requireTraceSpan(t, spans, "MQ trace.message", httpMQTraceID, httpMQ.SpanID)
 	_ = requireTraceSpan(t, spans, "cron trace.job", scheduled.TraceID, "")
