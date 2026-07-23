@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: neteast-software/linker
-          ref: v3.4.4
+          ref: v3.5.0
           path: linker-v3
           ssh-key: ${{ secrets.LINKER_DEPLOY_KEY }}
       - uses: actions/checkout@v4
