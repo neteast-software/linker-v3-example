@@ -147,7 +147,8 @@ internal/inspection/task.go
 - 表名使用单数业务名，不增加 `sys_`、`tbl_`、项目名或 `model_` prefix。
 - 对象可以自然生长格式化、转换、映射和批处理等自治能力。
 - 查询优先使用 GORM 链式 API；只有明确超出其表达范围时才使用底层 SQL。
-- 约束保持 GORM 可迁移，不优先依赖数据库函数、触发器或外键。
+- 数据库只作为可替换的持久化仓库，业务关系、规则、权限和流程由能力 package 自己拥有。
+- 新项目和新增能力不使用外键、自建函数、存储过程、触发器、事件调度器或数据库扩展承载业务语义；关系一致性由对象方法、批量校验、事务和唯一索引共同保证。
 - 数据范围、application、actor 和业务 filter 尽量合并成一次查询，避免 N+1。
 
 棕地 SQL-only 表可以通过 PostgreSQL adapter 的 `ExternalTable` 或 `ReadOnlyTable` 声明，不为门禁制造空 model。sqlc 只作为历史项目兼容路径，新项目统一采用 GORM。

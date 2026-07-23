@@ -6,6 +6,8 @@
 
 当前阶段新建 server 的关系型数据库推荐 PostgreSQL，并通过 `db/postgresql` 与可选 linker adapter 接入；普通业务模型嵌入 `db/gorm/model` 的 `model.Head` 接管自增 ID。这是脚手架默认选型，不让 Linker core 依赖数据库，也不削弱其他自治数据库 module。
 
+数据库只作为可替换的持久化仓库；业务关系、规则、权限和流程由所属能力在 Go 代码中自治实现。生产示例不使用外键、自建函数、存储过程、触发器或数据库扩展承载业务语义，关系一致性通过对象方法、批量校验、事务和唯一索引完成。
+
 ## 最短运行
 
 本地 YAML server：
