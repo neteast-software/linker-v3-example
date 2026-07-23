@@ -1,0 +1,7 @@
+schema_version: linker.generate.v1
+kind: grpc
+output: example-grpc
+grpc:
+  module: github.com/neteast-software/linker-v3-example-grpc
+  service: example
+  title: Linker gRPC 示例

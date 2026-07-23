@@ -2,7 +2,7 @@
 
 `linker-v3-example` 是 linker v3 的演示业务系统，用来验证 framework、HTTP route、ACL resource、PostgreSQL 生命周期和业务组件声明方式。
 
-当前工具链基线为 Go `1.26.5`，framework 基线为 linker `v3.3.3`；各自治 module 按自身版本发布，精确依赖以 `go.mod` 为准。现代 Go 能力和采用边界从 linker [`GO.md`](https://github.com/neteast-software/linker/blob/v3/GO.md) 进入。`go.mod` 中剩余的本地 `replace` 只对应尚未发布的 source-ready 能力，不覆盖已经发布的 canonical API。
+当前工具链基线为 Go `1.26.5`，framework 基线为 linker `v3.4.4`；各自治 module 按自身版本发布，精确依赖以 `go.mod` 为准。现代 Go 能力和采用边界从 linker [`GO.md`](https://github.com/neteast-software/linker/blob/v3/GO.md) 进入。`go.mod` 中剩余的本地 `replace` 服务于宽覆盖的 source-first 联调；已经发布且被生产源码直接使用的 adapter 不继续声明 `v0.0.0`，仍为 source-ready 的能力则保留真实边界。
 
 当前阶段新建 server 的关系型数据库推荐 PostgreSQL，并通过 `db/postgresql` 与可选 linker adapter 接入；普通业务模型嵌入 `db/gorm/model` 的 `model.Head` 接管自增 ID。这是脚手架默认选型，不让 Linker core 依赖数据库，也不削弱其他自治数据库 module。
 
@@ -196,6 +196,18 @@ go run .
 ## Example
 
 测试文件集中在 `example/` 目录。真实 PostgreSQL example 只在设置 `LINKER_V3_EXAMPLE_PG_PASSWORD` 后运行，host 默认使用 `127.0.0.1` 且可通过同前缀测试变量覆盖；当前环境不可用时会明确 skip。真实 Redis、Nacos 和 RocketMQ 样板分别由 `LINKER_V3_EXAMPLE_REDIS_ADDR`、`LINKER_V3_EXAMPLE_NACOS_HOST`、`LINKER_V3_EXAMPLE_ROCKETMQ_ENDPOINT` 显式开启；凭据只从同前缀环境变量读取。RocketMQ 的 topic/group 是部署资产，测试只引用预建名称并用唯一 message key 识别本次消息。`signal_example_test.go` 会启动真实 server 子进程，分别在 startup 和 running 阶段发送 SIGTERM，验证反向关闭和退出码，不依赖外部 provider。`production_http_example_test.go` 展示 body limit、trusted proxy、health endpoint 和负载中 graceful stop；`docs/Caddyfile` 是部署层终止 TLS 的最小样板。
+
+`scaffold/grpc.yaml` 演示 `linker generate grpc` 的最小业务输入，不复制生成后的源码。安装当前 Linker CLI 后可独立验证整个生成成果：
+
+```bash
+scripts/verify-grpc-scaffold.sh
+```
+
+联调尚未发布的 CLI 时显式传入可执行文件：
+
+```bash
+LINKER_BIN=../linker-v3/cli/linker scripts/verify-grpc-scaffold.sh
+```
 
 可选 OAuth 不需要 Linker component，直接在 route 影响面挂 middleware：
 

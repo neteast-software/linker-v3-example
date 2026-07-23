@@ -17,7 +17,7 @@ require (
 	github.com/neteast-software/go-module/config v0.3.0
 	github.com/neteast-software/go-module/config/env/linker v0.2.0
 	github.com/neteast-software/go-module/config/yaml/linker v0.2.0
-	github.com/neteast-software/go-module/db/gorm/model v0.0.0
+	github.com/neteast-software/go-module/db/gorm/model v0.1.0
 	github.com/neteast-software/go-module/db/gorm/query v0.0.0
 	github.com/neteast-software/go-module/db/gorm/table v0.3.1
 	github.com/neteast-software/go-module/db/postgresql v0.3.0
@@ -38,7 +38,7 @@ require (
 	github.com/neteast-software/go-module/notify/feishu/linker v0.0.0
 	github.com/neteast-software/go-module/observe/metrics v0.3.0
 	github.com/neteast-software/go-module/observe/metrics/linker v0.3.0
-	github.com/neteast-software/go-module/observe/metrics/prometheus/linker v0.0.0
+	github.com/neteast-software/go-module/observe/metrics/prometheus/linker v0.1.0
 	github.com/neteast-software/go-module/observe/metrics/rpc/grpc v0.2.0
 	github.com/neteast-software/go-module/observe/tracing v0.3.0
 	github.com/neteast-software/go-module/observe/tracing/linker v0.3.0
@@ -53,13 +53,13 @@ require (
 	github.com/neteast-software/go-module/rpc/grpc/linker v0.2.0
 	github.com/neteast-software/go-module/rpc/meta v0.2.0
 	github.com/neteast-software/go-module/scheduler/cron v0.1.0
-	github.com/neteast-software/go-module/scheduler/cron/linker v0.0.0
+	github.com/neteast-software/go-module/scheduler/cron/linker v0.1.0
 	github.com/neteast-software/go-module/token v0.2.0
 	github.com/neteast-software/go-module/user/account v0.0.0
 	github.com/neteast-software/go-module/worker/periodic v0.1.0
 	github.com/neteast-software/go-module/worker/periodic/linker v0.1.1
 	github.com/neteast-software/grpc-discovery v0.1.0
-	github.com/neteast-software/linker/v3 v3.3.3
+	github.com/neteast-software/linker/v3 v3.4.4
 	google.golang.org/grpc v1.81.1
 	google.golang.org/protobuf v1.36.11
 	gorm.io/gorm v1.31.1
@@ -200,7 +200,7 @@ require (
 	github.com/neteast-software/go-module/license v0.0.0
 	github.com/neteast-software/go-module/license/http/gin v0.0.0
 	github.com/neteast-software/go-module/registry/nacos v0.1.0
-	github.com/neteast-software/go-module/registry/nacos/linker v0.0.0
+	github.com/neteast-software/go-module/registry/nacos/linker v0.1.0
 	github.com/neteast-software/go-module/security/oauth v0.1.0
 	github.com/neteast-software/go-module/security/oauth/http/gin v0.1.0
 	github.com/neteast-software/go-module/security/oauth/jwt v0.1.0
@@ -230,8 +230,6 @@ replace github.com/neteast-software/go-module/audit/operate/rpc/grpc => ../modul
 
 replace github.com/neteast-software/go-module/db/gorm/query => ../modules/db/gorm/query
 
-replace github.com/neteast-software/go-module/db/gorm/model => ../modules/db/gorm/model
-
 replace github.com/neteast-software/go-module/crypto/sm => ../modules/crypto/sm
 
 replace github.com/neteast-software/go-module/notify/feishu => ../modules/notify/feishu
@@ -239,8 +237,6 @@ replace github.com/neteast-software/go-module/notify/feishu => ../modules/notify
 replace github.com/neteast-software/go-module/notify/feishu/linker => ../modules/notify/feishu/linker
 
 replace github.com/neteast-software/go-module/observe/metrics/prometheus => ../modules/observe/metrics/prometheus
-
-replace github.com/neteast-software/go-module/observe/metrics/prometheus/linker => ../modules/observe/metrics/prometheus/linker
 
 replace github.com/neteast-software/go-module/observe/metrics/fault/notice => ../modules/observe/metrics/fault/notice
 
@@ -264,13 +260,9 @@ replace github.com/neteast-software/go-module/observe/tracing/task => ../modules
 
 replace github.com/neteast-software/go-module/scheduler/cron => ../modules/scheduler/cron
 
-replace github.com/neteast-software/go-module/scheduler/cron/linker => ../modules/scheduler/cron/linker
-
 replace github.com/neteast-software/go-module/scheduler/cron/store/gorm => ../modules/scheduler/cron/store/gorm
 
 replace github.com/neteast-software/go-module/user/account => ../modules/user/account
-
-replace github.com/neteast-software/go-module/registry/nacos/linker => ../modules/registry/nacos/linker
 
 replace github.com/neteast-software/nacos-kit => ../modules/nacos-kit
 
