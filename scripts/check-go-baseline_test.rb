@@ -12,7 +12,7 @@ class ExampleGoBaselineTest < Minitest::Test
 
     assert_empty check.errors
     assert_equal "1.26.5", check.go_version
-    assert_equal "v3.3.3", check.linker_version
+    assert_equal "v3.4.4", check.linker_version
   end
 
   def test_reports_repository_projection_drift
