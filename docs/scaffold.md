@@ -20,20 +20,18 @@ internal/<capability>/
 `app` 只看见能力的装配入口：
 
 ```go
-users := user.NewComponent()
-
 return server.New(
     server.Config(sources...),
     server.WithComponents(
         postgresql.New(),
-        users,
+        user.New(),
         order.New(),
-        console.New(users.Service()),
+        console.New(),
     ),
 )
 ```
 
-业务调用方无需理解组件内部如何持久化、提供 route 或注册 capability。
+业务调用方无需读取组件内部对象，也无需重复声明 provider identity 或启动顺序。
 
 ## 能力
 
@@ -46,6 +44,7 @@ internal/user/
 ├── auth.go
 ├── store.go
 ├── http/
+│   ├── routes.go
 │   ├── profile.go
 │   └── user_login.go
 └── linker/
@@ -57,7 +56,7 @@ internal/user/
 
 ```text
 app -> capability/linker -> capability
-                     └── blank import capability/http
+                     └── capability/http
 capability/http -> capability
 capability -> autonomous modules
 ```
@@ -77,19 +76,19 @@ internal/<capability>/linker/component.go
 组件适配层可以承载：
 
 - `const ID linker.ID` 和 `Identity()`。
-- `Dependencies()`、`Assets()`、`Init()`、`OnMounted()`、`Start()`、`Stop()`。
+- `Capabilities()`、`Dependencies()`、`Assets()`、`Init()`、`Start()`、`Stop()`。
 - `Bootstrap()` 和 `Configs()`。
 - 能力的 table、RPC、consumer、job 等 Asset。
-- capability provide。
+- typed capability 的 `Offer`、`Need` 和 `Want`。
 
 约束：
 
 - 组件 identity 由组件自己声明，依赖方引用该符号，不重复字符串。
 - `*Component` 方法接收者统一使用 `p`。
 - 组件不承载 `http.Context` handler、response 或 route tree。
-- 有 HTTP 入口时，由组件 blank import `internal/<capability>/http`，使 route 服从组件编译边界。
-- 硬依赖使用 `linker.RequireComponent`；软启动次序由组件自己的 `Dependencies()` 声明。
-- `server.WithComponents` 按业务顺序声明。framework 遇到未满足依赖会让位、回扫并计算最终拓扑。
+- 有 HTTP 入口时，owner 正常 import `internal/<capability>/http`，并用 `http.Assets(Routes()...)` 声明路由所有权。
+- 运行值依赖使用 typed `linker.Need`；可选运行值使用 `linker.Want`；纯生命周期关系才使用 `Dependencies()`。
+- `server.WithComponents` 的参数顺序只服务阅读；最终顺序由 capability、component dependency 和 Asset target policy 共同计算。
 
 稳定周期任务优先使用自治 `worker/periodic`，再通过它的 Linker 适配层进入生命周期。需要日历表达、持久化或补跑时使用 `scheduler/cron`；单次并行处理使用 `worker/parallel`。
 
@@ -104,11 +103,21 @@ internal/<capability>/http/response.go
 internal/access/<policy>.go
 ```
 
-一个稳定 API 一个业务文件，并在自己的 `init()` 中注册：
+每个 HTTP package 用 `routes.go` 持有能力局部声明集合：
+
+```go
+var routes = http.NewRouteSet()
+
+func Routes() []http.Route {
+    return routes.Routes()
+}
+```
+
+一个稳定 API 一个业务文件，并在自己的 `init()` 中声明：
 
 ```go
 func init() {
-    http.RegisterIn("api/v1/app2",
+    routes.In("api/v1/app2",
         http.GET("user/:id/profile", profile).Resource(
             "http.app2.user.profile",
             acl.Scope("app2", 1, "应用二用户资料"),
@@ -122,7 +131,8 @@ route 文件集中表达 path、method、resource、scope、middleware 影响面
 要求：
 
 - 不维护中心 route tree。
-- 不让 Linker 组件代替 HTTP 文件声明入口。
+- 不使用进程全局 route registry，也不通过 blank import 代领入口。
+- API 文件负责声明入口，lifecycle owner 只转换 Asset。
 - 文件和 handler 不重复 `_api` 或 `API` 后缀。
 - payload、param、response 默认贴近入口，不强制拆 DTO/VO。
 - 跨 route 的访问策略统一放在 `internal/access`，具体 route 只声明影响面。
@@ -165,7 +175,7 @@ internal/user/service.go
 
 `service.go` 是可选文件，不是强制层。route 已经能自然闭环的入口过程留在 route；跨入口复用、具有稳定策略或生命周期的流程再进入能力根。
 
-能力 key 由能力根 package 自己声明，适配层只负责 `Provide`，调用方通过语义入口解析。避免 `UserServiceImpl`、`IUserRepository`、`UserModel` 等重复业务归属或技术路径的名称。
+能力 key 由能力根 package 自己声明，owner 通过 `Offer` 发布，consumer 通过 `Need` 或 `Want` 声明关系并用 `Resolve/Require` 取用。避免 `UserServiceImpl`、`IUserRepository`、`UserModel` 等重复业务归属或技术路径的名称。
 
 ## 出站调用
 
@@ -174,6 +184,7 @@ internal/user/service.go
 ```text
 internal/directory/client.go
 internal/tts/client/client.go
+internal/tts/client/linker/component.go
 ```
 
 - `directory.New(api).Badge(ctx, userID)` 这类调用应直接表达业务。

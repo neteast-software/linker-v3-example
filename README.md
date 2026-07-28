@@ -2,7 +2,7 @@
 
 `linker-v3-example` 是 linker v3 的演示业务系统，用来验证 framework、HTTP route、ACL resource、PostgreSQL 生命周期和业务组件声明方式。
 
-当前工具链基线为 Go `1.26.5`，framework 基线为 linker `v3.5.0`；各自治 module 按自身版本发布，精确依赖以 `go.mod` 为准。现代 Go 能力和采用边界从 linker [`GO.md`](https://github.com/neteast-software/linker/blob/v3/GO.md) 进入。当前分支处于 P17 source-first 发布验证期，本地 `replace` 只指向尚未形成远端 tag 的候选版本；正式主路径必须移除这些 replace。边界和当前分组见 [`docs/example-policy.md`](docs/example-policy.md)。
+当前工具链基线为 Go `1.26.5`，framework 基线为 linker `v3.5.0`；各自治 module 按自身版本发布，精确依赖以 `go.mod` 为准。现代 Go 能力和采用边界从 linker [`GO.md`](https://github.com/neteast-software/linker/blob/v3/GO.md) 进入。本地 `replace` 只用于联调尚未发布的 module 契约，正式主路径必须使用可追溯版本。边界和当前分组见 [`docs/example-policy.md`](docs/example-policy.md)。
 
 当前阶段新建 server 的关系型数据库推荐 PostgreSQL，并通过 `db/postgresql` 与可选 linker adapter 接入；普通业务模型嵌入 `db/gorm/model` 的 `model.Head` 接管自增 ID。这是脚手架默认选型，不让 Linker core 依赖数据库，也不削弱其他自治数据库 module。
 
@@ -70,13 +70,21 @@ go build -o ./bin/linker-v3-example .
 - `acl.Resource`：每个 route 自己声明权限资源和 scope。
 - `audit/operate`：登录这类敏感操作记录 actor、client、request、resource 和成功状态。
 
-HTTP API 按业务文件自声明 route：`system_login.go`、`user_login.go`、`profile.go` 各自通过 `init()` 注册自己的入口，常用形式是 `http.RegisterIn("api", http.GET("profile", frontProfile).Resource("http.front.user.profile", acl.Scope(...)))`。`route` 已经表达 API 归属，文件和 handler 不重复携带 `_api` / `API` 后缀；同一 package 存在多个 profile 入口时，用 `frontProfile`、`systemProfile` 这类最小业务词区分。组件声明自己的 identity、表资产、生命周期和 service capability，API 通过 `http.Require(c, user.ServiceKey())` 从 linker runtime 解析能力，不在业务侧维护全局 runtime 容器。
+HTTP API 按业务文件自声明 route。每个 HTTP package 用私有 `RouteSet` 隔离声明，并通过 `Routes()` 打开稳定入口：
 
-多层 route 可以把稳定前缀放进 `RegisterIn`：
+```go
+var routes = http.NewRouteSet()
+
+func Routes() []http.Route {
+    return routes.Routes()
+}
+```
+
+`system_login.go`、`user_login.go`、`profile.go` 各自通过 `init()` 声明一个入口：
 
 ```go
 func init() {
-    http.RegisterIn("api/v1/app2",
+    routes.In("api/v1/app2",
         http.GET("user/:id/profile", app2Profile).Resource(
             "http.app2.user.profile",
             acl.Scope("app2", 1, "应用二用户资料"),
@@ -89,7 +97,7 @@ func init() {
 
 ```go
 func init() {
-    http.RegisterIn("api/v1/app2",
+    routes.In("api/v1/app2",
         http.Group("user/:id",
             http.Use(requireApp2),
             http.GET("profile", app2Profile),
@@ -98,6 +106,16 @@ func init() {
     )
 }
 ```
+
+生命周期 owner 正常 import 自己的 HTTP package，并把声明转换为自己拥有的 Asset：
+
+```go
+func (p *Component) Assets(context.Context, linker.Runtime) ([]linker.Asset, error) {
+    return http.Assets(userhttp.Routes()...), nil
+}
+```
+
+`route` 已经表达 API 归属，文件和 handler 不重复携带 `_api` / `API` 后缀；同一 package 存在多个 profile 入口时，用 `frontProfile`、`systemProfile` 这类最小业务词区分。组件通过 `Capabilities()` 自治声明 `Offer`、`Need` 和 `Want`，API 通过 `http.Require(c, user.ServiceKey())` 解析稳定能力，不维护全局 runtime 容器。
 
 业务代码按能力 package 组织，不再按技术职责横向切开：
 
@@ -120,20 +138,20 @@ internal/
 ```
 
 - `internal/user`：用户、账号、认证、session 和存储闭环；`user.User`、`user.NewStore`、`user.ServiceKey` 直接打开业务语义。
-- `internal/user/http`：一个 API 一个文件，通过 `init()` 自注册；payload、param 和 response 留在入口附近。
-- `internal/user/linker`：组件 identity、类型化配置、表 Asset 和 capability 挂载；不承载 HTTP handler。
+- `internal/user/http`：一个 API 一个文件，通过 `init()` 向能力局部 `RouteSet` 声明；payload、param 和 response 留在入口附近。
+- `internal/user/linker`：组件 identity、类型化配置、表/路由 Asset 和 typed capability；不承载 HTTP handler。
 - `internal/inspection`：任务对象、状态、查询、数据范围和 store；`TaskAccess` 把 application、actor、resource 与 record range 合并进一次查询。
 - `internal/inspection/http`：只补充 HTTP 参数、actor 和响应投影。
 - `internal/inspection/linker`：声明普通迁移表与 `postgresql.External()` 外部维护表。
-- `internal/notification`：provider 业务闭环；其 `http` 和 `linker` 子目录分别适配 SSE/发送入口与 MQ/cron 生命周期。
+- `internal/notification`：provider 业务闭环；`linker` 拥有 MQ/cron Asset，`http` 作为独立 API component 等待 consumer capability 后再开放路由。
 - `internal/order`、`internal/permission`：业务对象与可复用流程；各自的 `http` 目录承载 Graph Console target 对应的真实服务端校验。
 - `internal/console`：Graph Console provider、菜单、页面、ACL 投影和布局声明；`console/linker` 只完成 framework 装配。
-- `internal/tts`：RPC 协议、转写对象与服务；`tts/client`、`tts/http`、`tts/linker` 分别承担 typed client、HTTP bridge 和生命周期适配。
+- `internal/tts`：RPC 协议、转写对象与服务；`tts/rpc`、`tts/client/linker`、`tts/http`、`tts/linker` 分别承担 endpoint、typed client 生命周期、HTTP proxy 和服务生命周期。
 - `internal/directory`：出站 HTTP typed client，业务调用表达为 `directory.New(api).Badge(ctx, userID)`。
 
-依赖方向固定为 `app -> capability/linker -> capability`，HTTP 适配只依赖能力根 package。能力根不反向依赖 `app`、`http` 或 `linker`。`http`、`linker` 是技术路径，因此其中的 package 仍叫 `user`、`order` 等业务能力名。
+依赖方向固定为 `app -> capability adapter -> capability`，HTTP 适配只依赖能力根 package。能力根不反向依赖 `app`、`http` 或 `linker`。`http`、`linker` 只是技术路径时，其中的 package 仍叫 `user`、`order` 等业务能力名；`client` 本身成为稳定调用能力时，package 直接叫 `client`。
 
-组件 identity 必须由组件自己声明，例如 `user.ID` 来自 `internal/user/linker`。依赖方引用该符号，不把 ID 放进公共常量包。带 HTTP 入口的组件 blank import 自己的 `http` 子目录，使未挂载的组件不会进入编译；route 通过 `http.Require(c, user.ServiceKey())` 获取能力，不反向依赖组件适配层。
+组件 identity 必须由组件自己声明，例如 `user.ID` 来自 `internal/user/linker`。运行值依赖通过能力 package 的 typed key 声明，不在 composition root 重复 provider identity。route 由真实 lifecycle owner 正常 import、转换为 Asset；未选择 owner 时不会进入装配，且不存在污染其他 App 的进程全局 registry。
 
 跨 route 的访问策略集中在 `internal/access`，单个 API 只声明影响面。稳定固定周期后台循环由自治 `worker/periodic` 承载，再通过 `worker/periodic/linker` 进入 framework；标准 metrics/tracing 使用 `observe/metrics/prometheus/linker` 和 `observe/tracing/opentelemetry/linker`。License 仅在需要保护的入口挂载 `license/http/gin` middleware，不进入 core 或默认 server。
 
