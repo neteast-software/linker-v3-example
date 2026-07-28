@@ -25,7 +25,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	tts "linker-v3-example/internal/tts"
-	ttsclient "linker-v3-example/internal/tts/client"
+	ttsclient "linker-v3-example/internal/tts/client/linker"
 )
 
 func TestFrameworkObservabilityExample(t *testing.T) {
@@ -79,7 +79,7 @@ func TestFrameworkObservabilityExample(t *testing.T) {
 			rpc.New(
 				rpc.WithRegisters(func(server *stdgrpc.Server) { tts.Register(server, traceTTS{}) }),
 			),
-			ttsclient.Provider(),
+			ttsclient.New(),
 		),
 	)
 	if err := app.Start(context.Background()); err != nil {

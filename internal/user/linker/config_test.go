@@ -9,7 +9,7 @@ import (
 )
 
 func TestComponentOwnsTokenConfig(t *testing.T) {
-	component := NewComponent()
+	component := New()
 	declarations := component.Configs()
 	if len(declarations) != 1 || declarations[0].Namespace() != Namespace || declarations[0].Mode() != linker.ConfigRestart {
 		t.Fatalf("configs = %#v", declarations)

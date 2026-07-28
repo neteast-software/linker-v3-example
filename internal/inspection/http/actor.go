@@ -14,15 +14,15 @@ func currentActorID(c *http.Context) (uint64, bool) {
 		response.Warning(c, "%s", err.Error())
 		return 0, false
 	}
-	svc, err := http.Require(c, user.ServiceKey())
+	actor, err := http.Require(c, user.ActorKey())
 	if err != nil {
 		response.Warning(c, "%s", err.Error())
 		return 0, false
 	}
-	user, err := svc.Profile(c.Request.Context(), raw, "front")
+	id, err := actor.ActorID(c.Request.Context(), raw, "front")
 	if err != nil {
 		response.Warning(c, "%s", err.Error())
 		return 0, false
 	}
-	return user.ID, true
+	return id, true
 }

@@ -110,7 +110,11 @@ db/postgresql:
 	}
 	t.Cleanup(func() { _ = app.Stop(context.Background()) })
 	awaitDynamicValue(t, remote.started)
-	if config := client.Client().Config(); config.BaseURL != "https://remote-old.example" || config.Timeout != 3*time.Second {
+	runtimeClient, err := httpclient.Require(app)
+	if err != nil {
+		t.Fatalf("http client capability: %v", err)
+	}
+	if config := runtimeClient.Config(); config.BaseURL != "https://remote-old.example" || config.Timeout != 3*time.Second {
 		t.Fatalf("initial effective config = %#v", config)
 	}
 
@@ -128,7 +132,7 @@ db/postgresql:
 	if event.Status != linker.ConfigRestartRequired || !event.Plan.RestartRequired {
 		t.Fatalf("event = %#v", event)
 	}
-	if config := client.Client().Config(); config.BaseURL != "https://remote-new.example" || config.Timeout != 3*time.Second {
+	if config := runtimeClient.Config(); config.BaseURL != "https://remote-new.example" || config.Timeout != 3*time.Second {
 		t.Fatalf("live config = %#v", config)
 	}
 	database, ok := app.Setting(postgresql.Namespace)
@@ -154,8 +158,8 @@ db/postgresql:
 	if recovered := awaitDynamicValue(t, events); recovered.Status != linker.ConfigRestartRequired {
 		t.Fatalf("recovery event = %#v", recovered)
 	}
-	if client.Client().Config().BaseURL != "https://remote-recovered.example" {
-		t.Fatalf("recovered client config = %#v", client.Client().Config())
+	if runtimeClient.Config().BaseURL != "https://remote-recovered.example" {
+		t.Fatalf("recovered client config = %#v", runtimeClient.Config())
 	}
 }
 

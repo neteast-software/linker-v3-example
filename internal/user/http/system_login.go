@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	http.RegisterIn("system",
+	routes.In("system",
 		http.POST("login", systemLogin).Resource(
 			"http.console.auth.login",
 			acl.Scope("console", 0, "后台登录"),

@@ -25,13 +25,16 @@ import (
 	linker "github.com/neteast-software/linker/v3"
 
 	notificationdata "linker-v3-example/internal/notification"
+	notificationhttp "linker-v3-example/internal/notification/http"
 	notification "linker-v3-example/internal/notification/linker"
 )
 
 func TestNotificationLifecycleExample(t *testing.T) {
 	eventRecorder := eventcore.NewMemoryRecorder()
 	auditRecorder := auditcore.NewMemoryRecorder()
-	notifier := notification.NewComponent(
+	provider := notificationdata.NewProvider()
+	notifier := notification.New(
+		notification.WithProvider(provider),
 		notification.WithCronSpec("@every 1s"),
 	)
 	metricComponent := prometheus.New(prometheus.WithConfig(prometheus.Config{
@@ -50,6 +53,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		server.WithComponents(
 			traceComponent,
 			notifier,
+			notificationhttp.New(),
 			mq.New(),
 			schedule.New(
 				schedule.WithStore(cron.NewMemoryStore()),
@@ -94,8 +98,8 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		t.Fatalf("submit: %v", err)
 	}
 	waitFor(t, 2*time.Second, func() bool {
-		return hasProviderMessage(notifier.Provider().Messages(), "mq") &&
-			hasProviderTrace(notifier.Provider().Messages(), "mq", exampleTraceID) &&
+		return hasProviderMessage(provider.Messages(), "mq") &&
+			hasProviderTrace(provider.Messages(), "mq", exampleTraceID) &&
 			len(auditRecorder.Records()) > 0 &&
 			len(eventRecorder.Events()) > 0
 	})
@@ -134,7 +138,7 @@ func TestNotificationLifecycleExample(t *testing.T) {
 		t.Fatalf("unexpected send response: status=%d header=%#v body=%q", sendResp.StatusCode, sendResp.Header, sendPayload)
 	}
 	waitFor(t, 2*time.Second, func() bool {
-		return hasProviderTrace(notifier.Provider().Messages(), "mq", httpMQTraceID)
+		return hasProviderTrace(provider.Messages(), "mq", httpMQTraceID)
 	})
 	waitFor(t, time.Second, func() bool {
 		return hasAuditRecord(
@@ -168,8 +172,8 @@ func TestNotificationLifecycleExample(t *testing.T) {
 	}
 
 	waitFor(t, 2500*time.Millisecond, func() bool {
-		return hasProviderMessage(notifier.Provider().Messages(), "cron") &&
-			hasProviderNonEmptyTrace(notifier.Provider().Messages(), "cron")
+		return hasProviderMessage(provider.Messages(), "cron") &&
+			hasProviderNonEmptyTrace(provider.Messages(), "cron")
 	})
 	metricsText := getRaw(t, "http://"+httpServer.Addr()+"/metrics")
 	assertMetricText(t, metricsText, "linker_v3_example_mq_consumer_messages_total", "status", "handled")

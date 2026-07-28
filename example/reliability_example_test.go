@@ -28,7 +28,7 @@ func (slowStopComponent) Stop(ctx context.Context) error {
 }
 
 func TestDBBackedComponentReportsMissingStoreDependency(t *testing.T) {
-	component := inspection.NewComponent()
+	component := inspection.New()
 	runtime := linker.New(linker.WithMode(linker.Bin))
 
 	err := component.Init(context.Background(), runtime)

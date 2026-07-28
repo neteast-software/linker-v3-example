@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	http.RegisterIn("system",
+	routes.In("system",
 		http.GET("profile", systemProfile).Resource(
 			"http.console.user.profile",
 			acl.Scope("console", 1, "后台用户信息"),

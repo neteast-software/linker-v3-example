@@ -162,7 +162,7 @@ func requireCoreComponentPlan(t *testing.T, plan linker.Plan, id linker.ID) link
 
 func corePlanHasCapability(plan linker.Plan, id linker.ID, owner linker.ID) bool {
 	for _, capability := range plan.Capabilities {
-		if capability.ID == id && capability.Owner == owner {
+		if capability.ID == id && capability.Provider == owner {
 			return true
 		}
 	}

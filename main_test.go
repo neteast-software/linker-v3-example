@@ -39,7 +39,7 @@ func TestPlanCommand(t *testing.T) {
 	if !jsonPlanHasAsset(assets, "rpc/grpc/server", "127.0.0.1:9900") {
 		t.Fatalf("plan missing grpc server asset: %#v", assets)
 	}
-	if !jsonPlanHasAsset(assets, "rpc/grpc/client", "rpc/client/tts") {
+	if !jsonPlanHasAsset(assets, "rpc/grpc/client", "example/tts-client") {
 		t.Fatalf("plan missing grpc client asset: %#v", assets)
 	}
 	if !jsonPlanHasAsset(assets, "observe/metrics", "prometheus") {

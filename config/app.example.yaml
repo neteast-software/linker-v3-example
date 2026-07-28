@@ -22,7 +22,7 @@ http:
 rpc/grpc:
   addr: 127.0.0.1:9900
 
-rpc/client/tts:
+example/tts-client:
   discovery:
     scheme: example
     service: tts

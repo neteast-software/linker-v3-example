@@ -4,30 +4,22 @@ import (
 	"slices"
 
 	"github.com/neteast-software/go-module/acl"
-	graphconsole "github.com/neteast-software/go-module/graph/console"
+	graphconsole "github.com/neteast-software/go-module/graph/console/linker"
 	"github.com/neteast-software/go-module/graph/console/protocol"
-	linker "github.com/neteast-software/linker/v3"
 
 	console "linker-v3-example/internal/console"
 	"linker-v3-example/internal/console/dashboard"
 	orderpage "linker-v3-example/internal/console/order"
 	permissionpage "linker-v3-example/internal/console/permission"
 	orderresource "linker-v3-example/internal/order"
-	order "linker-v3-example/internal/order/linker"
 	permissionresource "linker-v3-example/internal/permission"
-	permission "linker-v3-example/internal/permission/linker"
-	userauth "linker-v3-example/internal/user"
-	user "linker-v3-example/internal/user/linker"
+	user "linker-v3-example/internal/user"
 )
 
-func New(auth userauth.Auth, options ...graphconsole.Option) *graphconsole.Component {
-	provider := console.New(auth)
+func New(options ...graphconsole.Option) *graphconsole.Component {
+	provider := console.New()
 	defaults := []graphconsole.Option{
-		graphconsole.WithDependencies(
-			linker.RequireComponent(user.ID),
-			linker.RequireComponent(order.ID),
-			linker.RequireComponent(permission.ID),
-		),
+		graphconsole.ConfigureFrom(user.AuthKey(), provider.Configure),
 		graphconsole.WithEntry(console.Entry()),
 		graphconsole.WithMenu(console.Menu()),
 		graphconsole.WithPages(map[string]protocol.Object{
@@ -42,11 +34,7 @@ func New(auth userauth.Auth, options ...graphconsole.Option) *graphconsole.Compo
 			acl.NewResource(orderresource.Update, acl.Scope("app2", 2, "应用二订单维护", acl.Read|acl.Update)),
 			acl.NewResource(permissionresource.Manage, acl.Scope("console", 3, "角色权限配置", acl.Read|acl.Update)),
 		),
-		graphconsole.WithLogin(provider),
-		graphconsole.WithSession(provider),
-		graphconsole.WithProfile(provider),
-		graphconsole.WithAccess(provider),
-		graphconsole.WithNotice(provider),
+		graphconsole.WithProvider(provider),
 	}
 	return graphconsole.New(slices.Concat(defaults, options)...)
 }

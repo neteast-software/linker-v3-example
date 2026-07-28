@@ -11,7 +11,11 @@ import (
 )
 
 func (p *Provider) Current(ctx context.Context, raw string) (login.Session, error) {
-	user, claims, err := p.user.Current(ctx, raw, "console")
+	auth, err := p.auth()
+	if err != nil {
+		return login.Session{}, providerError(err)
+	}
+	user, claims, err := auth.Current(ctx, raw, "console")
 	if err != nil {
 		return login.Session{}, providerError(err)
 	}
@@ -19,7 +23,11 @@ func (p *Provider) Current(ctx context.Context, raw string) (login.Session, erro
 }
 
 func (p *Provider) Refresh(ctx context.Context, raw string) (login.Session, error) {
-	user, issued, err := p.user.Refresh(ctx, raw, "console")
+	auth, err := p.auth()
+	if err != nil {
+		return login.Session{}, providerError(err)
+	}
+	user, issued, err := auth.Refresh(ctx, raw, "console")
 	if err != nil {
 		return login.Session{}, providerError(err)
 	}
@@ -27,7 +35,11 @@ func (p *Provider) Refresh(ctx context.Context, raw string) (login.Session, erro
 }
 
 func (p *Provider) Revoke(ctx context.Context, raw string) error {
-	return providerError(p.user.Revoke(ctx, raw, "console"))
+	auth, err := p.auth()
+	if err != nil {
+		return providerError(err)
+	}
+	return providerError(auth.Revoke(ctx, raw, "console"))
 }
 
 func session(current user.User, raw string, claims token.Claims) login.Session {

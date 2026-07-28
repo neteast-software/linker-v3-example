@@ -13,7 +13,7 @@ import (
 
 	applicationcore "github.com/neteast-software/go-module/application"
 	applicationcomponent "github.com/neteast-software/go-module/application/linker"
-	graphconsole "github.com/neteast-software/go-module/graph/console"
+	graphconsole "github.com/neteast-software/go-module/graph/console/linker"
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	server "github.com/neteast-software/go-module/linker/server"
 	"github.com/neteast-software/go-module/token"
@@ -73,8 +73,12 @@ func (p graphUserComponent) Identity() linker.ID {
 	return user.ID
 }
 
-func (p graphUserComponent) OnMounted(_ context.Context, runtime linker.Runtime) error {
-	return linker.Provide(runtime, userdata.AuthKey(), userdata.Auth(p.user))
+func (p graphUserComponent) Capabilities() linker.Capabilities {
+	return linker.Capabilities{
+		linker.Offer(userdata.AuthKey(), func() userdata.Auth {
+			return p.user
+		}),
+	}
 }
 
 func TestGraphConsoleExample(t *testing.T) {
@@ -101,7 +105,7 @@ func TestGraphConsoleExample(t *testing.T) {
 			graphUserComponent{user: current},
 			order.New(),
 			permission.New(),
-			console.New(current, graphconsole.WithStatic(fstest.MapFS{
+			console.New(graphconsole.WithStatic(fstest.MapFS{
 				"index.html":    {Data: []byte("<!doctype html><title>Graph Console</title>")},
 				"assets/app.js": {Data: []byte("console.log('graph-console')")},
 			})),

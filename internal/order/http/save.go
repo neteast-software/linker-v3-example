@@ -20,7 +20,7 @@ type saveRequest struct {
 }
 
 func init() {
-	http.RegisterIn("api/v1/app2",
+	routes.In("api/v1/app2",
 		http.PUT("order", save).
 			With(
 				access.Console(),

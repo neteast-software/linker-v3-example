@@ -6,11 +6,11 @@ import (
 
 	http "github.com/neteast-software/go-module/http/gin/linker"
 
-	_ "linker-v3-example/internal/user/http"
+	userhttp "linker-v3-example/internal/user/http"
 )
 
 func TestStaticRoutePlanShowsApp2ResourceAndMiddleware(t *testing.T) {
-	plan := findRoutePlan(http.RegisteredRoutePlans(), "GET", "/api/v1/app2/user/:id/profile")
+	plan := findRoutePlan(http.RoutePlans(userhttp.Routes()...), "GET", "/api/v1/app2/user/:id/profile")
 	if plan == nil {
 		t.Fatalf("missing app2 profile route plan")
 	}

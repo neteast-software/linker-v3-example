@@ -31,10 +31,10 @@ func TestMultipleHTTPListenerExample(t *testing.T) {
 	adminConfig.Addr = "127.0.0.1:0"
 
 	routes := &multiListenerRoutes{assets: append(
-		public.Routes(http.GET("status", func(c *http.Context) {
+		public.Assets(http.GET("status", func(c *http.Context) {
 			c.String(stdhttp.StatusOK, "public")
 		})),
-		admin.Routes(http.Group("admin",
+		admin.Assets(http.Group("admin",
 			http.Use(func(c *http.Context) {
 				c.Header("X-Listener", "admin")
 				c.Next()

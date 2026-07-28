@@ -7,11 +7,12 @@ import (
 
 	session "github.com/neteast-software/go-module/acl/session"
 	postgresql "github.com/neteast-software/go-module/db/postgresql/linker"
+	http "github.com/neteast-software/go-module/http/gin/linker"
 	"github.com/neteast-software/go-module/token"
 	linker "github.com/neteast-software/linker/v3"
 
 	user "linker-v3-example/internal/user"
-	_ "linker-v3-example/internal/user/http" // route 声明随组件进入编译
+	userhttp "linker-v3-example/internal/user/http"
 )
 
 // ID 是组件自治声明的稳定身份。
@@ -24,7 +25,7 @@ type Component struct {
 	config  Config
 }
 
-func NewComponent() *Component {
+func New() *Component {
 	return &Component{service: user.New()}
 }
 
@@ -49,15 +50,27 @@ func (p *Component) Identity() linker.ID {
 	return ID
 }
 
-func (p *Component) Dependencies() []linker.Dependency {
-	return []linker.Dependency{linker.RequireComponent(postgresql.ID)}
+func (p *Component) Capabilities() linker.Capabilities {
+	return linker.Capabilities{
+		linker.Need(postgresql.Key()),
+		linker.Offer(user.AuthKey(), func() user.Auth {
+			return p.service
+		}),
+		linker.Offer(user.ActorKey(), func() user.Actor {
+			return p.service
+		}),
+		linker.Offer(user.ServiceKey(), func() *user.Service {
+			return p.service
+		}),
+	}
 }
 
 func (p *Component) Assets(context.Context, linker.Runtime) ([]linker.Asset, error) {
-	return []linker.Asset{
+	assets := []linker.Asset{
 		postgresql.Table(&user.User{}, postgresql.Comment("演示用户")),
 		postgresql.Table(&user.Account{}, postgresql.Comment("演示用户账号")),
-	}, nil
+	}
+	return append(assets, http.Assets(userhttp.Routes()...)...), nil
 }
 
 func (p *Component) Init(ctx context.Context, runtime linker.Runtime) error {
@@ -77,15 +90,4 @@ func (p *Component) Init(ctx context.Context, runtime linker.Runtime) error {
 		return nil
 	}
 	return user.Seed(ctx, p.store, password)
-}
-
-func (p *Component) OnMounted(_ context.Context, runtime linker.Runtime) error {
-	if err := linker.Provide(runtime, user.AuthKey(), user.Auth(p.service)); err != nil {
-		return err
-	}
-	return linker.Provide(runtime, user.ServiceKey(), p.service)
-}
-
-func (p *Component) Service() *user.Service {
-	return p.service
 }

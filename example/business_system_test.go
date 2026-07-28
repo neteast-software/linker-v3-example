@@ -34,8 +34,10 @@ import (
 
 	app "linker-v3-example/internal/app"
 	inspection "linker-v3-example/internal/inspection/linker"
+	notificationhttp "linker-v3-example/internal/notification/http"
 	notification "linker-v3-example/internal/notification/linker"
-	ttsclient "linker-v3-example/internal/tts/client"
+	ttsclient "linker-v3-example/internal/tts/client/linker"
+	ttshttp "linker-v3-example/internal/tts/http"
 	tts "linker-v3-example/internal/tts/linker"
 	userdata "linker-v3-example/internal/user"
 	user "linker-v3-example/internal/user/linker"
@@ -85,10 +87,12 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		!planHasComponent(plan, audit.ID) ||
 		!planHasComponent(plan, inspection.ID) ||
 		!planHasComponent(plan, notification.ID) ||
+		!planHasComponent(plan, notificationhttp.ID) ||
 		!planHasComponent(plan, metricscomponent.ID) ||
 		!planHasComponent(plan, tracingcomponent.ID) ||
 		!planHasComponent(plan, user.ID) ||
 		!planHasComponent(plan, tts.ID) ||
+		!planHasComponent(plan, ttshttp.ID) ||
 		!planHasComponent(plan, mq.ID) ||
 		!planHasComponent(plan, schedule.ID) ||
 		!planHasComponent(plan, rpc.ID) ||
@@ -128,12 +132,14 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	auditOrder := planOrder(plan, audit.ID)
 	inspectionOrder := planOrder(plan, inspection.ID)
 	notificationOrder := planOrder(plan, notification.ID)
+	notificationHTTPOrder := planOrder(plan, notificationhttp.ID)
 	userOrder := planOrder(plan, user.ID)
 	ttsOrder := planOrder(plan, tts.ID)
 	mqOrder := planOrder(plan, mq.ID)
 	cronOrder := planOrder(plan, schedule.ID)
 	rpcOrder := planOrder(plan, rpc.ID)
 	ttsClientOrder := planOrder(plan, ttsclient.ID)
+	ttsHTTPOrder := planOrder(plan, ttshttp.ID)
 	httpOrder := planOrder(plan, http.ID)
 	if postgresqlOrder >= auditOrder ||
 		postgresqlOrder >= applicationOrder ||
@@ -143,13 +149,15 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 		applicationOrder >= httpOrder ||
 		inspectionOrder >= httpOrder ||
 		notificationOrder >= mqOrder ||
+		mqOrder >= notificationHTTPOrder ||
 		notificationOrder >= cronOrder ||
 		ttsOrder >= rpcOrder ||
-		rpcOrder >= ttsClientOrder ||
 		auditOrder >= httpOrder ||
 		userOrder >= httpOrder ||
-		ttsClientOrder >= httpOrder {
-		t.Fatalf("unexpected startup order: postgresql=%d application=%d audit=%d inspection=%d notification=%d user=%d tts=%d mq=%d cron=%d rpc=%d ttsClient=%d http=%d plan=%#v", postgresqlOrder, applicationOrder, auditOrder, inspectionOrder, notificationOrder, userOrder, ttsOrder, mqOrder, cronOrder, rpcOrder, ttsClientOrder, httpOrder, plan.Components)
+		ttsClientOrder >= ttsHTTPOrder ||
+		ttsHTTPOrder >= httpOrder ||
+		notificationHTTPOrder >= httpOrder {
+		t.Fatalf("unexpected startup order: postgresql=%d application=%d audit=%d inspection=%d notification=%d notificationAPI=%d user=%d tts=%d mq=%d cron=%d rpc=%d ttsClient=%d ttsProxy=%d http=%d plan=%#v", postgresqlOrder, applicationOrder, auditOrder, inspectionOrder, notificationOrder, notificationHTTPOrder, userOrder, ttsOrder, mqOrder, cronOrder, rpcOrder, ttsClientOrder, ttsHTTPOrder, httpOrder, plan.Components)
 	}
 	if err := app.Start(context.Background()); err != nil {
 		t.Fatalf("start: %v", err)

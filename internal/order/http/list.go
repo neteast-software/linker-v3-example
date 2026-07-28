@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	http.RegisterIn("api/v1/app2",
+	routes.In("api/v1/app2",
 		http.GET("order", list).
 			With(
 				access.Console(),

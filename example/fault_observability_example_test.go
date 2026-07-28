@@ -45,10 +45,10 @@ func TestFaultRecoveryNoticeMetricsExample(t *testing.T) {
 	}
 	waitFor(t, 2*time.Second, func() bool { return len(sender.Notices()) == 3 })
 	waitFor(t, 2*time.Second, func() bool {
-		return strings.Contains(scrapeMetrics(t, metricComponent), "linker_v3_example_linker_fault_notice_results_total")
+		return strings.Contains(scrapeMetrics(t, app), "linker_v3_example_linker_fault_notice_results_total")
 	})
 
-	text := scrapeMetrics(t, metricComponent)
+	text := scrapeMetrics(t, app)
 	for _, value := range []string{
 		"linker_v3_example_linker_fault_transition_total",
 		"linker_v3_example_linker_fault_recovery_seconds",
@@ -64,10 +64,14 @@ func TestFaultRecoveryNoticeMetricsExample(t *testing.T) {
 	}
 }
 
-func scrapeMetrics(t *testing.T, component *prometheus.Component) string {
+func scrapeMetrics(t *testing.T, runtime linker.Runtime) string {
 	t.Helper()
+	recorder, err := prometheus.Require(runtime)
+	if err != nil {
+		t.Fatalf("prometheus capability: %v", err)
+	}
 	response := httptest.NewRecorder()
-	component.Handler().ServeHTTP(response, httptest.NewRequest("GET", "/metrics", nil))
+	recorder.Handler().ServeHTTP(response, httptest.NewRequest("GET", "/metrics", nil))
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		t.Fatalf("read metrics: %v", err)

@@ -14,7 +14,11 @@ func (p *Provider) Access(ctx context.Context, subject string) (acl.Access, erro
 	if err != nil {
 		return acl.Access{}, err
 	}
-	user, err := p.user.ProfileByID(ctx, id)
+	auth, err := p.auth()
+	if err != nil {
+		return acl.Access{}, providerError(err)
+	}
+	user, err := auth.ProfileByID(ctx, id)
 	if err != nil {
 		return acl.Access{}, err
 	}

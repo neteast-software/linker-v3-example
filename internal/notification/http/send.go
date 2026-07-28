@@ -15,7 +15,7 @@ type sendRequest struct {
 }
 
 func init() {
-	http.RegisterIn("api/v1/app2/notification",
+	routes.In("api/v1/app2/notification",
 		http.POST("send", send).Resource(
 			"http.app2.notification.send",
 			acl.Scope("app2", 1, "通知发送", acl.Write),
@@ -31,7 +31,12 @@ func send(c *http.Context) {
 			return
 		}
 	}
-	executor, err := http.Require(c, mq.ConsumerKey("notification"))
+	runtime, ok := http.Runtime(c)
+	if !ok {
+		response.Warning(c, "通知运行环境尚未就绪")
+		return
+	}
+	executor, err := mq.Require(runtime, "notification")
 	if err != nil {
 		response.Warning(c, "%s", err.Error())
 		return

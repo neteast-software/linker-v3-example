@@ -97,8 +97,12 @@ func (p fakeNacosComponent) Identity() linker.ID {
 	return registrynacos.ID
 }
 
-func (p fakeNacosComponent) OnMounted(_ context.Context, runtime linker.Runtime) error {
-	return linker.Provide(runtime, registrynacos.NamingKey(), p.naming)
+func (p fakeNacosComponent) Capabilities() linker.Capabilities {
+	return linker.Capabilities{
+		linker.Offer(registrynacos.NamingKey(), func() nacoskit.Naming {
+			return p.naming
+		}),
+	}
 }
 
 func TestServerFrameworkLoadsNacosSourceAfterLocalSeed(t *testing.T) {

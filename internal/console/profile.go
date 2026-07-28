@@ -14,7 +14,11 @@ func (p *Provider) Profile(ctx context.Context, subject string) (login.Profile, 
 	if err != nil {
 		return login.Profile{}, err
 	}
-	user, err := p.user.ProfileByID(ctx, id)
+	auth, err := p.auth()
+	if err != nil {
+		return login.Profile{}, providerError(err)
+	}
+	user, err := auth.ProfileByID(ctx, id)
 	if err != nil {
 		return login.Profile{}, err
 	}

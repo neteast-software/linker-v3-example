@@ -10,7 +10,7 @@ import (
 )
 
 func TestAssetsDeclareExternalArchiveTable(t *testing.T) {
-	assets, err := NewComponent().Assets(context.Background(), nil)
+	assets, err := New().Assets(context.Background(), nil)
 	if err != nil {
 		t.Fatalf("assets: %v", err)
 	}

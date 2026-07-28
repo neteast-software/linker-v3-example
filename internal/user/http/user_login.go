@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	http.RegisterIn("user",
+	routes.In("user",
 		http.POST("login", userLogin).Resource(
 			"http.front.auth.login",
 			acl.Scope("front", 0, "用户登录"),

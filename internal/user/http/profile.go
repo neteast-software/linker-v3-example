@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	http.RegisterIn("api",
+	routes.In("api",
 		http.GET("profile", frontProfile).Resource(
 			"http.front.user.profile",
 			acl.Scope("front", 1, "前台用户信息"),

@@ -23,7 +23,11 @@ func (p *Provider) Login(ctx context.Context, credential login.Credential) (logi
 	if !ok {
 		return login.Session{}, fmt.Errorf("密码不能为空")
 	}
-	_, raw, err := p.user.AdminLogin(ctx, username, password)
+	auth, err := p.auth()
+	if err != nil {
+		return login.Session{}, providerError(err)
+	}
+	_, raw, err := auth.AdminLogin(ctx, username, password)
 	if err != nil {
 		return login.Session{}, err
 	}

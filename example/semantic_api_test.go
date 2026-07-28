@@ -49,7 +49,11 @@ func TestRecommendedSemanticAPIsCompile(t *testing.T) {
 	_, _ = prometheus.Resolve(runtime)
 	_, _ = opentelemetry.Resolve(runtime)
 
-	_ = http.RegisterIn
+	routes := http.NewRouteSet()
+	routes.In("api", http.GET("ping"))
+	if len(routes.Routes()) != 1 {
+		t.Fatal("能力局部路由声明应保持可读")
+	}
 	_ = response.Success
 	_ = response.Message
 	_ = response.Data

@@ -39,6 +39,9 @@ func TestScaffoldAdaptersKeepCapabilityPackageName(t *testing.T) {
 				t.Fatalf("解析 %s: %v", file, err)
 			}
 			capability := filepath.Base(filepath.Dir(filepath.Dir(file)))
+			if adapter == "client" {
+				capability = "client"
+			}
 			if parsed.Name.Name != capability {
 				t.Fatalf("%s 是 %s 的适配层，package 应为 %q，实际为 %q", file, capability, capability, parsed.Name.Name)
 			}
@@ -47,25 +50,21 @@ func TestScaffoldAdaptersKeepCapabilityPackageName(t *testing.T) {
 }
 
 func TestScaffoldLinkerAdaptersOwnCompileBoundary(t *testing.T) {
-	componentFiles, err := filepath.Glob("../internal/*/linker/component.go")
-	if err != nil {
-		t.Fatalf("扫描 Linker 适配层: %v", err)
+	var componentFiles []string
+	for _, file := range adapterFiles(t, "linker") {
+		if filepath.Base(file) == "component.go" {
+			componentFiles = append(componentFiles, file)
+		}
 	}
 	if len(componentFiles) == 0 {
 		t.Fatal("没有找到 Linker 组件适配层")
 	}
 	for _, file := range componentFiles {
-		for _, forbidden := range []string{"http.Context", "response.", "http.RegisterIn", "http.Routes("} {
+		for _, forbidden := range []string{"http.Context", "response.", "http.Register"} {
 			assertFileNotContains(t, file, forbidden)
 		}
-
-		capability := filepath.Base(filepath.Dir(filepath.Dir(file)))
-		httpDir := filepath.Join("../internal", capability, "http")
-		if _, err := os.Stat(httpDir); err == nil {
-			want := "linker-v3-example/internal/" + capability + "/http"
-			if !hasBlankImport(t, file, want) {
-				t.Fatalf("%s 应 blank import %q，使 HTTP 声明服从组件编译边界", file, want)
-			}
+		if imported := blankLocalImport(t, file); imported != "" {
+			t.Fatalf("%s 不应通过空白导入代领 %q 的路由", file, imported)
 		}
 
 		content := readFile(t, file)
@@ -78,7 +77,7 @@ func TestScaffoldLinkerAdaptersOwnCompileBoundary(t *testing.T) {
 	}
 }
 
-func TestScaffoldHTTPFilesSelfRegister(t *testing.T) {
+func TestScaffoldHTTPFilesDeclareOneRoute(t *testing.T) {
 	files := adapterFiles(t, "http")
 	routeFiles := 0
 	for _, file := range files {
@@ -110,8 +109,10 @@ func TestScaffoldHTTPFilesSelfRegister(t *testing.T) {
 			switch selector.Sel.Name {
 			case "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD", "Any", "Match":
 				methods++
-			case "Register", "RegisterIn":
-				registers++
+			case "In", "Add":
+				if identifier, ok := selector.X.(*ast.Ident); ok && identifier.Name == "routes" {
+					registers++
+				}
 			}
 			return true
 		})
@@ -127,7 +128,41 @@ func TestScaffoldHTTPFilesSelfRegister(t *testing.T) {
 		}
 	}
 	if routeFiles == 0 {
-		t.Fatal("没有找到自注册 HTTP route")
+		t.Fatal("没有找到文件级 HTTP route 声明")
+	}
+}
+
+func TestScaffoldRouteSetsHaveLifecycleOwner(t *testing.T) {
+	routeSets, err := filepath.Glob("../internal/*/http/routes.go")
+	if err != nil {
+		t.Fatalf("扫描路由声明集合: %v", err)
+	}
+	if len(routeSets) == 0 {
+		t.Fatal("没有找到能力局部路由声明集合")
+	}
+	for _, file := range routeSets {
+		content := readFile(t, file)
+		for _, required := range []string{
+			"var routes = http.NewRouteSet()",
+			"func Routes() []http.Route",
+		} {
+			if !strings.Contains(content, required) {
+				t.Fatalf("%s 缺少局部路由集合契约 %q", file, required)
+			}
+		}
+		if strings.Contains(content, "func (p *Component) Assets(") &&
+			strings.Contains(content, "http.Assets(Routes()...)") {
+			continue
+		}
+		capability := filepath.Base(filepath.Dir(filepath.Dir(file)))
+		owner := filepath.Join("../internal", capability, "linker", "component.go")
+		if _, err := os.Stat(owner); err != nil {
+			t.Fatalf("%s 没有生命周期 owner: %v", file, err)
+		}
+		ownerContent := readFile(t, owner)
+		if !strings.Contains(ownerContent, "http.Assets("+capability+"http.Routes()...)") {
+			t.Fatalf("%s 没有把本能力 Routes 转换为自身 Asset", owner)
+		}
 	}
 }
 
@@ -174,7 +209,8 @@ func TestScaffoldKeepsFrameworkAssemblySemantic(t *testing.T) {
 	app := readFile(t, "../internal/app/app.go")
 	for _, imported := range localImports(t, "../internal/app/app.go") {
 		parts := strings.Split(strings.TrimPrefix(imported, "linker-v3-example/internal/"), "/")
-		if len(parts) < 2 || parts[1] != "linker" && parts[1] != "client" {
+		if len(parts) < 2 ||
+			parts[1] != "linker" && parts[1] != "client" && parts[1] != "http" {
 			t.Fatalf("internal/app 只应装配能力适配层，不应直连业务实现 %q", imported)
 		}
 	}
@@ -237,7 +273,7 @@ func assertFileNotContains(t *testing.T, file string, needle string) {
 	}
 }
 
-func hasBlankImport(t *testing.T, file string, importPath string) bool {
+func blankLocalImport(t *testing.T, file string) string {
 	t.Helper()
 	parsed, err := parser.ParseFile(token.NewFileSet(), file, nil, parser.ImportsOnly)
 	if err != nil {
@@ -251,11 +287,11 @@ func hasBlankImport(t *testing.T, file string, importPath string) bool {
 		if err != nil {
 			t.Fatalf("unquote import path %s: %v", spec.Path.Value, err)
 		}
-		if path == importPath {
-			return true
+		if strings.HasPrefix(path, "linker-v3-example/internal/") {
+			return path
 		}
 	}
-	return false
+	return ""
 }
 
 func localImports(t *testing.T, file string) []string {
@@ -279,18 +315,24 @@ func localImports(t *testing.T, file string) []string {
 
 func adapterFiles(t *testing.T, adapter string) []string {
 	t.Helper()
-	pattern := filepath.Join("../internal", "*", adapter, "*.go")
-	files, err := filepath.Glob(pattern)
+	var files []string
+	err := filepath.WalkDir("../internal", func(path string, entry os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if entry.IsDir() ||
+			filepath.Base(filepath.Dir(path)) != adapter ||
+			filepath.Ext(path) != ".go" ||
+			strings.HasSuffix(path, "_test.go") {
+			return nil
+		}
+		files = append(files, path)
+		return nil
+	})
 	if err != nil {
 		t.Fatalf("扫描 %s 适配层: %v", adapter, err)
 	}
-	ret := files[:0]
-	for _, file := range files {
-		if !strings.HasSuffix(file, "_test.go") {
-			ret = append(ret, file)
-		}
-	}
-	return ret
+	return files
 }
 
 func readFile(t *testing.T, file string) string {

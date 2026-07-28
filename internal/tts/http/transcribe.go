@@ -5,7 +5,7 @@ import (
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	"github.com/neteast-software/go-module/http/gin/response"
 
-	ttsclient "linker-v3-example/internal/tts/client"
+	ttsclient "linker-v3-example/internal/tts/client/linker"
 )
 
 type transcribeRequest struct {
@@ -13,7 +13,7 @@ type transcribeRequest struct {
 }
 
 func init() {
-	http.RegisterIn("api/v1/app2/tts",
+	routes.In("api/v1/app2/tts",
 		http.POST("transcribe", transcribe).Resource(
 			"http.app2.tts.transcribe",
 			acl.Scope("app2", 1, "TTS 转写", acl.Write),
@@ -27,7 +27,7 @@ func transcribe(c *http.Context) {
 		response.Warning(c, "TTS 参数错误: %s", err.Error())
 		return
 	}
-	client, err := http.Require(c, ttsclient.ClientKey())
+	client, err := http.Require(c, ttsclient.Key())
 	if err != nil {
 		response.Warning(c, "%s", err.Error())
 		return

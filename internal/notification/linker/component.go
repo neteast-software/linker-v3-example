@@ -14,7 +14,6 @@ import (
 	linker "github.com/neteast-software/linker/v3"
 
 	notification "linker-v3-example/internal/notification"
-	_ "linker-v3-example/internal/notification/http" // route 声明随组件进入编译
 )
 
 const ID linker.ID = "example/notification"
@@ -30,7 +29,7 @@ type Component struct {
 
 type Option func(*Component)
 
-func NewComponent(opts ...Option) *Component {
+func New(opts ...Option) *Component {
 	p := &Component{
 		provider: notification.NewProvider(),
 		audit:    auditcore.NoopRecorder{},
@@ -74,10 +73,13 @@ func (p *Component) Identity() linker.ID {
 	return ID
 }
 
-func (p *Component) Dependencies() []linker.Dependency {
-	return []linker.Dependency{
-		linker.StartAfter(audit.ID),
-		linker.StartAfter(event.ID),
+func (p *Component) Capabilities() linker.Capabilities {
+	return linker.Capabilities{
+		linker.Want(audit.RecorderKey()),
+		linker.Want(event.RecorderKey()),
+		linker.Offer(notification.ProviderKey(), func() *notification.Provider {
+			return p.provider
+		}),
 	}
 }
 
@@ -96,12 +98,4 @@ func (p *Component) Init(_ context.Context, runtime linker.Runtime) error {
 		p.event = recorder
 	}
 	return nil
-}
-
-func (p *Component) OnMounted(_ context.Context, runtime linker.Runtime) error {
-	return linker.Provide(runtime, notification.ProviderKey(), p.provider)
-}
-
-func (p *Component) Provider() *notification.Provider {
-	return p.provider
 }

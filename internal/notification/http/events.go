@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	http.RegisterIn("api/v1/app2/notification",
+	routes.In("api/v1/app2/notification",
 		http.GET("events", events).
 			With(http.SSEHeader).
 			Resource("http.app2.notification.events", acl.Scope("app2", 1, "通知事件流", acl.Read)),
