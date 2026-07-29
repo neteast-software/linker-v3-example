@@ -59,7 +59,7 @@ require (
 	github.com/neteast-software/go-module/worker/periodic v0.1.0
 	github.com/neteast-software/go-module/worker/periodic/linker v0.4.0
 	github.com/neteast-software/grpc-discovery v0.1.0
-	github.com/neteast-software/linker/v3 v3.6.0
+	github.com/neteast-software/linker/v3 v3.7.0
 	google.golang.org/grpc v1.82.1
 	google.golang.org/protobuf v1.36.11
 	gorm.io/gorm v1.31.1

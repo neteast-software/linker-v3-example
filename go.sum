@@ -466,6 +466,8 @@ github.com/neteast-software/grpc-discovery v0.1.0 h1:WBukoc/5spiQ0I5GIw2nQAEJFQQ
 github.com/neteast-software/grpc-discovery v0.1.0/go.mod h1:TZ6JCiEYGXzg+1rlzbUpNv7N7fdtfky3d68BzYhXdzM=
 github.com/neteast-software/linker/v3 v3.6.0 h1:eicfgnu1TjDdx/cSsbDmHqfLW2F2uJGGQYmLOORu77Q=
 github.com/neteast-software/linker/v3 v3.6.0/go.mod h1:WuVU+LFQfaZFsibv/BpUhMkkao29yJ1pvgIRsU/2Xpw=
+github.com/neteast-software/linker/v3 v3.7.0 h1:fIKbvWp2uS9Ev/w5Muo9fTq4m4PvPZp6ct4aAInj+6s=
+github.com/neteast-software/linker/v3 v3.7.0/go.mod h1:WuVU+LFQfaZFsibv/BpUhMkkao29yJ1pvgIRsU/2Xpw=
 github.com/neteast-software/nacos-kit v0.1.0 h1:mvwSg/YQujNGnLTVp6CV2Op/oswX5AuavFkAIF1NalA=
 github.com/neteast-software/nacos-kit v0.1.0/go.mod h1:69uFxN5xuPuOKlATTAjEZieza7WoHT+dKHReU8VpOx8=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
