@@ -61,16 +61,26 @@ require (
 	github.com/neteast-software/grpc-discovery v0.1.0
 	github.com/neteast-software/linker/v3 v3.7.0
 	google.golang.org/grpc v1.82.1
-	google.golang.org/protobuf v1.36.11
+	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af
 	gorm.io/gorm v1.31.1
 )
 
 require (
+	github.com/dgryski/go-jump v0.0.0-20211018200510-ba001c3ffce0 // indirect
+	github.com/dgryski/go-mpchash v0.0.0-20200819201138-7382f34c4cd1 // indirect
+	github.com/dimfeld/httppath v0.0.0-20170720192232-ee938bf73598 // indirect
+	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/google/pprof v0.0.0-20260402051712-545e8a4df936 // indirect
+	github.com/instana/go-sensor v1.73.5 // indirect
+	github.com/lightstep/lightstep-tracer-common/golang/gogo v0.0.0-20210210170715-a8dfcb80d3a7 // indirect
+	github.com/lightstep/lightstep-tracer-go v0.26.0 // indirect
+	github.com/looplab/fsm v1.0.3 // indirect
 	github.com/neteast-software/go-module/audit/operate/store/gorm v0.4.0 // indirect
 	github.com/neteast-software/go-module/config/env v0.2.0 // indirect
 	github.com/neteast-software/go-module/config/yaml v0.2.0 // indirect
 	github.com/neteast-software/go-module/crypto/sm v0.1.0 // indirect
 	github.com/neteast-software/go-module/fault v0.3.0 // indirect
+	github.com/neteast-software/go-module/http/gateway v0.1.0 // indirect
 	github.com/neteast-software/go-module/observe/metrics/fault/notice v0.2.0 // indirect
 	github.com/neteast-software/go-module/observe/metrics/http/gin v0.2.1 // indirect
 	github.com/neteast-software/go-module/observe/metrics/http/gin/linker v0.4.0 // indirect
@@ -87,6 +97,26 @@ require (
 	github.com/neteast-software/go-module/registry/service/linker v0.4.0 // indirect
 	github.com/neteast-software/go-module/registry/service/nacos v0.4.0 // indirect
 	github.com/neteast-software/go-module/scheduler/cron/store/gorm v0.4.0 // indirect
+	github.com/oklog/ulid v1.3.1 // indirect
+	github.com/opentracing/basictracer-go v1.1.0 // indirect
+	github.com/opentracing/opentracing-go v1.2.0 // indirect
+	github.com/rcrowley/go-metrics v0.0.0-20250401214520-65e299d6c5c9 // indirect
+	github.com/sirupsen/logrus v1.9.4 // indirect
+	github.com/sony/gobreaker v1.0.0 // indirect
+	github.com/szuecs/rate-limit-buffer v0.9.0 // indirect
+	github.com/uber/jaeger-client-go v2.30.0+incompatible // indirect
+	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
+	github.com/valkey-io/valkey-go v1.0.76 // indirect
+	github.com/valkey-io/valkey-go/valkeyhook v1.0.76 // indirect
+	github.com/valkey-io/valkey-go/valkeyotel v1.0.76 // indirect
+	github.com/yookoala/gofast v0.8.0 // indirect
+	github.com/zalando/skipper v0.27.41 // indirect
+	go.opentelemetry.io/otel/bridge/opentracing v1.44.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.44.0 // indirect
+	go.opentelemetry.io/otel/sdk/metric v1.44.0 // indirect
+	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba // indirect
+	golang.org/x/exp v0.0.0-20251209150349-8475f28825e9 // indirect
+	golang.org/x/tools/godoc v0.1.0-deprecated // indirect
 )
 
 require (
@@ -139,19 +169,19 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
-	github.com/klauspost/compress v1.18.7 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/klauspost/compress v1.19.1 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/nacos-group/nacos-sdk-go/v2 v2.3.5 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible // indirect
 	github.com/orcaman/concurrent-map v0.0.0-20210501183033-44dafcb38ecc // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/prometheus/client_golang v1.23.2 // indirect
+	github.com/prometheus/client_golang v1.24.1 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.66.1 // indirect
-	github.com/prometheus/procfs v0.16.1 // indirect
-	github.com/redis/go-redis/v9 v9.16.0 // indirect
+	github.com/prometheus/common v0.70.1 // indirect
+	github.com/prometheus/procfs v0.21.1 // indirect
+	github.com/redis/go-redis/v9 v9.21.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/tjfoc/gmsm v1.4.1 // indirect
 	github.com/valyala/fastrand v1.1.0 // indirect
@@ -168,12 +198,12 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	go.yaml.in/yaml/v2 v2.4.2 // indirect
-	golang.org/x/time v0.11.0 // indirect
-	google.golang.org/api v0.230.0 // indirect
+	go.yaml.in/yaml/v2 v2.4.4 // indirect
+	golang.org/x/time v0.15.0 // indirect
+	google.golang.org/api v0.256.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa // indirect
-	gopkg.in/ini.v1 v1.67.0 // indirect
+	gopkg.in/ini.v1 v1.67.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/postgres v1.6.0 // indirect
