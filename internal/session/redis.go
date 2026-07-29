@@ -26,14 +26,15 @@ func (p *RedisStore) Save(ctx context.Context, current Session) error {
 	if p == nil || p.client == nil || p.prefix == "" {
 		return fmt.Errorf("Redis session store 未配置")
 	}
-	if err := current.validate(p.now()); err != nil {
+	now := p.now()
+	if err := current.validate(now); err != nil {
 		return err
 	}
 	content, err := json.Marshal(current)
 	if err != nil {
 		return fmt.Errorf("session 编码失败: %w", err)
 	}
-	return p.client.Set(ctx, p.key(current.ID), content, time.Until(current.ExpiresAt))
+	return p.client.Set(ctx, p.key(current.ID), content, current.ExpiresAt.Sub(now))
 }
 
 func (p *RedisStore) Lookup(ctx context.Context, id string) (Session, error) {
