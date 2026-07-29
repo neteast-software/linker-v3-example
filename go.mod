@@ -28,6 +28,7 @@ require (
 	github.com/neteast-software/go-module/fault/notice/linker v0.4.0
 	github.com/neteast-software/go-module/http/client v0.4.0
 	github.com/neteast-software/go-module/http/client/linker v0.4.0
+	github.com/neteast-software/go-module/http/gateway v0.1.0
 	github.com/neteast-software/go-module/http/gin v0.5.0
 	github.com/neteast-software/go-module/linker/server v0.4.0
 	github.com/neteast-software/go-module/mq/consumer v0.2.0
@@ -80,7 +81,6 @@ require (
 	github.com/neteast-software/go-module/config/yaml v0.2.0 // indirect
 	github.com/neteast-software/go-module/crypto/sm v0.1.0 // indirect
 	github.com/neteast-software/go-module/fault v0.3.0 // indirect
-	github.com/neteast-software/go-module/http/gateway v0.1.0 // indirect
 	github.com/neteast-software/go-module/observe/metrics/fault/notice v0.2.0 // indirect
 	github.com/neteast-software/go-module/observe/metrics/http/gin v0.2.1 // indirect
 	github.com/neteast-software/go-module/observe/metrics/http/gin/linker v0.4.0 // indirect
@@ -198,7 +198,6 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	google.golang.org/api v0.256.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa // indirect
