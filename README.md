@@ -4,8 +4,9 @@
 server framework、自治能力、HTTP route、ACL、PostgreSQL、RPC、MQ、动态配置、可观测性和
 graceful shutdown 如何闭环，不把演示业务模型当成公司统一模型。
 
-当前工具链基线为 Go `1.26.5`，已发布 framework 基线为 Linker `v3.5.0`。开发分支会用同级
-源码工作区验证尚未发布的契约；正式消费路径仍必须使用可追溯版本。精确依赖以 `go.mod` 为准。
+当前工具链基线为 Go `1.26.5`，已发布 framework 基线为 Linker `v3.6.0`。默认分支只使用
+远端可追溯版本，不依赖本地 `replace`；候选契约的源码联调不得冒充正式消费闭环。精确依赖以
+`go.mod` 为准。
 
 ## 最短路径
 

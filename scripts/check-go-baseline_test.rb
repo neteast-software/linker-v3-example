@@ -12,7 +12,7 @@ class ExampleGoBaselineTest < Minitest::Test
 
     assert_empty check.errors
     assert_equal "1.26.5", check.go_version
-    assert_equal "v3.5.0", check.linker_version
+    assert_equal "v3.6.0", check.linker_version
   end
 
   def test_reports_repository_projection_drift
@@ -25,7 +25,7 @@ class ExampleGoBaselineTest < Minitest::Test
 
         require github.com/neteast-software/linker/v3 v3.3.0
       MOD
-      File.write(File.join(root, "README.md"), "当前工具链基线为 Go `1.26.4`，framework 基线为 linker `v3.2.0`\n")
+      File.write(File.join(root, "README.md"), "当前工具链基线为 Go `1.26.4`，framework 基线为 Linker `v3.2.0`\n")
       workflow = File.join(root, ".github/workflows/check.yml")
       File.write(workflow, <<~YAML)
         go-version: 1.26.4

@@ -32,36 +32,10 @@ example 只有两种可解释状态：
 `replace` 不是 Linker 的安装方式，也不是业务项目的推荐依赖方式。不得用它覆盖已经发布且可组合的
 版本，不得使用 `v0.0.0` 冒充候选版本，也不得把开发者本机绝对路径提交进仓库。
 
-当前 P17 source-first 投影包含 19 个路径。
-
-首个正式版本候选共 13 个：
-
-- `acl/session`
-- `application/http/gin`
-- `crypto/sm`
-- `db/gorm/query`
-- `graph/console`
-- `http/client`
-- `http/client/linker`
-- `license`
-- `license/http/gin`
-- `observe/tracing/http/client`
-- `registry/service/nacos`
-- `registry/service/nacos/linker`
-- `user/account`
-
-发布闭包修复共 6 个：
-
-- `mq/consumer/linker`
-- `observe/metrics/mq/consumer`
-- `observe/tracing/mq/consumer`
-- `scheduler/cron`
-- `scheduler/cron/linker`
-- `scheduler/cron/store/gorm`
-
-Graph Console 是 example 明确覆盖的 framework 场景。其 tag 成立前，当前 checkout 整体属于
-source-first 集成投影；不能把它描述成已经完成远端闭环的默认样板。发布后必须重新使用空
-`GOMODCACHE`、`GOWORK=off` 和无 replace 的 `go mod download`、`go test` 验证默认主路径。
+当前默认分支属于 `released` 状态：P18 provider 使用协调发布的 `v0.4.0`，MQ 与 Cron
+依赖闭包使用修正版 `v0.4.1`，原有 19 条本地 `replace` 已全部删除。每轮 provider 发布后，
+仍须使用隔离缓存、`GOWORK=off` 和无 replace 的 `go mod download`、测试、race、vet、QADC
+与漏洞扫描复验默认主路径。
 
 ## 外部依赖
 

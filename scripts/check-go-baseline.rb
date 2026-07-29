@@ -48,7 +48,7 @@ class ExampleGoBaseline
 
     readme = File.read(path("README.md"))
     documented_go = readme[/当前工具链基线为 Go `([^`]+)`/, 1]
-    documented_linker = readme[/framework 基线为 linker `([^`]+)`/, 1]
+    documented_linker = readme[/framework 基线为 Linker `([^`]+)`/, 1]
     failures << "README.md: Go 基线=#{documented_go.inspect}，期望 #{go_version}" unless documented_go == go_version
     unless documented_linker == linker_version
       failures << "README.md: Linker 基线=#{documented_linker.inspect}，期望 #{linker_version}"
@@ -70,7 +70,7 @@ class ExampleGoBaseline
       match = content.match(/repository:\s*neteast-software\/linker\s*\n\s*ref:\s*["']?([^\s"']+)["']?/)
       refs << [display(workflow), match[1]] unless match.nil?
     end
-    failures << ".github/workflows: 缺少 Linker source-ready checkout" if linker_refs.empty?
+    failures << ".github/workflows: 缺少 Linker 版本基线 checkout" if linker_refs.empty?
     linker_refs.each do |workflow, ref|
       failures << "#{workflow}: Linker ref=#{ref}，期望 #{linker_version}" unless ref == linker_version
     end
