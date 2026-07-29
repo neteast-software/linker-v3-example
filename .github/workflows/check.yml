@@ -8,6 +8,8 @@ on:
 jobs:
   example:
     runs-on: ubuntu-latest
+    env:
+      GOPRIVATE: github.com/neteast-software/*
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,10 +26,35 @@ jobs:
           ref: v0.4.1
           path: modules
           submodules: false
+          ssh-key: ${{ secrets.GO_MODULE_DEPLOY_KEY }}
       - uses: actions/setup-go@v5
         with:
           go-version: 1.26.5
           cache-dependency-path: linker-v3-example/go.sum
+      - name: Configure private Go modules
+        env:
+          LINKER_KEY: ${{ secrets.LINKER_DEPLOY_KEY }}
+          GO_MODULE_KEY: ${{ secrets.GO_MODULE_DEPLOY_KEY }}
+        run: |
+          umask 077
+          mkdir -p ~/.ssh
+          printf '%s\n' "$LINKER_KEY" > ~/.ssh/linker
+          printf '%s\n' "$GO_MODULE_KEY" > ~/.ssh/go-module
+          ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+          cat >> ~/.ssh/config <<'EOF'
+          Host github-linker
+            HostName github.com
+            User git
+            IdentityFile ~/.ssh/linker
+            IdentitiesOnly yes
+          Host github-go-module
+            HostName github.com
+            User git
+            IdentityFile ~/.ssh/go-module
+            IdentitiesOnly yes
+          EOF
+          git config --global url."ssh://git@github-linker/neteast-software/linker".insteadOf "https://github.com/neteast-software/linker"
+          git config --global url."ssh://git@github-go-module/neteast-software/go-module".insteadOf "https://github.com/neteast-software/go-module"
       - run: go install golang.org/x/vuln/cmd/govulncheck@v1.6.0
       - working-directory: linker-v3-example
         env:
