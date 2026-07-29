@@ -54,7 +54,8 @@ example 只有两种可解释状态：
 
 测试按场景拆分在 `example/` 目录：
 
-- `http_example_test.go`：HTTP、response、gateway、license、Prometheus。
+- `http_example_test.go`：业务 HTTP、response、license 和 Prometheus。
+- `gateway_example_test.go`：Gateway 代理、声明热更新、管理探针、指标、trace 和 graceful stop。
 - `business_system_test.go`：接近真实业务系统的组合启动、登录、DB、gRPC、MQ、cron。
 - `graph_example_test.go`：Graph Console Component、登录/session、ACL、页面、静态挂载和业务 API。
 - `notification_example_test.go`：MQ、cron、SSE 和 HTTP -> MQ trace。

@@ -10,6 +10,7 @@ import (
 	postgresql "github.com/neteast-software/go-module/db/postgresql/linker"
 	linker "github.com/neteast-software/linker/v3"
 
+	"linker-v3-example/internal/app"
 	user "linker-v3-example/internal/user/linker"
 )
 
@@ -81,6 +82,48 @@ func TestPlanCommandArg(t *testing.T) {
 	}
 	if isPlanCommand([]string{"linker-v3-example"}) {
 		t.Fatal("unexpected plan command")
+	}
+}
+
+func TestGatewayCommandArg(t *testing.T) {
+	if nacos, ok := gatewayCommand([]string{"linker-v3-example", "--gateway"}); !ok || nacos {
+		t.Fatalf("--gateway = (%v, %v)", nacos, ok)
+	}
+	if nacos, ok := gatewayCommand([]string{"linker-v3-example", "--gateway-nacos"}); !ok || !nacos {
+		t.Fatalf("--gateway-nacos = (%v, %v)", nacos, ok)
+	}
+	if _, ok := gatewayCommand([]string{"linker-v3-example"}); ok {
+		t.Fatal("empty command was recognized as Gateway")
+	}
+}
+
+func TestGatewayNacosProfileCanPrepareWithoutCredentialsOrNetwork(t *testing.T) {
+	t.Setenv("LINKER_V3_EXAMPLE_NACOS_DATA_ID", "")
+	sources, err := gatewaySources(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	gatewayApp, err := app.GatewayNacos(sources...)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = gatewayApp.Prepare(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	required := map[linker.ID]bool{
+		"registry/nacos":           false,
+		"registry/discovery/nacos": false,
+		"http/gateway":             false,
+	}
+	for _, component := range gatewayApp.Plan().Components {
+		if _, ok := required[component.ID]; ok {
+			required[component.ID] = true
+		}
+	}
+	for id, found := range required {
+		if !found {
+			t.Fatalf("Gateway Nacos plan missing %s", id)
+		}
 	}
 }
 

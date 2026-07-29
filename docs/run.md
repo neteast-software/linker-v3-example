@@ -41,9 +41,56 @@ go run .
 ```
 
 Nacos bootstrap endpoint 和凭据使用
-`LINKER_V3_EXAMPLE_NACOS_HOST/PORT/USERNAME/PASSWORD`，不进入业务 namespace。
+`LINKER_V3_EXAMPLE_NACOS_HOST/PORT/USERNAME/PASSWORD/NAMESPACE`，不进入业务 namespace。
 `Live` 配置先整批 decode/validate，再原子发布给新操作；`Restart` 只更新 desired Setting 并
 标记整个服务需要重启。component 不实现 Nacos reload，也不会被 framework 隐式重启。
+
+## Gateway 工作背景
+
+Gateway 是与普通业务 server 分开的启动背景。默认 profile 只读取：
+
+```text
+config/gateway.example.yaml -> config/gateway.routes.yaml -> APP_ env override
+```
+
+先在 `127.0.0.1:8800` 启动本仓库普通 server 或任意本地 HTTP upstream，再启动 Gateway：
+
+```bash
+go run . --gateway
+curl http://127.0.0.1:8810/live
+curl http://127.0.0.1:8810/example/live
+```
+
+`/live`、`/ready` 和 `/startup` 由 Gateway listener 直接回答，不经过 Route 或 upstream。
+loopback 管理 listener 在 `127.0.0.1:8820` 提供 `/metrics` 和 framework 健康面。普通 server
+与 Gateway 可以独立发布，Gateway profile 不装配 PostgreSQL、RPC 或 MQ。
+
+路由文件使用严格 `linker.gateway.v1`：
+
+```bash
+linker route check --file config/gateway.routes.yaml
+linker route list --file config/gateway.routes.yaml
+linker route diff candidate.yaml --file config/gateway.routes.yaml
+```
+
+`add/remove` 会先编译完整候选 Plan，再原子替换文件；运行中 Route 热更新仍由配置 Source
+负责，CLI 不连接 Gateway 进程。
+
+Nacos 服务发现 profile 显式启用 `registry/nacos` 和 `registry/discovery/nacos`：
+
+```bash
+APP_REGISTRY_NACOS__HOST='nacos.example.internal' \
+APP_REGISTRY_NACOS__NAMESPACE_ID='linker-v3-test-namespace' \
+APP_REGISTRY_NACOS__USERNAME='...' \
+APP_REGISTRY_NACOS__PASSWORD='...' \
+go run . --gateway-nacos
+```
+
+需要从 Nacos 读取完整 Linker 配置快照时，再声明
+`LINKER_V3_EXAMPLE_NACOS_DATA_ID/HOST/PORT/USERNAME/PASSWORD/NAMESPACE`。配置顺序固定为
+`Gateway YAML -> optional Nacos -> env override`，后声明来源覆盖前者。仓库不会提供 endpoint
+或凭据默认值。发现已有服务实例只需要读取 namespace；注册临时 upstream、发布配置等写入
+验收必须使用独立测试 namespace，不能把真实业务 namespace 当作测试写入区。
 
 ## 演示账号
 
@@ -116,5 +163,5 @@ scripts/verify-grpc-scaffold.sh
 LINKER_BIN=../linker-v3/cli/linker scripts/verify-grpc-scaffold.sh
 ```
 
-部署层 TLS 由 `docs/Caddyfile` 终止。Prometheus、OTel Collector 和 Grafana 配置见
-`observability.md`。
+部署层 TLS 由 `docs/Caddyfile` 终止。Prometheus、OTel Collector、Gateway 指标和 Grafana
+配置见 `observability.md`。

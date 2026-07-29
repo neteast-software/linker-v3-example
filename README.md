@@ -28,10 +28,23 @@ go run .
 默认密码；完整启动、Nacos 覆盖、seed 和外部依赖变量见
 [`docs/run.md`](docs/run.md)。
 
+启动独立 Gateway 工作背景：
+
+```bash
+go run . --gateway
+linker route check --file config/gateway.routes.yaml
+```
+
+它只加载 Gateway YAML、独立路由声明和 env override，不装配 DB/RPC 等普通 server 背景。
+`vendorauth.Protect`、`session.Protect/Socket/UploadRoute`、`captcha.Login` 和 `accesslog.New`
+分别是开放平台、普通会话、验证码和审计的 canonical package 入口；完整语法与 Nacos profile
+见 [`docs/run.md`](docs/run.md)，纵向边界见 [`docs/scaffold.md`](docs/scaffold.md)。
+
 ## 覆盖范围
 
 - framework：`New / Use / Run`、依赖拓扑、typed capability、Asset、Plan 和反向关闭漏斗。
 - HTTP：能力局部 `RouteSet`、文件级 API 声明、middleware 影响面、ACL Resource 和统一 response。
+- Gateway：静态/Nacos upstream、纵向入口策略、声明热更新、管理探针、指标、trace 和请求排空。
 - 数据：PostgreSQL 生命周期、GORM 对象、`model.Head`、数据范围和棕地表显式边界。
 - 服务：typed gRPC client/server、出站 HTTP client、Redis、Nacos、RocketMQ、cron、Worker 和 SSE。
 - 工作背景：health、Prometheus、OpenTelemetry、audit、fault、notice、license 和 outbox。

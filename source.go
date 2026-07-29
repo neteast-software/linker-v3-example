@@ -10,10 +10,15 @@ import (
 	yaml "github.com/neteast-software/go-module/config/yaml/linker"
 	nacos "github.com/neteast-software/go-module/registry/nacos/linker"
 	linker "github.com/neteast-software/linker/v3"
+
+	gateway "linker-v3-example/internal/gateway/linker"
 )
 
 const configPathEnv = "LINKER_V3_EXAMPLE_CONFIG"
 const configOverridePrefix = "APP_"
+const gatewayConfigPath = "config/gateway.example.yaml"
+const gatewayNacosConfigPath = "config/gateway.nacos.example.yaml"
+const gatewayRoutesPath = "config/gateway.routes.yaml"
 
 func configSources(extra ...linker.Source) ([]linker.Source, error) {
 	sources := []linker.Source{yaml.File(configPaths()...)}
@@ -25,6 +30,27 @@ func configSources(extra ...linker.Source) ([]linker.Source, error) {
 		sources = append(sources, source)
 	}
 	sources = append(sources, extra...)
+	sources = append(sources, env.Prefix(configOverridePrefix))
+	return sources, nil
+}
+
+func gatewaySources(nacosProfile bool) ([]linker.Source, error) {
+	path := gatewayConfigPath
+	if nacosProfile {
+		path = gatewayNacosConfigPath
+	}
+	sources := []linker.Source{yaml.File(path)}
+	if nacosProfile {
+		source, err := nacosSource()
+		if err != nil {
+			return nil, err
+		}
+		if source != nil {
+			sources = append(sources, source)
+		}
+	} else {
+		sources = append(sources, gateway.Routes(gatewayRoutesPath))
+	}
 	sources = append(sources, env.Prefix(configOverridePrefix))
 	return sources, nil
 }
@@ -46,6 +72,7 @@ func nacosSource() (linker.Source, error) {
 	client.Host = strings.TrimSpace(os.Getenv("LINKER_V3_EXAMPLE_NACOS_HOST"))
 	client.Username = strings.TrimSpace(os.Getenv("LINKER_V3_EXAMPLE_NACOS_USERNAME"))
 	client.Password = os.Getenv("LINKER_V3_EXAMPLE_NACOS_PASSWORD")
+	client.NamespaceID = strings.TrimSpace(os.Getenv("LINKER_V3_EXAMPLE_NACOS_NAMESPACE"))
 	if value := strings.TrimSpace(os.Getenv("LINKER_V3_EXAMPLE_NACOS_PORT")); value != "" {
 		port, err := strconv.ParseUint(value, 10, 16)
 		if err != nil || port == 0 {

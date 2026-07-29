@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	yaml "github.com/neteast-software/go-module/config/yaml/linker"
+	gateway "github.com/neteast-software/go-module/http/gateway/linker"
 	opentelemetry "github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker"
 	linker "github.com/neteast-software/linker/v3"
 )
@@ -18,6 +19,57 @@ func TestConfigSourcesRejectInvalidNacosPort(t *testing.T) {
 	_, err := configSources()
 	if err == nil || !strings.Contains(err.Error(), "NACOS_PORT") {
 		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestGatewaySourcesKeepDeclarationAsIndependentAsset(t *testing.T) {
+	t.Setenv("LINKER_V3_EXAMPLE_NACOS_DATA_ID", "")
+	sources, err := gatewaySources(false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(sources) != 3 {
+		t.Fatalf("sources = %d", len(sources))
+	}
+	want := []string{"config/yaml", "example/gateway/routes", "config/env"}
+	for index, source := range sources {
+		if source.Name() != want[index] {
+			t.Fatalf("source %d = %s", index, source.Name())
+		}
+	}
+	settings := make([]linker.Setting, 0, len(sources))
+	for _, source := range sources {
+		setting, err := source.Load(context.Background(), linker.BootstrapContext{})
+		if err != nil {
+			t.Fatalf("load %s: %v", source.Name(), err)
+		}
+		settings = append(settings, setting)
+	}
+	merged := linker.MergeSettings(settings...)
+	if _, ok := merged.Lookup(gateway.Namespace); !ok {
+		t.Fatal("Gateway static namespace missing")
+	}
+	content, ok := merged.Lookup(gateway.RoutesNamespace)
+	if !ok || !strings.Contains(string(content), "linker.gateway.v1") {
+		t.Fatalf("Gateway routes = %q", content)
+	}
+}
+
+func TestGatewayNacosSourcesKeepOverrideOrder(t *testing.T) {
+	t.Setenv("LINKER_V3_EXAMPLE_NACOS_DATA_ID", "gateway.yaml")
+	t.Setenv("LINKER_V3_EXAMPLE_NACOS_HOST", "127.0.0.1")
+	sources, err := gatewaySources(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []string{"config/yaml", "registry/nacos/config", "config/env"}
+	if len(sources) != len(want) {
+		t.Fatalf("sources = %d", len(sources))
+	}
+	for index, source := range sources {
+		if source.Name() != want[index] {
+			t.Fatalf("source %d = %s", index, source.Name())
+		}
 	}
 }
 

@@ -1,0 +1,36 @@
+# Nacos endpoint、namespace 和凭据只允许由本地 override、env 或 secret provider 注入。
+registry/nacos: {}
+
+http:
+  addr: 127.0.0.1:8820
+  recovery: true
+  health:
+    liveness:  {enabled: true, path: /live}
+    readiness: {enabled: true, path: /ready}
+    startup:   {enabled: true, path: /startup}
+
+http/gateway:
+  address: 127.0.0.1:8810
+  discovery: nacos
+  read_timeout: 0s
+  read_header_timeout: 10s
+  write_timeout: 0s
+  idle_timeout: 90s
+  max_header_bytes: 1048576
+  concurrency: 4096
+  health:
+    liveness:  {enabled: true, path: /live}
+    readiness: {enabled: true, path: /ready}
+    startup:   {enabled: true, path: /startup}
+
+observe/metrics:
+  enabled: true
+  namespace: linker_v3_example_gateway
+  const_labels:
+    service: gateway-example
+
+observe/tracing:
+  mode: memory
+  service: gateway-example
+  environment: local
+  sample_ratio: 1

@@ -138,6 +138,45 @@ route 文件集中表达 path、method、resource、scope、middleware 影响面
 - 跨 route 的访问策略统一放在 `internal/access`，具体 route 只声明影响面。
 - route 通过 `http.Require(c, user.ServiceKey())` 获取能力，不接触全局 runtime 容器。
 
+## Gateway
+
+Gateway 是独立 server 工作背景，不是业务 HTTP 的中心 route tree。composition root 只装配
+中立 Route Document、provider 和生命周期组件：
+
+```go
+component := gateway.New(
+    document,
+    gateway.WithConfig(config),
+    gateway.WithDiscovery(provider),
+    gateway.WithFilters(vendorFilter, sessionFilter, captchaFilter),
+)
+return server.New(server.WithGateway(component)), nil
+```
+
+入口策略按业务能力纵向落位：
+
+```text
+internal/vendorauth/   # 开放平台 JWT、scope、证书绑定和 route decoration
+internal/session/      # 普通 session、WebSocket 和上传兼容策略
+internal/captcha/      # 一次性 challenge 和登录 route decoration
+internal/accesslog/    # 脱敏记录、有界投递 worker 和消息适配
+internal/gateway/      # 仅保留当前项目的 Route Document 组合
+```
+
+route 调用只表达业务影响面：
+
+```go
+route := vendorauth.Protect(gateway.URL(
+    "vendor/equipment",
+    "/vendor/equipment/**",
+    equipmentOrigin,
+), "equipment-read")
+```
+
+策略能力自行声明 Filter factory 和 route decoration；`app` 不解析 policy map，也不维护
+filter switch。内部身份 Header 先在可信入口统一清理，再由已经验证的能力投影。Nacos、
+Redis 和 RocketMQ 只通过各自 adapter 接入，不进入 Gateway core。
+
 ## 持久化对象
 
 model 是可持久化资源映射的概念，不是必须建立的全局目录。对象直接位于能力 package：

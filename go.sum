@@ -486,6 +486,10 @@ github.com/neteast-software/go-module/http/client/linker v0.4.0 h1:RhHO32hhVULuW
 github.com/neteast-software/go-module/http/client/linker v0.4.0/go.mod h1:jBulABQONqo4eclrRlA0aIVTTAgbVrsloVCePWnJh10=
 github.com/neteast-software/go-module/http/gateway v0.1.0 h1:ChioJhP5aKqCjjLUiK5HFRgIm8i0C/mxoRZ4CwQALUE=
 github.com/neteast-software/go-module/http/gateway v0.1.0/go.mod h1:VFXXjNf5JcQT1Ar1nEf8aZKlRDZ8IAcMOYy6MtM4CyA=
+github.com/neteast-software/go-module/http/gateway/declaration v0.1.0 h1:vCxheFl/Dq4GYMfsmEkxUWMd99CmfjTx/IvmdlQ9wQk=
+github.com/neteast-software/go-module/http/gateway/declaration v0.1.0/go.mod h1:BQBNKvUkmTQI7koqGUCMBhnpNioLADn1yy9+Fdw+5gA=
+github.com/neteast-software/go-module/http/gateway/linker v0.2.0 h1:aCb640kLy8CTwHhsE6epcSRndQYcvBWBjSjArQV6xiE=
+github.com/neteast-software/go-module/http/gateway/linker v0.2.0/go.mod h1:ayxaUr6yShOc4jMd9kDhw6vK4ENd61q9PisdRrZLzLE=
 github.com/neteast-software/go-module/http/gin v0.5.0 h1:PzoicgOdz0oVFdQkeb8vMTRg9BCrT93eAOJvO5wyhKc=
 github.com/neteast-software/go-module/http/gin v0.5.0/go.mod h1:2MxVdJFVLRNjVu23q6xxb7rYjYHgSLv6p8aMRiRA8NI=
 github.com/neteast-software/go-module/http/gin/linker v0.4.0 h1:g0AWJQrEFchI2keGBcYze8g4wrjmei87WpnEbV7Lj3s=
@@ -494,8 +498,8 @@ github.com/neteast-software/go-module/license v0.4.0 h1:+oc4kAHf/Onh1O880O5JPJx9
 github.com/neteast-software/go-module/license v0.4.0/go.mod h1:vDhKbGoV+p/L/kB7fBsKZ1pm8VAuBKdcFyXL75OAKrY=
 github.com/neteast-software/go-module/license/http/gin v0.4.0 h1:WaxlFYTcLBV0ZcgsWjTvfhlfWrMs2fxJdhR0VKwSCS0=
 github.com/neteast-software/go-module/license/http/gin v0.4.0/go.mod h1:2/f9AYNOK3RMMu2zYSIdDmIgzHBhGPJmehy0SM7quKI=
-github.com/neteast-software/go-module/linker/server v0.4.0 h1:IG0u/oKzHl2VSrIDnhbSZwH2n9QkAO7cBsXwjNuP0Wc=
-github.com/neteast-software/go-module/linker/server v0.4.0/go.mod h1:g1cCVQ5nvoz705LR/vREstRvjVgyTOv1+3srcK7d5/c=
+github.com/neteast-software/go-module/linker/server v0.4.1 h1:z/qzKYkPUJQB+/FFASA/JsveU7SENM0tsUS1axDPcMw=
+github.com/neteast-software/go-module/linker/server v0.4.1/go.mod h1:EeuidcrACqvGYawe1gvSRI35pRluneEWnkUrS9kRuj0=
 github.com/neteast-software/go-module/mq/consumer v0.2.0 h1:Tv0cjGDR19bvXwaY+kiyxQs7ScbjCMyIQloHzCSoFoM=
 github.com/neteast-software/go-module/mq/consumer v0.2.0/go.mod h1:BWnjle16lDXOC23o40ZXNvkEgjLhat3KgiZ7U5RcctQ=
 github.com/neteast-software/go-module/mq/consumer/linker v0.4.1 h1:/Yi0ErxROduwDGmqP64nbSn3D0Dl0k54D1CG81wlaqQ=
@@ -512,6 +516,8 @@ github.com/neteast-software/go-module/observe/metrics v0.3.0 h1:QsYfTx/cKp37/rqH
 github.com/neteast-software/go-module/observe/metrics v0.3.0/go.mod h1:xdMmA1CjqaWytffqlLA5ZzRFl7LrcXx42fD5hOhAA0k=
 github.com/neteast-software/go-module/observe/metrics/fault/notice v0.2.0 h1:iBjP5UyUccfr1XXaW1IpeWVTlGmjmcwUIOwy+D64Iak=
 github.com/neteast-software/go-module/observe/metrics/fault/notice v0.2.0/go.mod h1:cA4JrbClWv56u02j9ZypGxXkiSigYz2lj9ixnDBA5Hg=
+github.com/neteast-software/go-module/observe/metrics/http/gateway v0.1.0 h1:eumjnpu8b3wz3SvYi1GHF+JuwbPr5Wdaw7ePhiAhWlo=
+github.com/neteast-software/go-module/observe/metrics/http/gateway v0.1.0/go.mod h1:yQKbAml8lIlN33smy4TDEwfbmsNechh1NQ35nytynCY=
 github.com/neteast-software/go-module/observe/metrics/http/gin v0.2.1 h1:OCcEyEm+eyYm2KgxbHV4GYjfn1YcrhGgu3sGpCGPyac=
 github.com/neteast-software/go-module/observe/metrics/http/gin v0.2.1/go.mod h1:Kv24XAfRVSOK5ELmekSKPqKjvy/TK2N+UGJsHIhd1Ts=
 github.com/neteast-software/go-module/observe/metrics/http/gin/linker v0.4.0 h1:jIDNfX0OBsOcm6TRMMpzuuDtH38qO0GjBNqaIfscJ1g=
@@ -534,6 +540,8 @@ github.com/neteast-software/go-module/observe/tracing v0.3.0 h1:tXTzyl5bDWPmE8QH
 github.com/neteast-software/go-module/observe/tracing v0.3.0/go.mod h1:PU+cNLa/3gkYJaiBRHQ0gzv874nYmDkZKA8cw5B5J0s=
 github.com/neteast-software/go-module/observe/tracing/http/client v0.4.0 h1:CY2h7KAI8BTeELB6d3DOl4cSlFH5RT6wgi8W6ECca2Q=
 github.com/neteast-software/go-module/observe/tracing/http/client v0.4.0/go.mod h1:59vFh8ND4+YjQ4m1fiwfT7YTL8QThlv6Os1eopfKFo0=
+github.com/neteast-software/go-module/observe/tracing/http/gateway v0.1.0 h1:JfzDWD0VzA8g7NjH1RKvueuBqZPZfwS4qtG9G4lxChY=
+github.com/neteast-software/go-module/observe/tracing/http/gateway v0.1.0/go.mod h1:YO4DBIMjDgDdjBvBjJ/x2pkR11ktNAPsIebrQzifI34=
 github.com/neteast-software/go-module/observe/tracing/http/gin v0.2.1 h1:TQkt2c7I1XjvhRS9uxWZg67OJgzXlT+RWSBxjNUpmeA=
 github.com/neteast-software/go-module/observe/tracing/http/gin v0.2.1/go.mod h1:0QF/qUIu3M9EM51evx3afHYdzKMKK38fO3LX34ijrn4=
 github.com/neteast-software/go-module/observe/tracing/http/gin/linker v0.4.0 h1:gUpCuJXZBmr+Q1dqCPdE9NDPdja/7QhCFqBAfgSeRT4=
@@ -544,8 +552,8 @@ github.com/neteast-software/go-module/observe/tracing/mq/consumer v0.4.1 h1:gWp4
 github.com/neteast-software/go-module/observe/tracing/mq/consumer v0.4.1/go.mod h1:iTOc6D0xw/MESg7eAVGBszY/Y4fzTuLZwR9d77ggeYU=
 github.com/neteast-software/go-module/observe/tracing/opentelemetry v0.4.0 h1:Z+rlV45juMGE7fhtZJbFCRSstzQRI+YHGMUABtTkrc0=
 github.com/neteast-software/go-module/observe/tracing/opentelemetry v0.4.0/go.mod h1:FrDFDqU7WCeszWvvB/wx6S2kmFeiLQXxyGSKwD/+x1E=
-github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker v0.4.0 h1:SDXe9xPywYSn1QCtamC/Vy4kiq8R5hzhs+DCL+QOYJQ=
-github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker v0.4.0/go.mod h1:0JzJQRF2ApsEuYEqP63PLR3JdzARwiwwyfPKVVMYL9M=
+github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker v0.4.1 h1:RjUH1OzdxGM0QHq8PvRafnBWXFYlOjqT9rOLjm7+rtU=
+github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker v0.4.1/go.mod h1:rlO2ACtA1HBVRx9cgzSZjvn5254JR9NaCil88jeZi38=
 github.com/neteast-software/go-module/observe/tracing/rpc/grpc v0.3.1 h1:m5Z3CGWAsJHRrusfuM3wuHC3Qn8UQEdSk+bdcDO9vkw=
 github.com/neteast-software/go-module/observe/tracing/rpc/grpc v0.3.1/go.mod h1:S+wMtxofC2T0iZba+oRA/ix5UcTHMVb5gjMQFYG9FSU=
 github.com/neteast-software/go-module/observe/tracing/scheduler/cron v0.1.0 h1:v+e80N/dhDEo8eRBl8jnkO90S1eCJ7MMshgMBhU/C1U=
@@ -556,6 +564,14 @@ github.com/neteast-software/go-module/provider v0.3.0 h1:AfZ2AslTuVLxa3/hMN2B3VC
 github.com/neteast-software/go-module/provider v0.3.0/go.mod h1:yAxPGmMMQmuMzjJI8s0uREskjWy6CAifxNtM6beYqCs=
 github.com/neteast-software/go-module/redact v0.3.0 h1:+RsmdG2RLj6WEz9GO+6Ab/wnoAtX0+XlU9nw9b5e4sM=
 github.com/neteast-software/go-module/redact v0.3.0/go.mod h1:mI+10+QYh9t6RekJ8zkmek9VYyL4kWvmHJTplP8bGuM=
+github.com/neteast-software/go-module/registry/discovery v0.1.0 h1:QcLBVpZMjZox93WZ9rXuTy91gl6JEweNZF+6k5V0Smo=
+github.com/neteast-software/go-module/registry/discovery v0.1.0/go.mod h1:MFIb0jN3x8FAMJO+nnNagK2HDvPUSY6KqhRy/cPoaNk=
+github.com/neteast-software/go-module/registry/discovery/linker v0.1.0 h1:LMMMpAzhTWDRZDIhdn6EoQGcTzgwWeRDZ9DXTc08A0w=
+github.com/neteast-software/go-module/registry/discovery/linker v0.1.0/go.mod h1:ecI92QWMi/3qg1FvmzIAjMRJ+nASDNS4XIQneueS8D0=
+github.com/neteast-software/go-module/registry/discovery/nacos v0.1.0 h1:FTmRNH5/cZ8F/IRXBK0P7pKXOyLMzrh9oUvEaKFrH0E=
+github.com/neteast-software/go-module/registry/discovery/nacos v0.1.0/go.mod h1:ZIXAKqb3ZYrsJYA27M9sVqSR74ibaYgPb17eGt5aXMk=
+github.com/neteast-software/go-module/registry/discovery/nacos/linker v0.1.0 h1:6Vo9woNuZJUNROZBzuk6jkeVtN3qWDqh8CB0taDf/U0=
+github.com/neteast-software/go-module/registry/discovery/nacos/linker v0.1.0/go.mod h1:jTC5L/zkX4DiJxf+evnAa+AMXBs78tSthyhxETlxUY4=
 github.com/neteast-software/go-module/registry/nacos v0.1.1 h1:SxICLFAYSA8itHbSVWchhqCe9++Gxkd0a5CHq6X1tQo=
 github.com/neteast-software/go-module/registry/nacos v0.1.1/go.mod h1:nrIYr3Exx4YiZBjdvUY3DLDa2PFKaUieSX5AjDxJKKE=
 github.com/neteast-software/go-module/registry/nacos/linker v0.4.0 h1:0BlW3EenWTFzLxgusbp3QXKaJQ8GJIGT40kFRIbm7h0=

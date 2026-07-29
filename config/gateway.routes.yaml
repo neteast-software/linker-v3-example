@@ -1,0 +1,80 @@
+schema: linker.gateway.v1
+plan:
+  routes:
+    - id: local/public
+      match:
+        paths: [/example/**]
+      upstream:
+        url: http://127.0.0.1:8800
+      filters:
+        - strip_prefix: 1
+      timeout: 5s
+    - id: local/vendor-equipment
+      match:
+        paths: [/vendor/equipment/**]
+      upstream:
+        url: http://127.0.0.1:8800
+      filters:
+        - external:
+            factory: vendor-auth
+            config:
+              policy: equipment-read
+        - strip_prefix: 2
+      timeout: 5s
+    - id: local/profile
+      match:
+        paths: [/session/profile/**]
+      upstream:
+        url: http://127.0.0.1:8800
+      filters:
+        - external:
+            factory: session
+            config:
+              scope: profile.read
+              platform: console
+        - strip_prefix: 2
+      timeout: 5s
+    - id: local/login
+      match:
+        paths: [/login/**]
+      upstream:
+        url: http://127.0.0.1:8800
+      filters:
+        - external:
+            factory: captcha
+        - strip_prefix: 1
+      timeout: 5s
+    - id: local/socket
+      match:
+        paths: [/socket/**]
+      upstream:
+        url: http://127.0.0.1:8800
+      filters:
+        - external:
+            factory: session
+            config:
+              websocket_path: /socket/
+        - strip_prefix: 1
+      timeout: 5s
+    - id: local/upload
+      match:
+        paths: [/file/upload/file]
+      upstream:
+        url: http://127.0.0.1:8800
+      filters:
+        - external:
+            factory: upload-token
+        - strip_prefix: 2
+      timeout: 5s
+    - id: local/file
+      match:
+        paths: [/file/**]
+      upstream:
+        url: http://127.0.0.1:8800
+      filters:
+        - external:
+            factory: session
+            config:
+              scope: file.read
+        - strip_prefix: 1
+      timeout: 5s

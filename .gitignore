@@ -3,3 +3,4 @@
 reports/
 *.log
 *.tmp
+config/*.local.yaml

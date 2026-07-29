@@ -33,4 +33,22 @@ Collector 最小配置见 `otel-collector.yaml`。Prometheus 使用 `prometheus.
 
 `example/observability_example_test.go` 使用本地 gRPC、内存 consumer、cron、Prometheus 和 OTel memory exporter 验证 HTTP -> gRPC、HTTP -> MQ、cron 的 span 关系。`example/fault_observability_example_test.go` 使用 fake sender 验证 detected -> recovering -> recovered、notice 和 metrics 闭环。
 
-飞书只作为 framework fault notice sender 显式接入。结构见 `feishu-notice.example.yaml`；默认 example 不加载该文件，也不内置 app identity、secret 或接收人。
+飞书只作为 framework fault notice sender 显式接入。结构见 `feishu-notice.example.yaml`；默认
+example 不加载该文件，也不内置 app identity、secret 或接收人。
+
+## Gateway
+
+Gateway profile 使用同一 Prometheus recorder 和 OpenTelemetry provider，通过
+`gatewaymetrics.Observe(metrics)` 与 `gatewaytracing.Observe(tracing)` 接入请求漏斗。
+稳定观测面包括：
+
+- `gateway_requests_total`、请求耗时、in-flight 和稳定 upstream failure 分类。
+- `gateway_plan_reloads_total` 与最后正常 Plan 保留结果。
+- 以 route ID 命名的 server span 和标准 trace context 传播。
+- `accesslog.New` 产生的脱敏 `operateLog` 记录、有界队列状态和投递失败反馈。
+
+Gateway metrics 不使用原始 path、upstream 地址、用户、trace ID 或错误正文作为 label；
+trace 和 accesslog 不记录 token、cookie、证书、完整 query、body 或凭据。管理探针不经过
+业务 Route，也不会制造 upstream 请求。默认 scrape 地址为
+`http://127.0.0.1:8820/metrics`，只绑定 loopback；部署时由受控采集链路访问，不把指标端点
+暴露为公网 Gateway Route。

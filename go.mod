@@ -29,8 +29,10 @@ require (
 	github.com/neteast-software/go-module/http/client v0.4.0
 	github.com/neteast-software/go-module/http/client/linker v0.4.0
 	github.com/neteast-software/go-module/http/gateway v0.1.0
+	github.com/neteast-software/go-module/http/gateway/declaration v0.1.0
+	github.com/neteast-software/go-module/http/gateway/linker v0.2.0
 	github.com/neteast-software/go-module/http/gin v0.5.0
-	github.com/neteast-software/go-module/linker/server v0.4.0
+	github.com/neteast-software/go-module/linker/server v0.4.1
 	github.com/neteast-software/go-module/mq/consumer v0.2.0
 	github.com/neteast-software/go-module/mq/consumer/linker v0.4.1
 	github.com/neteast-software/go-module/mq/rocketmq v0.4.0
@@ -38,16 +40,19 @@ require (
 	github.com/neteast-software/go-module/notify/feishu v0.1.0
 	github.com/neteast-software/go-module/notify/feishu/linker v0.4.0
 	github.com/neteast-software/go-module/observe/metrics v0.3.0
+	github.com/neteast-software/go-module/observe/metrics/http/gateway v0.1.0
 	github.com/neteast-software/go-module/observe/metrics/linker v0.4.0
 	github.com/neteast-software/go-module/observe/metrics/prometheus/linker v0.4.0
 	github.com/neteast-software/go-module/observe/metrics/rpc/grpc v0.3.1
 	github.com/neteast-software/go-module/observe/tracing v0.3.0
+	github.com/neteast-software/go-module/observe/tracing/http/gateway v0.1.0
 	github.com/neteast-software/go-module/observe/tracing/linker v0.4.0
 	github.com/neteast-software/go-module/observe/tracing/mq/consumer v0.4.1
 	github.com/neteast-software/go-module/observe/tracing/opentelemetry v0.4.0
-	github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker v0.4.0
+	github.com/neteast-software/go-module/observe/tracing/opentelemetry/linker v0.4.1
 	github.com/neteast-software/go-module/observe/tracing/rpc/grpc v0.3.1
 	github.com/neteast-software/go-module/outbox v0.2.0
+	github.com/neteast-software/go-module/registry/discovery/nacos/linker v0.1.0
 	github.com/neteast-software/go-module/registry/service v0.3.0
 	github.com/neteast-software/go-module/registry/service/nacos/linker v0.4.0
 	github.com/neteast-software/go-module/rpc/grpc v0.3.1
@@ -94,6 +99,9 @@ require (
 	github.com/neteast-software/go-module/observe/tracing/scheduler/cron v0.1.0 // indirect
 	github.com/neteast-software/go-module/provider v0.3.0 // indirect
 	github.com/neteast-software/go-module/redact v0.3.0 // indirect
+	github.com/neteast-software/go-module/registry/discovery v0.1.0 // indirect
+	github.com/neteast-software/go-module/registry/discovery/linker v0.1.0 // indirect
+	github.com/neteast-software/go-module/registry/discovery/nacos v0.1.0 // indirect
 	github.com/neteast-software/go-module/registry/service/linker v0.4.0 // indirect
 	github.com/neteast-software/go-module/registry/service/nacos v0.4.0 // indirect
 	github.com/neteast-software/go-module/scheduler/cron/store/gorm v0.4.0 // indirect
