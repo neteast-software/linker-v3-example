@@ -28,7 +28,7 @@ require (
 	github.com/neteast-software/go-module/fault/notice/linker v0.4.0
 	github.com/neteast-software/go-module/http/client v0.4.0
 	github.com/neteast-software/go-module/http/client/linker v0.4.0
-	github.com/neteast-software/go-module/http/gin v0.4.0
+	github.com/neteast-software/go-module/http/gin v0.5.0
 	github.com/neteast-software/go-module/linker/server v0.4.0
 	github.com/neteast-software/go-module/mq/consumer v0.2.0
 	github.com/neteast-software/go-module/mq/consumer/linker v0.4.1

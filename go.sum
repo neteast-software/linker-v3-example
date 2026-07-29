@@ -352,8 +352,8 @@ github.com/neteast-software/go-module/http/client v0.4.0 h1:zApBdmzxpk+cOhcYAfNu
 github.com/neteast-software/go-module/http/client v0.4.0/go.mod h1:8lTuvlW+iO4O0gG7Iq5ATuk9xPR6jDciCnG1rHTCsNA=
 github.com/neteast-software/go-module/http/client/linker v0.4.0 h1:RhHO32hhVULuWii9uPUwU9tOcaEtE76fCr6+eHvoT6E=
 github.com/neteast-software/go-module/http/client/linker v0.4.0/go.mod h1:jBulABQONqo4eclrRlA0aIVTTAgbVrsloVCePWnJh10=
-github.com/neteast-software/go-module/http/gin v0.4.0 h1:ql5Us9MP1I9gwLDOfFN3h6otuvVSmtjbIOenKwRDERs=
-github.com/neteast-software/go-module/http/gin v0.4.0/go.mod h1:2MxVdJFVLRNjVu23q6xxb7rYjYHgSLv6p8aMRiRA8NI=
+github.com/neteast-software/go-module/http/gin v0.5.0 h1:PzoicgOdz0oVFdQkeb8vMTRg9BCrT93eAOJvO5wyhKc=
+github.com/neteast-software/go-module/http/gin v0.5.0/go.mod h1:2MxVdJFVLRNjVu23q6xxb7rYjYHgSLv6p8aMRiRA8NI=
 github.com/neteast-software/go-module/http/gin/linker v0.4.0 h1:g0AWJQrEFchI2keGBcYze8g4wrjmei87WpnEbV7Lj3s=
 github.com/neteast-software/go-module/http/gin/linker v0.4.0/go.mod h1:MhybqQkYeBrbkTVXGxVQV9EkCjC2PetHQgzc8OEpPbQ=
 github.com/neteast-software/go-module/license v0.4.0 h1:+oc4kAHf/Onh1O880O5JPJx9cw8O8FPhUpx5JDv7pRQ=

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	eventcore "github.com/neteast-software/go-module/fault/event"
-	"github.com/neteast-software/go-module/http/gin/gateway"
+	"github.com/neteast-software/go-module/http/gin/forwarded"
 	http "github.com/neteast-software/go-module/http/gin/linker"
 	"github.com/neteast-software/go-module/http/gin/param"
 	"github.com/neteast-software/go-module/http/gin/response"
@@ -48,7 +48,7 @@ func TestLinkerV3HTTPGinExample(t *testing.T) {
 					response.Warning(c, "%s", err.Error())
 					return
 				}
-				url, err := gateway.CurrentURL(c, "items/"+c.Param("id"))
+				url, err := forwarded.CurrentURL(c, "items/"+c.Param("id"))
 				if err != nil {
 					response.Warning(c, "%s", err.Error())
 					return
