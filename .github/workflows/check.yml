@@ -35,11 +35,15 @@ jobs:
         env:
           LINKER_KEY: ${{ secrets.LINKER_DEPLOY_KEY }}
           GO_MODULE_KEY: ${{ secrets.GO_MODULE_DEPLOY_KEY }}
+          GRPC_DISCOVERY_KEY: ${{ secrets.GRPC_DISCOVERY_DEPLOY_KEY }}
+          NACOS_KIT_KEY: ${{ secrets.NACOS_KIT_DEPLOY_KEY }}
         run: |
           umask 077
           mkdir -p ~/.ssh
           printf '%s\n' "$LINKER_KEY" > ~/.ssh/linker
           printf '%s\n' "$GO_MODULE_KEY" > ~/.ssh/go-module
+          printf '%s\n' "$GRPC_DISCOVERY_KEY" > ~/.ssh/grpc-discovery
+          printf '%s\n' "$NACOS_KIT_KEY" > ~/.ssh/nacos-kit
           ssh-keyscan -H github.com >> ~/.ssh/known_hosts
           cat >> ~/.ssh/config <<'EOF'
           Host github-linker
@@ -52,9 +56,21 @@ jobs:
             User git
             IdentityFile ~/.ssh/go-module
             IdentitiesOnly yes
+          Host github-grpc-discovery
+            HostName github.com
+            User git
+            IdentityFile ~/.ssh/grpc-discovery
+            IdentitiesOnly yes
+          Host github-nacos-kit
+            HostName github.com
+            User git
+            IdentityFile ~/.ssh/nacos-kit
+            IdentitiesOnly yes
           EOF
           git config --global url."ssh://git@github-linker/neteast-software/linker".insteadOf "https://github.com/neteast-software/linker"
           git config --global url."ssh://git@github-go-module/neteast-software/go-module".insteadOf "https://github.com/neteast-software/go-module"
+          git config --global url."ssh://git@github-grpc-discovery/neteast-software/grpc-discovery".insteadOf "https://github.com/neteast-software/grpc-discovery"
+          git config --global url."ssh://git@github-nacos-kit/neteast-software/nacos-kit".insteadOf "https://github.com/neteast-software/nacos-kit"
       - run: go install golang.org/x/vuln/cmd/govulncheck@v1.6.0
       - working-directory: linker-v3-example
         env:
