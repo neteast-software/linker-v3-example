@@ -11,7 +11,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 
@@ -29,7 +28,6 @@ import (
 	rpccore "github.com/neteast-software/go-module/rpc/grpc"
 	rpc "github.com/neteast-software/go-module/rpc/grpc/linker"
 	schedule "github.com/neteast-software/go-module/scheduler/cron/linker"
-	grpcdiscovery "github.com/neteast-software/grpc-discovery"
 	linker "github.com/neteast-software/linker/v3"
 
 	app "linker-v3-example/internal/app"
@@ -49,18 +47,9 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	httpConfig := http.DefaultConfig()
 	httpConfig.Addr = "127.0.0.1:0"
 	grpcConfig := rpccore.ServerConfig{Addr: freeLocalAddr(t)}
-	discovery := &exampleDiscovery{addr: grpcConfig.Addr}
-	rpccore.ConfigureDiscovery("example", discovery)
 	postgresqlConfig := prepareExampleDatabase(t)
 	ttsConfig := rpccore.ClientConfig{
-		Discovery: rpccore.ClientDiscoveryConfig{
-			Scheme:  "example",
-			Service: "tts",
-			Group:   "DEFAULT_GROUP",
-			Metadata: map[string]string{
-				"version": "v1",
-			},
-		},
+		Target:   grpcConfig.Addr,
 		Timeout:  time.Second,
 		Insecure: true,
 		Metadata: map[string]string{
@@ -260,7 +249,6 @@ func TestBusinessSystemExampleWithPostgreSQL(t *testing.T) {
 	if httpTTSData["result"] != "tts:hello-http:front" {
 		t.Fatalf("unexpected http tts result: %#v", httpTTSData)
 	}
-	discovery.assertLookup(t, "tts", map[string]string{"version": "v1"})
 	cancelCtx, cancel := context.WithCancel(context.Background())
 	cancel()
 	if _, err = tts.Transcribe(cancelCtx, "cancel"); err == nil {
@@ -349,50 +337,6 @@ func prepareExampleDatabase(t *testing.T) postgresqlcore.Config {
 	})
 	config.DBName = dbName
 	return config
-}
-
-type exampleDiscovery struct {
-	mu    sync.Mutex
-	addr  string
-	query grpcdiscovery.Query
-}
-
-func (p *exampleDiscovery) Lookup(_ context.Context, query grpcdiscovery.Query) ([]grpcdiscovery.Instance, error) {
-	p.mu.Lock()
-	p.query = query
-	p.mu.Unlock()
-	return []grpcdiscovery.Instance{
-		{
-			Addr: p.addr,
-			Metadata: map[string]string{
-				"version": "v1",
-			},
-		},
-	}, nil
-}
-
-func (p *exampleDiscovery) Watch(context.Context, grpcdiscovery.Query, func([]grpcdiscovery.Instance, error)) (grpcdiscovery.Watcher, error) {
-	return noopWatcher{}, nil
-}
-
-func (p *exampleDiscovery) assertLookup(t *testing.T, service string, metadata map[string]string) {
-	t.Helper()
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	if p.query.ServiceName != service {
-		t.Fatalf("discovery service = %q", p.query.ServiceName)
-	}
-	for key, want := range metadata {
-		if p.query.Metadata[key] != want {
-			t.Fatalf("discovery metadata[%s] = %q, want %q query=%#v", key, p.query.Metadata[key], want, p.query)
-		}
-	}
-}
-
-type noopWatcher struct{}
-
-func (noopWatcher) Close() error {
-	return nil
 }
 
 func freeLocalAddr(t *testing.T) string {

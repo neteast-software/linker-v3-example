@@ -64,7 +64,6 @@ require (
 	github.com/neteast-software/go-module/user/account v0.4.0
 	github.com/neteast-software/go-module/worker/periodic v0.1.0
 	github.com/neteast-software/go-module/worker/periodic/linker v0.4.0
-	github.com/neteast-software/grpc-discovery v0.1.0
 	github.com/neteast-software/linker/v3 v3.7.0
 	google.golang.org/grpc v1.82.1
 	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af
@@ -105,6 +104,7 @@ require (
 	github.com/neteast-software/go-module/registry/service/linker v0.4.0 // indirect
 	github.com/neteast-software/go-module/registry/service/nacos v0.4.0 // indirect
 	github.com/neteast-software/go-module/scheduler/cron/store/gorm v0.4.0 // indirect
+	github.com/neteast-software/grpc-discovery v0.1.0 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/opentracing/basictracer-go v1.1.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect

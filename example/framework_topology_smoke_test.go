@@ -65,11 +65,6 @@ func (p *smokeProvider) Start(context.Context) error {
 	return nil
 }
 
-func (p *smokeProvider) OnMounted(context.Context, linker.Runtime) error {
-	*p.events = append(*p.events, "provider:mounted")
-	return nil
-}
-
 func (p *smokeProvider) Stop(context.Context) error {
 	*p.events = append(*p.events, "provider:stop")
 	return nil
@@ -170,7 +165,7 @@ func TestFrameworkStartupRollbackAndGracefulShutdown(t *testing.T) {
 		if err := app.Start(context.Background()); err == nil {
 			t.Fatal("expected startup failure")
 		}
-		if !containsInOrder(events, "provider:mounted", "consumer:init", "provider:stop", "provider:close") {
+		if !containsInOrder(events, "provider:start", "consumer:init", "provider:stop", "provider:close") {
 			t.Fatalf("rollback lifecycle = %#v", events)
 		}
 	})
@@ -190,7 +185,7 @@ func TestFrameworkStartupRollbackAndGracefulShutdown(t *testing.T) {
 		if err := app.Stop(context.Background()); err != nil {
 			t.Fatalf("stop: %v", err)
 		}
-		if !containsInOrder(events, "provider:mounted", "manager:init", "manager:stop", "provider:stop", "provider:close") {
+		if !containsInOrder(events, "provider:start", "manager:init", "manager:stop", "provider:stop", "provider:close") {
 			t.Fatalf("graceful lifecycle = %#v", events)
 		}
 	})
