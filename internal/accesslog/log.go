@@ -17,7 +17,8 @@ const publishTimeout = 2 * time.Second
 type Log struct {
 	publisher Publisher
 	queue     chan Record
-	stop      chan struct{}
+	ctx       context.Context
+	cancel    context.CancelFunc
 	done      chan struct{}
 	now       func() time.Time
 	prefix    string
@@ -46,10 +47,12 @@ func New(publisher Publisher, capacity int) (*Log, error) {
 	if _, err := rand.Read(value); err != nil {
 		return nil, fmt.Errorf("accesslog event prefix 生成失败: %w", err)
 	}
+	ctx, cancel := context.WithCancel(context.Background())
 	return &Log{
 		publisher: publisher,
 		queue:     make(chan Record, capacity),
-		stop:      make(chan struct{}),
+		ctx:       ctx,
+		cancel:    cancel,
 		done:      make(chan struct{}),
 		now:       time.Now,
 		prefix:    hex.EncodeToString(value),
@@ -65,22 +68,25 @@ func (p *Log) Open() error {
 	if p == nil {
 		return fmt.Errorf("accesslog 不能为空")
 	}
+	if p.ctx == nil || p.cancel == nil || p.queue == nil || p.done == nil {
+		return fmt.Errorf("accesslog 未通过 New 初始化")
+	}
 	if p.closing.Load() {
 		return fmt.Errorf("accesslog 已进入关闭流程")
 	}
 	if p.started.CompareAndSwap(false, true) {
-		go p.run()
+		go p.run(p.ctx)
 	}
 	return nil
 }
 
-func (p *Log) run() {
+func (p *Log) run(ctx context.Context) {
 	defer close(p.done)
 	for {
 		select {
 		case record := <-p.queue:
 			p.publish(record)
-		case <-p.stop:
+		case <-ctx.Done():
 			for {
 				select {
 				case record := <-p.queue:
@@ -117,7 +123,7 @@ func (p *Log) Close(ctx context.Context) error {
 	}
 	p.enqueueMutex.Lock()
 	if p.closing.CompareAndSwap(false, true) {
-		close(p.stop)
+		p.cancel()
 	}
 	p.enqueueMutex.Unlock()
 	select {
