@@ -5,14 +5,9 @@ import (
 
 	"github.com/neteast-software/go-module/acl"
 	graphconsole "github.com/neteast-software/go-module/graph/console/linker"
-	"github.com/neteast-software/go-module/graph/console/protocol"
 
 	console "linker-v3-example/internal/console"
 	"linker-v3-example/internal/console/dashboard"
-	orderpage "linker-v3-example/internal/console/order"
-	permissionpage "linker-v3-example/internal/console/permission"
-	orderresource "linker-v3-example/internal/order"
-	permissionresource "linker-v3-example/internal/permission"
 	user "linker-v3-example/internal/user"
 )
 
@@ -22,17 +17,9 @@ func New(options ...graphconsole.Option) *graphconsole.Component {
 		graphconsole.ConfigureFrom(user.AuthKey(), provider.Configure),
 		graphconsole.WithEntry(console.Entry()),
 		graphconsole.WithMenu(console.Menu()),
-		graphconsole.WithPages(map[string]protocol.Object{
-			"dashboard":                dashboard.Page(),
-			"order.list":               orderpage.List(),
-			"order.form":               orderpage.Form(),
-			"permission.role-resource": permissionpage.Relation(),
-		}),
+		graphconsole.WithPage("dashboard", dashboard.Page()),
 		graphconsole.WithResources(
 			acl.NewResource(console.Dashboard, acl.Scope("console", 0, "后台工作台", acl.Read)),
-			acl.NewResource(orderresource.List, acl.Scope("console", 1, "后台订单列表", acl.Read)),
-			acl.NewResource(orderresource.Update, acl.Scope("app2", 2, "应用二订单维护", acl.Read|acl.Update)),
-			acl.NewResource(permissionresource.Manage, acl.Scope("console", 3, "角色权限配置", acl.Read|acl.Update)),
 		),
 		graphconsole.WithProvider(provider),
 	}

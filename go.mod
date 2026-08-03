@@ -26,6 +26,8 @@ require (
 	github.com/neteast-software/go-module/fault/event/linker v0.4.0
 	github.com/neteast-software/go-module/fault/notice v0.2.0
 	github.com/neteast-software/go-module/fault/notice/linker v0.4.0
+	github.com/neteast-software/go-module/graph/console v0.5.0
+	github.com/neteast-software/go-module/graph/console/linker v0.1.1
 	github.com/neteast-software/go-module/http/client v0.4.0
 	github.com/neteast-software/go-module/http/client/linker v0.4.0
 	github.com/neteast-software/go-module/http/gateway v0.1.0
@@ -64,7 +66,7 @@ require (
 	github.com/neteast-software/go-module/user/account v0.4.0
 	github.com/neteast-software/go-module/worker/periodic v0.1.0
 	github.com/neteast-software/go-module/worker/periodic/linker v0.4.0
-	github.com/neteast-software/linker/v3 v3.7.0
+	github.com/neteast-software/linker/v3 v3.9.0
 	google.golang.org/grpc v1.82.1
 	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af
 	gorm.io/gorm v1.31.1
@@ -235,7 +237,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
-	github.com/neteast-software/go-module/graph/console v0.4.0
 	github.com/neteast-software/go-module/http/gin/linker v0.4.0
 	github.com/neteast-software/go-module/license v0.4.0
 	github.com/neteast-software/go-module/license/http/gin v0.4.0

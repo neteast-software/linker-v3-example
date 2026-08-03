@@ -47,6 +47,9 @@ internal/user/
 │   ├── routes.go
 │   ├── profile.go
 │   └── user_login.go
+├── console/
+│   ├── list.go
+│   └── form.go
 └── linker/
     ├── component.go
     └── config.go
@@ -57,11 +60,18 @@ internal/user/
 ```text
 app -> capability/linker -> capability
                      └── capability/http
+                     └── capability/console
 capability/http -> capability
+capability/console -> capability
 capability -> autonomous modules
 ```
 
 能力根 package 不反向依赖 `app`、`http` 或 `linker`。末级目录只有在它本身就是调用能力时才适合作为 package 名；`http`、`linker` 只是技术路径，因此其中的 package 仍使用 `user`、`order` 等业务名。
+
+Graph Console 页面也是能力内部的协议适配。`internal/<capability>/console` 拥有页面对象、交互和
+资源引用；不能放入全局 `internal/console/<capability>`，也不能让 composition root 拥有页面
+实现。Graph Console adapter 尚未发布 owner Asset 契约时，中央装配可以临时引用这些对象；正式
+契约可用后必须由 capability lifecycle adapter 自治声明页面与 Resource Asset。
 
 一个文件保持一个重心。对象、流程或适配器形成稳定中心后单独成文件；很轻的聚合关系可以同文件保留。不要为了对象化制造没有状态、策略、生命周期、反馈或审计闭环的包装。
 
