@@ -66,7 +66,7 @@ require (
 	github.com/neteast-software/go-module/user/account v0.4.0
 	github.com/neteast-software/go-module/worker/periodic v0.1.0
 	github.com/neteast-software/go-module/worker/periodic/linker v0.4.0
-	github.com/neteast-software/linker/v3 v3.7.0
+	github.com/neteast-software/linker/v3 v3.9.0
 	google.golang.org/grpc v1.82.1
 	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af
 	gorm.io/gorm v1.31.1
