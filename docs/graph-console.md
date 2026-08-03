@@ -1,7 +1,9 @@
 # Graph Console 运行方式
 
 Graph Console 的 Go 协议和 Component 位于 `go-module/graph/console`，浏览器实现位于
-独立的 `graph-console` 仓库。本项目只演示业务装配，不复制协议或前端源码。
+独立的 `graph-console` 仓库。本项目只演示业务装配，不复制协议或前端源码。业务 page/resource
+由 `internal/<capability>/linker` 使用 typed Asset 自治声明；`internal/console/linker` 只保留
+dashboard 和系统级 menu/session/provider 装配。
 
 ## 1. Fixture
 

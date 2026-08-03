@@ -478,8 +478,10 @@ github.com/neteast-software/go-module/fault/notice v0.2.0 h1:zcMFaCsbEeLaLyeaU7D
 github.com/neteast-software/go-module/fault/notice v0.2.0/go.mod h1:4cVOoV3h+IGx5yQUx2H/xZgsMqgSOHLqDUsh9KNLs9c=
 github.com/neteast-software/go-module/fault/notice/linker v0.4.0 h1:nBaqto0Imz4vHraar5akaacY6w29LWRsC0gytHpE+aQ=
 github.com/neteast-software/go-module/fault/notice/linker v0.4.0/go.mod h1:tOTyJfx5sysPJpa2jKfs2TJlZBGTM+i9n5UiOrn2GGY=
-github.com/neteast-software/go-module/graph/console v0.4.0 h1:Vz5s9PqMPHD8zu0tBQ8oXSTDPDs4k+viIkyaa/zC3mQ=
-github.com/neteast-software/go-module/graph/console v0.4.0/go.mod h1:14W5rxCRsu5fCtr/3Kmc5VCietSn6wWwc3rvfcQavtg=
+github.com/neteast-software/go-module/graph/console v0.5.0 h1:r+08t2BLIhns8A4JS+PHls86HYag+w96QvkQ8vm+8XQ=
+github.com/neteast-software/go-module/graph/console v0.5.0/go.mod h1:skim+4V8eOo4RhuFrWBl/Btv+jCLlgVQcrlzYth+FfE=
+github.com/neteast-software/go-module/graph/console/linker v0.1.1 h1:aSKOGI3Ovvn1o8wpS0b4TAuHavTo3NDEELYO95XlGEM=
+github.com/neteast-software/go-module/graph/console/linker v0.1.1/go.mod h1:fNNOiSdMLq0l5QcJ//xmHih7UjJc48BMwV9IYBHZqkY=
 github.com/neteast-software/go-module/http/client v0.4.0 h1:zApBdmzxpk+cOhcYAfNuUmz3jfWSPC2Txw1/w46XdKc=
 github.com/neteast-software/go-module/http/client v0.4.0/go.mod h1:8lTuvlW+iO4O0gG7Iq5ATuk9xPR6jDciCnG1rHTCsNA=
 github.com/neteast-software/go-module/http/client/linker v0.4.0 h1:RhHO32hhVULuWii9uPUwU9tOcaEtE76fCr6+eHvoT6E=
