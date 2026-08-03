@@ -9,10 +9,10 @@ import (
 
 	console "linker-v3-example/internal/console"
 	"linker-v3-example/internal/console/dashboard"
-	orderpage "linker-v3-example/internal/console/order"
-	permissionpage "linker-v3-example/internal/console/permission"
 	orderresource "linker-v3-example/internal/order"
+	orderpage "linker-v3-example/internal/order/console"
 	permissionresource "linker-v3-example/internal/permission"
+	permissionpage "linker-v3-example/internal/permission/console"
 	user "linker-v3-example/internal/user"
 )
 
