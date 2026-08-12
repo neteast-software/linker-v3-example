@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/neteast-software/go-module/http/gateway/declaration"
+	gatewayplan "github.com/neteast-software/go-module/http/gateway/plan"
 
 	captcha "linker-v3-example/internal/captcha"
 	session "linker-v3-example/internal/session"
@@ -29,7 +30,7 @@ func TestLocalGatewayCodeAndYAMLDeclarationsStayEquivalent(t *testing.T) {
 	if strings.Contains(strings.ToLower(string(content)), "xss") {
 		t.Fatal("XSS body rewriting must not be a default Gateway policy")
 	}
-	if _, err = declaration.Compile(fromCode, declaration.WithFilters(
+	if _, err = gatewayplan.Compile(fromCode, gatewayplan.WithFilters(
 		vendorauth.Filter(nil, vendorauth.Scope("equipment-read", "equipment.read", true)),
 		session.Filter(nil, session.Memory()),
 		session.Upload(nil, session.Memory()),
@@ -40,7 +41,7 @@ func TestLocalGatewayCodeAndYAMLDeclarationsStayEquivalent(t *testing.T) {
 }
 
 func TestNacosGatewayDocumentUsesNeutralServiceRoute(t *testing.T) {
-	plan, err := declaration.Compile(nacosDocument())
+	plan, err := gatewayplan.Compile(nacosDocument())
 	if err != nil {
 		t.Fatal(err)
 	}

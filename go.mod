@@ -30,9 +30,9 @@ require (
 	github.com/neteast-software/go-module/graph/console/linker v0.1.1
 	github.com/neteast-software/go-module/http/client v0.4.0
 	github.com/neteast-software/go-module/http/client/linker v0.4.0
-	github.com/neteast-software/go-module/http/gateway v0.1.0
-	github.com/neteast-software/go-module/http/gateway/declaration v0.1.0
-	github.com/neteast-software/go-module/http/gateway/linker v0.2.0
+	github.com/neteast-software/go-module/http/gateway v0.2.0
+	github.com/neteast-software/go-module/http/gateway/declaration v0.2.0
+	github.com/neteast-software/go-module/http/gateway/linker v0.3.0
 	github.com/neteast-software/go-module/http/gin v0.5.0
 	github.com/neteast-software/go-module/linker/server v0.4.1
 	github.com/neteast-software/go-module/mq/consumer v0.2.0
@@ -66,7 +66,7 @@ require (
 	github.com/neteast-software/go-module/user/account v0.4.0
 	github.com/neteast-software/go-module/worker/periodic v0.1.0
 	github.com/neteast-software/go-module/worker/periodic/linker v0.4.0
-	github.com/neteast-software/linker/v3 v3.9.0
+	github.com/neteast-software/linker/v3 v3.9.1
 	google.golang.org/grpc v1.82.1
 	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af
 	gorm.io/gorm v1.31.1
