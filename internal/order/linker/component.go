@@ -38,8 +38,8 @@ func (p *Component) Capabilities() linker.Capabilities {
 func (p *Component) Assets(context.Context, linker.Runtime) ([]linker.Asset, error) {
 	assets := http.Assets(orderhttp.Routes()...)
 	return append(assets,
-		graphconsole.PageAsset("order.list", orderconsole.List()),
-		graphconsole.PageAsset("order.form", orderconsole.Form()),
+		graphconsole.PageAsset("/console/page/order.list", orderconsole.List()),
+		graphconsole.PageAsset("/console/page/order.form", orderconsole.Form()),
 		graphconsole.ResourceAsset(acl.NewResource(
 			order.List,
 			acl.Scope("console", 1, "后台订单列表", acl.Read),

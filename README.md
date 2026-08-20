@@ -48,7 +48,8 @@ linker route check --file config/gateway.routes.yaml
 - 数据：PostgreSQL 生命周期、GORM 对象、`model.Head`、数据范围和棕地表显式边界。
 - 服务：typed gRPC client/server、出站 HTTP client、Redis、Nacos、RocketMQ、cron、Worker 和 SSE。
 - 工作背景：health、Prometheus、OpenTelemetry、audit、fault、notice、license 和 outbox。
-- Graph Console：登录、session、菜单、权限、viewer、form、multilist、chart、theme 和 layout。
+- Graph Console：`graph.console/v2`、GraphPage、ClientPage、IframePage、菜单、权限、viewer、form、
+  multilist、chart、theme 和 layout。
 
 新建 server 的关系型数据库默认推荐 PostgreSQL。数据库只作为可替换仓库，业务关系、规则、
 权限和流程在所属 Go 能力中自治；新能力不使用外键、自建函数、存储过程、触发器或数据库扩展

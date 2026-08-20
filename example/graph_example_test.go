@@ -165,8 +165,13 @@ func TestGraphConsoleExample(t *testing.T) {
 	}
 
 	entry := getJSON(t, baseURL+"/console/entry", "")
-	if responseData(t, entry)["type"] != "config" {
+	entryData := responseData(t, entry)
+	if entryData["type"] != "config" || entryData["protocol"] != "graph.console/v2" {
 		t.Fatalf("unexpected entry: %#v", entry)
+	}
+	defaultTarget := responseMap(t, entryData["default"])
+	if defaultTarget["kind"] != "graph" || defaultTarget["value"] != "/console/page/dashboard" {
+		t.Fatalf("unexpected default target: %#v", defaultTarget)
 	}
 	loginPayload := postJSON(t, baseURL+"/console/login", map[string]any{
 		"method": "password",
@@ -179,8 +184,21 @@ func TestGraphConsoleExample(t *testing.T) {
 	}
 
 	menu := getJSON(t, baseURL+"/console/menu", access)
-	if responseData(t, menu)["type"] != "menu" {
+	menuData := responseData(t, menu)
+	if menuData["type"] != "menu" {
 		t.Fatalf("unexpected menu: %#v", menu)
+	}
+	for _, targetCase := range []struct {
+		kind  string
+		value string
+	}{
+		{"graph", "/console/page/order.list"},
+		{"client", "operations.overview"},
+		{"iframe", "https://docs.neteast.cn/linker-v3"},
+	} {
+		if !containsTarget(menuData, targetCase.kind, targetCase.value) {
+			t.Fatalf("menu missing target %#v: %#v", targetCase, menuData)
+		}
 	}
 	for _, pageCase := range []struct {
 		identity string
@@ -215,6 +233,27 @@ func TestGraphConsoleExample(t *testing.T) {
 	if responseData(t, valid)["number"] != "NO-20260716-009" {
 		t.Fatalf("unexpected saved order: %#v", valid)
 	}
+}
+
+func containsTarget(value any, kind string, target string) bool {
+	switch value := value.(type) {
+	case map[string]any:
+		if value["kind"] == kind && value["value"] == target {
+			return true
+		}
+		for _, child := range value {
+			if containsTarget(child, kind, target) {
+				return true
+			}
+		}
+	case []any:
+		for _, child := range value {
+			if containsTarget(child, kind, target) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func graphClaims(id uint64) token.Claims {

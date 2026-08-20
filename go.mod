@@ -26,14 +26,14 @@ require (
 	github.com/neteast-software/go-module/fault/event/linker v0.4.0
 	github.com/neteast-software/go-module/fault/notice v0.2.0
 	github.com/neteast-software/go-module/fault/notice/linker v0.4.0
-	github.com/neteast-software/go-module/graph/console v0.6.0
-	github.com/neteast-software/go-module/graph/console/linker v0.2.0
+	github.com/neteast-software/go-module/graph/console v0.7.1
+	github.com/neteast-software/go-module/graph/console/linker v0.3.0
 	github.com/neteast-software/go-module/http/client v0.4.0
 	github.com/neteast-software/go-module/http/client/linker v0.4.0
 	github.com/neteast-software/go-module/http/gateway v0.2.0
 	github.com/neteast-software/go-module/http/gateway/declaration v0.2.0
 	github.com/neteast-software/go-module/http/gateway/linker v0.3.0
-	github.com/neteast-software/go-module/http/gin v0.5.0
+	github.com/neteast-software/go-module/http/gin v0.6.0
 	github.com/neteast-software/go-module/linker/server v0.4.1
 	github.com/neteast-software/go-module/mq/consumer v0.2.0
 	github.com/neteast-software/go-module/mq/consumer/linker v0.4.1
@@ -237,7 +237,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
-	github.com/neteast-software/go-module/http/gin/linker v0.4.0
+	github.com/neteast-software/go-module/http/gin/linker v0.5.0
 	github.com/neteast-software/go-module/license v0.4.0
 	github.com/neteast-software/go-module/license/http/gin v0.4.0
 	github.com/neteast-software/go-module/registry/nacos v0.1.1

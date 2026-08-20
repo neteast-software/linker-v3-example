@@ -16,8 +16,8 @@ func New(options ...graphconsole.Option) *graphconsole.Component {
 	defaults := []graphconsole.Option{
 		graphconsole.ConfigureFrom(user.AuthKey(), provider.Configure),
 		graphconsole.WithEntry(console.Entry()),
-		graphconsole.WithMenu(console.Menu()),
-		graphconsole.WithPage("dashboard", dashboard.Page()),
+		graphconsole.WithMenuDeclaration(console.MenuDeclaration()),
+		graphconsole.WithPage("/console/page/dashboard", dashboard.Page()),
 		graphconsole.WithResources(
 			acl.NewResource(console.Dashboard, acl.Scope("console", 0, "后台工作台", acl.Read)),
 		),

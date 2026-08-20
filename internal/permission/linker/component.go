@@ -38,7 +38,7 @@ func (p *Component) Capabilities() linker.Capabilities {
 func (p *Component) Assets(context.Context, linker.Runtime) ([]linker.Asset, error) {
 	assets := http.Assets(permissionhttp.Routes()...)
 	return append(assets,
-		graphconsole.PageAsset("permission.role-resource", permissionconsole.Relation()),
+		graphconsole.PageAsset("/console/page/permission.role-resource", permissionconsole.Relation()),
 		graphconsole.ResourceAsset(acl.NewResource(
 			permission.Manage,
 			acl.Scope("console", 3, "角色权限配置", acl.Read|acl.Update),
