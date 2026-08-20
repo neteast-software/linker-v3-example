@@ -478,10 +478,10 @@ github.com/neteast-software/go-module/fault/notice v0.2.0 h1:zcMFaCsbEeLaLyeaU7D
 github.com/neteast-software/go-module/fault/notice v0.2.0/go.mod h1:4cVOoV3h+IGx5yQUx2H/xZgsMqgSOHLqDUsh9KNLs9c=
 github.com/neteast-software/go-module/fault/notice/linker v0.4.0 h1:nBaqto0Imz4vHraar5akaacY6w29LWRsC0gytHpE+aQ=
 github.com/neteast-software/go-module/fault/notice/linker v0.4.0/go.mod h1:tOTyJfx5sysPJpa2jKfs2TJlZBGTM+i9n5UiOrn2GGY=
-github.com/neteast-software/go-module/graph/console v0.5.0 h1:r+08t2BLIhns8A4JS+PHls86HYag+w96QvkQ8vm+8XQ=
-github.com/neteast-software/go-module/graph/console v0.5.0/go.mod h1:skim+4V8eOo4RhuFrWBl/Btv+jCLlgVQcrlzYth+FfE=
-github.com/neteast-software/go-module/graph/console/linker v0.1.1 h1:aSKOGI3Ovvn1o8wpS0b4TAuHavTo3NDEELYO95XlGEM=
-github.com/neteast-software/go-module/graph/console/linker v0.1.1/go.mod h1:fNNOiSdMLq0l5QcJ//xmHih7UjJc48BMwV9IYBHZqkY=
+github.com/neteast-software/go-module/graph/console v0.6.0 h1:w+zgtZO4sPL8aZfSpc7SpwW2btgdAYYwWGzYqgxBrfI=
+github.com/neteast-software/go-module/graph/console v0.6.0/go.mod h1:tg18VPfJFsZV9m4mK53n19WJK1uoMGpHpt3wpAcGqGc=
+github.com/neteast-software/go-module/graph/console/linker v0.2.0 h1:7PY8FzpV0nns1bf1biAzPehOwV/U/HKTuTMyHO0oR2w=
+github.com/neteast-software/go-module/graph/console/linker v0.2.0/go.mod h1:XykpJOXdMi+RCjPt5EK+VgUiXdAaDfWEq/L3u9PieJI=
 github.com/neteast-software/go-module/http/client v0.4.0 h1:zApBdmzxpk+cOhcYAfNuUmz3jfWSPC2Txw1/w46XdKc=
 github.com/neteast-software/go-module/http/client v0.4.0/go.mod h1:8lTuvlW+iO4O0gG7Iq5ATuk9xPR6jDciCnG1rHTCsNA=
 github.com/neteast-software/go-module/http/client/linker v0.4.0 h1:RhHO32hhVULuWii9uPUwU9tOcaEtE76fCr6+eHvoT6E=
@@ -578,8 +578,8 @@ github.com/neteast-software/go-module/registry/nacos v0.1.1 h1:SxICLFAYSA8itHbSV
 github.com/neteast-software/go-module/registry/nacos v0.1.1/go.mod h1:nrIYr3Exx4YiZBjdvUY3DLDa2PFKaUieSX5AjDxJKKE=
 github.com/neteast-software/go-module/registry/nacos/linker v0.4.0 h1:0BlW3EenWTFzLxgusbp3QXKaJQ8GJIGT40kFRIbm7h0=
 github.com/neteast-software/go-module/registry/nacos/linker v0.4.0/go.mod h1:mx9s6GytGszIAySg6RtO203DjYJLbykQcTCdqjoWg4E=
-github.com/neteast-software/go-module/registry/service v0.3.0 h1:fgnHLjloFhn6wATAbr2fiqf6Qh1dYaEnpuL9wHujSKk=
-github.com/neteast-software/go-module/registry/service v0.3.0/go.mod h1:/ZlonhLrSdPMvV4pZjMCqCuAxbYFA84XmFuAANriS9s=
+github.com/neteast-software/go-module/registry/service v0.4.0 h1:n6DXYVvTte6nVvXdp3a01nfGwJ6PQq2K1/GBTekaK2Q=
+github.com/neteast-software/go-module/registry/service v0.4.0/go.mod h1:/ZlonhLrSdPMvV4pZjMCqCuAxbYFA84XmFuAANriS9s=
 github.com/neteast-software/go-module/registry/service/linker v0.4.0 h1:xibRPpVxVy8bEAPdHThhdOL8WQe9P0z2dN0gIk8Gm8k=
 github.com/neteast-software/go-module/registry/service/linker v0.4.0/go.mod h1:VmIHwlk10z6ppCCqboVdKYMuq3DHTf6q3Y6BVfu5wHY=
 github.com/neteast-software/go-module/registry/service/nacos v0.4.0 h1:+UbGAnxggoane4bwhTu884qWgZzXYlMVDbdIzja07nY=

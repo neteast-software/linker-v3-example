@@ -26,8 +26,8 @@ require (
 	github.com/neteast-software/go-module/fault/event/linker v0.4.0
 	github.com/neteast-software/go-module/fault/notice v0.2.0
 	github.com/neteast-software/go-module/fault/notice/linker v0.4.0
-	github.com/neteast-software/go-module/graph/console v0.5.0
-	github.com/neteast-software/go-module/graph/console/linker v0.1.1
+	github.com/neteast-software/go-module/graph/console v0.6.0
+	github.com/neteast-software/go-module/graph/console/linker v0.2.0
 	github.com/neteast-software/go-module/http/client v0.4.0
 	github.com/neteast-software/go-module/http/client/linker v0.4.0
 	github.com/neteast-software/go-module/http/gateway v0.2.0
@@ -55,7 +55,7 @@ require (
 	github.com/neteast-software/go-module/observe/tracing/rpc/grpc v0.3.1
 	github.com/neteast-software/go-module/outbox v0.2.0
 	github.com/neteast-software/go-module/registry/discovery/nacos/linker v0.1.0
-	github.com/neteast-software/go-module/registry/service v0.3.0
+	github.com/neteast-software/go-module/registry/service v0.4.0
 	github.com/neteast-software/go-module/registry/service/nacos/linker v0.4.0
 	github.com/neteast-software/go-module/rpc/grpc v0.3.1
 	github.com/neteast-software/go-module/rpc/grpc/linker v0.4.0

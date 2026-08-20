@@ -149,7 +149,7 @@ func TestGraphConsoleExample(t *testing.T) {
 		}
 	})
 	if _, ok := graphconsole.Resolve(app); !ok {
-		t.Fatal("Graph Console service capability 未发布")
+		t.Fatal("Graph Console service capability 不可用")
 	}
 
 	httpServer, err := http.RequireServer(app)
