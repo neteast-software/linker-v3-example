@@ -10,14 +10,9 @@ import (
 func Entry() configprotocol.Entry {
 	value := configprotocol.New(
 		"Linker v3 Example",
-		protocol.Native("dashboard"),
-		configprotocol.Pages(
-			configprotocol.Multiple,
-			configprotocol.Native("dashboard", "工作台"),
-			configprotocol.Native("order.list", "订单列表"),
-			configprotocol.Native("order.form", "订单维护"),
-			configprotocol.Native("permission.role-resource", "角色权限"),
-		),
+		protocol.Graph("/console/page/dashboard"),
+		configprotocol.Pages(configprotocol.Multiple),
+		configprotocol.IframeOrigins("https://docs.neteast.cn"),
 		configprotocol.Themes("default", Theme()),
 	)
 	value.Login = []login.Method{

@@ -4,7 +4,7 @@
 server framework、自治能力、HTTP route、ACL、PostgreSQL、RPC、MQ、动态配置、可观测性和
 graceful shutdown 如何闭环，不把演示业务模型当成公司统一模型。
 
-当前工具链基线为 Go `1.26.5`，已发布 framework 基线为 Linker `v3.7.0`。默认分支只使用
+当前工具链基线为 Go `1.26.6`，已发布 framework 基线为 Linker `v3.14.3`。默认分支只使用
 远端可追溯版本，不依赖本地 `replace`；候选契约的源码联调不得冒充正式消费闭环。精确依赖以
 `go.mod` 为准。
 
@@ -35,7 +35,8 @@ go run . --gateway
 linker route check --file config/gateway.routes.yaml
 ```
 
-它只加载 Gateway YAML、独立路由声明和 env override，不装配 DB/RPC 等普通 server 背景。
+它只加载 Gateway YAML、独立路由声明和 env override，不装配 DB/RPC 等普通 server 背景；
+`GET /gateway/info` 是源码拥有的本地端点，不进入远程路由配置。
 `vendorauth.Protect`、`session.Protect/Socket/UploadRoute`、`captcha.Login` 和 `accesslog.New`
 分别是开放平台、普通会话、验证码和审计的 canonical package 入口；完整语法与 Nacos profile
 见 [`docs/run.md`](docs/run.md)，纵向边界见 [`docs/scaffold.md`](docs/scaffold.md)。
@@ -44,11 +45,13 @@ linker route check --file config/gateway.routes.yaml
 
 - framework：`New / Use / Run`、依赖拓扑、typed capability、Asset、Plan 和反向关闭漏斗。
 - HTTP：能力局部 `RouteSet`、文件级 API 声明、middleware 影响面、ACL Resource 和统一 response。
-- Gateway：静态/Nacos upstream、纵向入口策略、声明热更新、管理探针、指标、trace 和请求排空。
+- Gateway：method+path、静态/Nacos upstream、本地端点、纵向入口策略、声明热更新、管理探针、指标、
+  trace 和请求排空。
 - 数据：PostgreSQL 生命周期、GORM 对象、`model.Head`、数据范围和棕地表显式边界。
 - 服务：typed gRPC client/server、出站 HTTP client、Redis、Nacos、RocketMQ、cron、Worker 和 SSE。
 - 工作背景：health、Prometheus、OpenTelemetry、audit、fault、notice、license 和 outbox。
-- Graph Console：登录、session、菜单、权限、viewer、form、multilist、chart、theme 和 layout。
+- Graph Console：`graph.console/v2`、GraphPage、ClientPage、IframePage、菜单、权限、viewer、form、
+  multilist、chart、theme 和 layout。
 
 新建 server 的关系型数据库默认推荐 PostgreSQL。数据库只作为可替换仓库，业务关系、规则、
 权限和流程在所属 Go 能力中自治；新能力不使用外键、自建函数、存储过程、触发器或数据库扩展

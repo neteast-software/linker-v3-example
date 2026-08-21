@@ -16,21 +16,21 @@ func Document(routes ...declaration.Route) declaration.Document {
 	}
 }
 
-// URL 声明固定 HTTP origin 路由。
-func URL(id, path, origin string) declaration.Route {
+// URL 声明固定 HTTP origin 路由；method 为空时匹配任意 HTTP method。
+func URL(id, path, origin string, methods ...string) declaration.Route {
 	return declaration.Route{
 		ID:       id,
-		Match:    declaration.Match{Paths: []string{path}},
+		Match:    declaration.Match{Paths: []string{path}, Methods: append([]string(nil), methods...)},
 		Upstream: declaration.Upstream{URL: origin},
 		Timeout:  declaration.NewTimeout(5 * time.Second),
 	}
 }
 
-// Service 声明通过中立 discovery capability 解析的路由。
-func Service(id, path, service string) declaration.Route {
+// Service 声明通过中立 discovery capability 解析的路由；method 为空时匹配任意 HTTP method。
+func Service(id, path, service string, methods ...string) declaration.Route {
 	return declaration.Route{
 		ID:       id,
-		Match:    declaration.Match{Paths: []string{path}},
+		Match:    declaration.Match{Paths: []string{path}, Methods: append([]string(nil), methods...)},
 		Upstream: declaration.Upstream{Service: service},
 		Timeout:  declaration.NewTimeout(5 * time.Second),
 	}

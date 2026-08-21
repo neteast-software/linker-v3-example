@@ -1,7 +1,17 @@
 # Graph Console 运行方式
 
-Graph Console 的 Go 协议和 Component 位于 `go-module/graph/console`，浏览器实现位于
-独立的 `graph-console` 仓库。本项目只演示业务装配，不复制协议或前端源码。
+Graph Console 的 Go 协议位于 `go-module/graph/console`，独立 Linker adapter 位于
+`go-module/graph/console/linker`，浏览器实现位于独立的 `graph-console` 仓库。本项目只演示业务
+装配，不复制协议或前端源码。业务 page/resource 由 `internal/<capability>/linker` 使用 typed Asset
+自治声明；`internal/console/linker` 只保留 dashboard 和系统级 menu/session/provider 装配。
+
+本项目显式消费 `graph.console/v2`：GraphPage 使用完整 PageURI，ClientPage 使用业务前端 catalog
+拥有的唯一 identity，IframePage 使用经过 entry allowlist 允许的 URL。唯一系统菜单位于
+`internal/console/menu.yaml`，其 schema 为 `graph.console.menu.v2`。
+
+历史系统缺少 `protocol` 时，由业务前端 Shell 的版本选择层命中 `naive-v2`；显式
+`graph.console/v2` 命中 `graph-console-v2`。这是一轮确定性选择，不是请求失败后的 fallback。
+本 Go 示例始终输出显式 v2，不在后端复制历史协议或 renderer runtime。
 
 ## 1. Fixture
 

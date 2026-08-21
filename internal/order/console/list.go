@@ -32,7 +32,7 @@ func List() *viewer.Viewer[order.Order] {
 		Buttons(
 			button.Open(
 				"维护订单",
-				protocol.Native("order.form"),
+				protocol.Graph("/console/page/order.form"),
 				button.Resource(order.Update, permission.Update),
 				button.WithStatus(button.Primary),
 			),
@@ -40,7 +40,7 @@ func List() *viewer.Viewer[order.Order] {
 		Rows(
 			button.Run(
 				"编辑",
-				behavior.Redirect(protocol.Native("order.form")).From("id"),
+				behavior.Redirect(protocol.Graph("/console/page/order.form")).From("id"),
 				button.Resource(order.Update, permission.Update),
 				button.WithKeys("id"),
 			),

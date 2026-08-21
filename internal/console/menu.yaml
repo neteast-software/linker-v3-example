@@ -1,0 +1,59 @@
+schema_version: graph.console.menu.v2
+identity: console.menu
+items:
+  - id: dashboard
+    kind: page
+    title: 工作台
+    icon: LayoutDashboard
+    resource: console.dashboard
+    target:
+      kind: graph
+      value: /console/page/dashboard
+  - id: business
+    kind: group
+    title: 业务演示
+    children:
+      - id: order.list
+        kind: page
+        title: 订单列表
+        icon: List
+        resource: console.order.list
+        target:
+          kind: graph
+          value: /console/page/order.list
+      - id: order.form
+        kind: page
+        title: 订单维护
+        icon: SquarePen
+        resource: http.app2.order.update
+        target:
+          kind: graph
+          value: /console/page/order.form
+  - id: permission
+    kind: group
+    title: 权限演示
+    children:
+      - id: permission.role-resource
+        kind: page
+        title: 角色权限
+        icon: ShieldCheck
+        resource: console.permission.role-resource
+        target:
+          kind: graph
+          value: /console/page/permission.role-resource
+  - id: page-source
+    kind: group
+    title: 页面来源
+    children:
+      - id: operations.overview
+        kind: page
+        title: 前端运营概览
+        target:
+          kind: client
+          value: operations.overview
+      - id: linker.docs
+        kind: page
+        title: Linker 文档
+        target:
+          kind: iframe
+          value: https://docs.neteast.cn/linker-v3

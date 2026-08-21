@@ -40,7 +40,7 @@ func Page() *layout.Layout {
 		Encode(chart.XY("time", "value")).
 		Axes(chart.CategoryAxis("时间"), chart.ValueAxis("请求数")).
 		Interact(
-			chart.On(chart.Click, behavior.Redirect(protocol.Native("order.list"))).
+			chart.On(chart.Click, behavior.Redirect(protocol.Graph("/console/page/order.list"))).
 				Protect(order.List, permission.Read),
 		)
 	value := layout.Flowing(

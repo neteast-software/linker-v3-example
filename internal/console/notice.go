@@ -9,7 +9,7 @@ import (
 )
 
 func (p *Provider) List(_ context.Context, _ string) ([]notification.Notice, error) {
-	target := protocol.Native("order.list")
+	target := protocol.Graph("/console/page/order.list")
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 	_, firstRead := p.read["order-delayed"]

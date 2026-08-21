@@ -58,10 +58,12 @@ config/gateway.example.yaml -> config/gateway.routes.yaml -> APP_ env override
 ```bash
 go run . --gateway
 curl http://127.0.0.1:8810/live
+curl http://127.0.0.1:8810/gateway/info
 curl http://127.0.0.1:8810/example/live
 ```
 
 `/live`、`/ready` 和 `/startup` 由 Gateway listener 直接回答，不经过 Route 或 upstream。
+`GET /gateway/info` 是业务源码拥有的本地 endpoint，与代理共用 listener，但不会写入 Route YAML。
 loopback 管理 listener 在 `127.0.0.1:8820` 提供 `/metrics` 和 framework 健康面。普通 server
 与 Gateway 可以独立发布，Gateway profile 不装配 PostgreSQL、RPC 或 MQ。
 
@@ -74,7 +76,8 @@ linker route diff candidate.yaml --file config/gateway.routes.yaml
 ```
 
 `add/remove` 会先编译完整候选 Plan，再原子替换文件；运行中 Route 热更新仍由配置 Source
-负责，CLI 不连接 Gateway 进程。
+负责，CLI 不连接 Gateway 进程。`match.methods` 缺省时匹配任意 method；新路由应在业务事实明确时
+显式声明 method。
 
 Nacos 服务发现 profile 显式启用 `registry/nacos` 和 `registry/discovery/nacos`：
 

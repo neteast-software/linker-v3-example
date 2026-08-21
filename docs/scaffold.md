@@ -47,6 +47,9 @@ internal/user/
 │   ├── routes.go
 │   ├── profile.go
 │   └── user_login.go
+├── console/
+│   ├── list.go
+│   └── form.go
 └── linker/
     ├── component.go
     └── config.go
@@ -57,11 +60,18 @@ internal/user/
 ```text
 app -> capability/linker -> capability
                      └── capability/http
+                     └── capability/console
 capability/http -> capability
+capability/console -> capability
 capability -> autonomous modules
 ```
 
 能力根 package 不反向依赖 `app`、`http` 或 `linker`。末级目录只有在它本身就是调用能力时才适合作为 package 名；`http`、`linker` 只是技术路径，因此其中的 package 仍使用 `user`、`order` 等业务名。
+
+Graph Console 页面也是能力内部的协议适配。`internal/<capability>/console` 拥有页面对象、交互和
+资源引用；不能放入全局 `internal/console/<capability>`，也不能让 composition root 拥有页面
+实现。Graph Console adapter 尚未发布 owner Asset 契约时，中央装配可以临时引用这些对象；正式
+契约可用后必须由 capability lifecycle adapter 自治声明页面与 Resource Asset。
 
 一个文件保持一个重心。对象、流程或适配器形成稳定中心后单独成文件；很轻的聚合关系可以同文件保留。不要为了对象化制造没有状态、策略、生命周期、反馈或审计闭环的包装。
 
@@ -148,6 +158,7 @@ component := gateway.New(
     document,
     gateway.WithConfig(config),
     gateway.WithDiscovery(provider),
+    gateway.WithHandlers(projectgateway.Endpoints()...),
     gateway.WithFilters(vendorFilter, sessionFilter, captchaFilter),
 )
 return server.New(server.WithGateway(component)), nil
@@ -160,7 +171,7 @@ internal/vendorauth/   # 开放平台 JWT、scope、证书绑定和 route decora
 internal/session/      # 普通 session、WebSocket 和上传兼容策略
 internal/captcha/      # 一次性 challenge 和登录 route decoration
 internal/accesslog/    # 脱敏记录、有界投递 worker 和消息适配
-internal/gateway/      # 仅保留当前项目的 Route Document 组合
+internal/gateway/      # 当前项目的 Route Document 与源码本地 endpoint
 ```
 
 route 调用只表达业务影响面：
@@ -170,12 +181,16 @@ route := vendorauth.Protect(gateway.URL(
     "vendor/equipment",
     "/vendor/equipment/**",
     equipmentOrigin,
+    http.MethodGet,
+    http.MethodHead,
 ), "equipment-read")
 ```
 
 策略能力自行声明 Filter factory 和 route decoration；`app` 不解析 policy map，也不维护
 filter switch。内部身份 Header 先在可信入口统一清理，再由已经验证的能力投影。Nacos、
-Redis 和 RocketMQ 只通过各自 adapter 接入，不进入 Gateway core。
+Redis 和 RocketMQ 只通过各自 adapter 接入，不进入 Gateway core。未声明 method 的历史 Route
+继续匹配任意 method；源码本地 endpoint 使用标准 `net/http` pattern、优先于代理 Plan，且不进入
+可远程热更新的 Route YAML。
 
 ## 持久化对象
 

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"net/http"
 	"time"
 
 	audit "github.com/neteast-software/go-module/audit/operate"
@@ -74,6 +75,7 @@ func gatewayApp(
 	component := gatewaycomponent.New(
 		document,
 		gatewaycomponent.WithConfig(config),
+		gatewaycomponent.WithHandlers(examplegateway.Endpoints()...),
 		gatewaycomponent.WithFilters(vendorFilter, sessionFilter, session.Upload(nil, sessions), captchaFilter),
 		gatewaycomponent.WithGateway(gatewaycore.Observers(
 			gatewaymetrics.Observe(metrics),
@@ -103,36 +105,50 @@ func gatewayManagementConfig() httpcore.Config {
 
 func localDocument() declaration.Document {
 	return examplegateway.Document(
-		examplegateway.Strip(examplegateway.URL("local/public", "/example/**", localUpstream), 1),
+		examplegateway.Strip(examplegateway.URL(
+			"local/public", "/example/**", localUpstream, http.MethodGet, http.MethodHead,
+		), 1),
 		examplegateway.Strip(
 			vendorauth.Protect(
-				examplegateway.URL("local/vendor-equipment", "/vendor/equipment/**", localUpstream),
+				examplegateway.URL(
+					"local/vendor-equipment", "/vendor/equipment/**", localUpstream, http.MethodGet, http.MethodHead,
+				),
 				"equipment-read",
 			),
 			2,
 		),
 		examplegateway.Strip(
 			session.Protect(
-				examplegateway.URL("local/profile", "/session/profile/**", localUpstream),
+				examplegateway.URL(
+					"local/profile", "/session/profile/**", localUpstream, http.MethodGet, http.MethodHead,
+				),
 				"profile.read",
 				"console",
 			),
 			2,
 		),
 		examplegateway.Strip(
-			captcha.Login(examplegateway.URL("local/login", "/login/**", localUpstream)),
+			captcha.Login(examplegateway.URL("local/login", "/login/**", localUpstream, http.MethodPost)),
 			1,
 		),
 		examplegateway.Strip(
-			session.Socket(examplegateway.URL("local/socket", "/socket/**", localUpstream), "/socket/"),
+			session.Socket(
+				examplegateway.URL("local/socket", "/socket/**", localUpstream, http.MethodGet), "/socket/",
+			),
 			1,
 		),
 		examplegateway.Strip(
-			session.UploadRoute(examplegateway.URL("local/upload", "/file/upload/file", localUpstream)),
+			session.UploadRoute(examplegateway.URL(
+				"local/upload", "/file/upload/file", localUpstream, http.MethodPost,
+			)),
 			2,
 		),
 		examplegateway.Strip(
-			session.Protect(examplegateway.URL("local/file", "/file/**", localUpstream), "file.read", ""),
+			session.Protect(
+				examplegateway.URL("local/file", "/file/**", localUpstream, http.MethodGet, http.MethodHead),
+				"file.read",
+				"",
+			),
 			1,
 		),
 	)

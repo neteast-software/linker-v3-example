@@ -32,8 +32,11 @@ func TestScaffoldUsesCapabilityRoots(t *testing.T) {
 }
 
 func TestScaffoldAdaptersKeepCapabilityPackageName(t *testing.T) {
-	for _, adapter := range []string{"client", "http", "linker"} {
+	for _, adapter := range []string{"client", "console", "http", "linker"} {
 		for _, file := range adapterFiles(t, adapter) {
+			if adapter == "console" && filepath.Clean(filepath.Dir(file)) == filepath.Clean("../internal/console") {
+				continue
+			}
 			parsed, err := parser.ParseFile(token.NewFileSet(), file, nil, parser.PackageClauseOnly)
 			if err != nil {
 				t.Fatalf("解析 %s: %v", file, err)
@@ -45,6 +48,19 @@ func TestScaffoldAdaptersKeepCapabilityPackageName(t *testing.T) {
 			if parsed.Name.Name != capability {
 				t.Fatalf("%s 是 %s 的适配层，package 应为 %q，实际为 %q", file, capability, capability, parsed.Name.Name)
 			}
+		}
+	}
+}
+
+func TestScaffoldKeepsConsolePagesWithCapabilityOwner(t *testing.T) {
+	for _, capability := range []string{"order", "permission"} {
+		legacy := filepath.Join("../internal/console", capability)
+		if _, err := os.Stat(legacy); !os.IsNotExist(err) {
+			t.Fatalf("业务 Console 页面不应留在全局 Console 目录 %s: %v", legacy, err)
+		}
+		owned := filepath.Join("../internal", capability, "console")
+		if entries, err := os.ReadDir(owned); err != nil || len(entries) == 0 {
+			t.Fatalf("%s 缺少 capability-owned Console 页面: %v", capability, err)
 		}
 	}
 }
