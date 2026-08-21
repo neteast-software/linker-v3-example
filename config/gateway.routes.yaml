@@ -4,6 +4,7 @@ plan:
     - id: local/public
       match:
         paths: [/example/**]
+        methods: [GET, HEAD]
       upstream:
         url: http://127.0.0.1:8800
       filters:
@@ -12,6 +13,7 @@ plan:
     - id: local/vendor-equipment
       match:
         paths: [/vendor/equipment/**]
+        methods: [GET, HEAD]
       upstream:
         url: http://127.0.0.1:8800
       filters:
@@ -24,6 +26,7 @@ plan:
     - id: local/profile
       match:
         paths: [/session/profile/**]
+        methods: [GET, HEAD]
       upstream:
         url: http://127.0.0.1:8800
       filters:
@@ -37,6 +40,7 @@ plan:
     - id: local/login
       match:
         paths: [/login/**]
+        methods: [POST]
       upstream:
         url: http://127.0.0.1:8800
       filters:
@@ -47,6 +51,7 @@ plan:
     - id: local/socket
       match:
         paths: [/socket/**]
+        methods: [GET]
       upstream:
         url: http://127.0.0.1:8800
       filters:
@@ -59,6 +64,7 @@ plan:
     - id: local/upload
       match:
         paths: [/file/upload/file]
+        methods: [POST]
       upstream:
         url: http://127.0.0.1:8800
       filters:
@@ -69,6 +75,7 @@ plan:
     - id: local/file
       match:
         paths: [/file/**]
+        methods: [GET, HEAD]
       upstream:
         url: http://127.0.0.1:8800
       filters:

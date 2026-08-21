@@ -30,9 +30,9 @@ require (
 	github.com/neteast-software/go-module/graph/console/linker v0.3.0
 	github.com/neteast-software/go-module/http/client v0.4.0
 	github.com/neteast-software/go-module/http/client/linker v0.4.0
-	github.com/neteast-software/go-module/http/gateway v0.2.0
-	github.com/neteast-software/go-module/http/gateway/declaration v0.2.0
-	github.com/neteast-software/go-module/http/gateway/linker v0.3.0
+	github.com/neteast-software/go-module/http/gateway v0.3.0
+	github.com/neteast-software/go-module/http/gateway/declaration v0.3.0
+	github.com/neteast-software/go-module/http/gateway/linker v0.4.0
 	github.com/neteast-software/go-module/http/gin v0.6.0
 	github.com/neteast-software/go-module/linker/server v0.4.1
 	github.com/neteast-software/go-module/mq/consumer v0.2.0

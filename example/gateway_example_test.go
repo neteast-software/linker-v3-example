@@ -85,6 +85,24 @@ func TestGatewayRecommendedWorkingBackground(t *testing.T) {
 	if body := gatewayExampleGET(t, address, "/example/profile"); body != "first:/profile" {
 		t.Fatalf("initial body = %q", body)
 	}
+	if body := gatewayExampleGET(t, address, "/gateway/info"); body != "{\"service\":\"linker-v3-example\"}\n" {
+		t.Fatalf("local endpoint body = %q", body)
+	}
+	request, err := http.NewRequest(http.MethodPost, "http://"+address+"/example/profile", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = response.Body.Close()
+	if response.StatusCode != http.StatusNotFound {
+		t.Fatalf("POST /example/profile status = %d", response.StatusCode)
+	}
+	if calls := firstCalls.Load(); calls != 1 {
+		t.Fatalf("method 未命中的请求进入了 upstream，calls=%d", calls)
+	}
 
 	source.updates <- linker.SourceSnapshot{
 		Revision: "routes-2",
@@ -152,7 +170,10 @@ func TestGatewayRecommendedWorkingBackground(t *testing.T) {
 func gatewayExampleSetting(t *testing.T, address, managementAddress, origin string) linker.Setting {
 	t.Helper()
 	document := examplegateway.Document(
-		examplegateway.Strip(examplegateway.URL("local/public", "/example/**", origin), 1),
+		examplegateway.Strip(
+			examplegateway.URL("local/public", "/example/**", origin, http.MethodGet, http.MethodHead),
+			1,
+		),
 	)
 	routes, err := declaration.Encode(document)
 	if err != nil {
